@@ -9,6 +9,7 @@ version = "0.1.0"
 
 
 dependencies = [
+    "boutiques",
     "pandas",
     "numpy",
     "joblib",
@@ -19,7 +20,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = [
+    "pytest",
+    "fids@git+https://github.com/neurodatascience/FIDS.git",
+]
 
 # alias in case of typo
 tests = ["nipoppy[test]"]
@@ -31,6 +35,9 @@ packages = ["nipoppy"]
 include = [
     "nipoppy/workflow/proc_pipe/tractoflow/tractoflow",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.codespell]
 skip = '.git,.github,*.pdf,*.svg,pyproject.toml,*.ipynb,*.html,ppmi_imaging_descriptions.json'

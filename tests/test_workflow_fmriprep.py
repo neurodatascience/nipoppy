@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-from .conftest import global_config_for_testing
+from .conftest import global_configs_for_testing
 
 import nipoppy.workflow.logger as my_logger
 import nipoppy.workflow.proc_pipe.fmriprep.run_fmriprep as fmriprep_module
@@ -51,7 +51,7 @@ def test_run(tmp_path, use_bids_filter, anat_only):
 
     run(
         participant_id=participant_id,
-        global_configs=global_config_for_testing(tmp_path),
+        global_configs=global_configs_for_testing(tmp_path),
         session_id=session_id,
         output_dir=tmp_path,
         use_bids_filter=use_bids_filter,
@@ -68,7 +68,7 @@ def test_run_fmriprep(tmp_path, use_bids_filter, anat_only):
     log_file = tmp_path / "fmriprep.log"
 
     bids_dir = "bids_dir"
-    proc_dir = "fmripre_proc"
+    proc_dir = "fmriprep_proc"
     fmriprep_dir = tmp_path / "fmriprep_dir"
     fs_dir = "fs_dir"
     templateflow_dir = "templateflow_dir"
@@ -91,21 +91,21 @@ def test_run_fmriprep(tmp_path, use_bids_filter, anat_only):
     expected_cmd = [
         'singularity', 'run', 
             '-B', f'{bids_dir}:{bids_dir}',
-            '-B', f'{proc_dir}:/fmriprep_proc',  
-            '-B', f'{fmriprep_dir}/output/fmriprep_home_{participant_id}/:/home/fmriprep', 
+            '-B', f'{fmriprep_dir}/output//fmriprep_home_{participant_id}/:/home/fmriprep', 
             '--home', '/home/fmriprep', 
             '--cleanenv', 
             '-B', f'{fmriprep_dir}/output/:/output', 
+            '-B', f'{proc_dir}:/fmriprep_proc',  
             '-B', f'{templateflow_dir}:/templateflow', 
             '-B', f'{fmriprep_dir}:/work', 
             '-B', f'{fs_dir}:/fsdir/', 
-                singularity_container, '/data_dir', '/output', 'participant', 
+                singularity_container, bids_dir, '/output', 'participant', 
                     '--participant-label', participant_id, 
                     '-w', '/work', 
                     '--output-spaces', 'MNI152NLin2009cAsym:res-2', 'anat', 'fsnative', 
                     '--fs-subjects-dir', '/fsdir/', 
                     '--skip_bids_validation', 
-                    '--bids-database-dir', '/fmripre_proc/bids_db_fmriprep', 
+                    '--bids-database-dir', '/fmriprep_proc/bids_db_fmriprep', 
                     '--fs-license-file', '/fsdir/license.txt', 
                     '--return-all-components', 
                     '-v', 
@@ -117,7 +117,7 @@ def test_run_fmriprep(tmp_path, use_bids_filter, anat_only):
     # fmt: on
 
     if use_bids_filter:
-        expected_cmd += ["--bids-filter-file", "/fmripre_proc/bids_filter_fmriprep.json"]
+        expected_cmd += ["--bids-filter-file", "/fmriprep_proc/bids_filter_fmriprep.json"]
 
     if anat_only:
         expected_cmd += ["--anat-only"]

@@ -1,0 +1,368 @@
+{
+    "name": "mriqc",
+    "description": "mriqc",
+    "tool-version": "23.1.0",
+    "schema-version": "0.5",
+    "command-line": "[[NIPOPPY_SINGULARITY_PATH]] run [[NIPOPPY_SINGULARITY_FLAGS]] [[NIPOPPY_FPATH_CONTAINER]] [[NIPOPPY_DPATH_BIDS]] [[NIPOPPY_DPATH_OUTPUT]] [ANALYSIS_LEVEL] --work-dir [[NIPOPPY_DPATH_WORK]] --bids-database-dir [[NIPOPPY_DPATH_BIDS_DB]] [VERBOSE_COUNT] [SPECIES] [PARTICIPANT_LABEL] [SESSION_ID] [RUN_ID] [TASK_ID] [MODALITIES] [DSNAME] [BIDS_DATABASE_WIPE] [NPROCS] [OMP_NTHREADS] [MEMORY_GB] [DEBUG] [FLOAT32] [PDB] [VERBOSE_REPORTS] [REPORTS_ONLY] [WRITE_GRAPH] [DRY_RUN] [RESOURCE_MONITOR] [USE_PLUGIN] [NO_SUB] [EMAIL] [WEBAPI_URL] [WEBAPI_PORT] [UPLOAD_STRICT] [NOTRACK] [ANTS_FLOAT] [ANTS_SETTINGS] [FFT_SPIKES_DETECTOR] [FD_THRES] [DEOBLIQUE] [DESPIKE] [START_IDX] [STOP_IDX]",
+    "inputs": [
+        {
+            "id": "analysis_level",
+            "name": "analysis_level",
+            "description": "Level of the analysis that will be performed. Multiple participant level analyses can be run independently (in parallel) using the same output_dir.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[ANALYSIS_LEVEL]",
+            "list": true,
+            "value-choices": [
+                "participant",
+                "group"
+            ]
+        },
+        {
+            "id":            "verbose_count",
+            "name":          "Verbose output",
+            "description":   "Increases log verbosity for each occurrence, debug level is -vvv",
+            "type":          "String",
+            "optional":      true,
+            "value-key":     "[VERBOSE_COUNT]",
+            "value-choices": [
+                "-v",
+                "-vv",
+                "-vvv"
+            ]
+        },
+        {
+            "id": "species",
+            "name": "species",
+            "description": "Use appropriate template for population",
+            "optional": true,
+            "type": "String",
+            "value-key": "[SPECIES]",
+            "default-value": "human",
+            "value-choices": [
+                "human",
+                "rat"
+            ],
+            "command-line-flag": "--species"
+        },
+        {
+            "id": "participant_label",
+            "name": "participant_label",
+            "description": "A space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed).",
+            "optional": true,
+            "type": "String",
+            "value-key": "[PARTICIPANT_LABEL]",
+            "list": true,
+            "command-line-flag": "--participant-label"
+        },
+        {
+            "id": "session_id",
+            "name": "session_id",
+            "description": "Filter input dataset by session ID.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[SESSION_ID]",
+            "command-line-flag": "--session-id"
+        },
+        {
+            "id": "run_id",
+            "name": "run_id",
+            "description": "Filter input dataset by run ID (only integer run IDs are valid).",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[RUN_ID]",
+            "command-line-flag": "--run-id"
+        },
+        {
+            "id": "task_id",
+            "name": "task_id",
+            "description": "Filter input dataset by task ID.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[TASK_ID]",
+            "command-line-flag": "--task-id"
+        },
+        {
+            "id": "modalities",
+            "name": "modalities",
+            "description": "Filter input dataset by MRI type.",
+            "optional": true,
+            "type": "String",
+            "list": true,
+            "value-key": "[MODALITIES]",
+            "default-value": [
+                "T1w",
+                "T2w",
+                "bold",
+                "dwi"
+            ],
+            "value-choices": [
+                "T1w",
+                "T2w",
+                "bold",
+                "dwi"
+            ],
+            "command-line-flag": "-m"
+        },
+        {
+            "id": "dsname",
+            "name": "dsname",
+            "description": "A dataset name.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[DSNAME]",
+            "command-line-flag": "--dsname"
+        },
+        {
+            "id": "bids_database_wipe",
+            "name": "bids_database_wipe",
+            "description": "Wipe out previously existing BIDS indexing caches, forcing re-indexing.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[BIDS_DATABASE_WIPE]",
+            "command-line-flag": "--bids-database-wipe"
+        },
+        {
+            "id": "nprocs",
+            "name": "nprocs",
+            "description": "Maximum number of simultaneously running parallel processes executed by *MRIQC* (e.g., several instances of ANTs' registration). However, when ``--nprocs`` is greater or equal to the ``--omp-nthreads`` option, it also sets the maximum number of threads that simultaneously running processes may aggregate (meaning, with ``--nprocs 16 --omp-nthreads 8`` a maximum of two 8-CPU-threaded processes will be running at a given time). Under this mode of operation, ``--nprocs`` sets the maximum number of processors that can be assigned work within an *MRIQC* job, which includes all the processors used by currently running single- and multi-threaded processes. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[NPROCS]",
+            "command-line-flag": "--nprocs"
+        },
+        {
+            "id": "omp_nthreads",
+            "name": "omp_nthreads",
+            "description": "Maximum number of threads that multi-threaded processes executed by *MRIQC* (e.g., ANTs' registration) can use. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[OMP_NTHREADS]",
+            "command-line-flag": "--omp-nthreads"
+        },
+        {
+            "id": "memory_gb",
+            "name": "memory_gb",
+            "description": "Upper bound memory limit for MRIQC processes.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[MEMORY_GB]",
+            "command-line-flag": "--mem"
+        },
+        {
+            "id": "debug",
+            "name": "debug",
+            "description": "Use testing settings for a minimal footprint.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[DEBUG]",
+            "command-line-flag": "--testing"
+        },
+        {
+            "id": "float32",
+            "name": "float32",
+            "description": "Cast the input data to float32 if it's represented in higher precision (saves space and improves performance).",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[FLOAT32]",
+            "default-value": true,
+            "command-line-flag": "-f"
+        },
+        {
+            "id": "pdb",
+            "name": "pdb",
+            "description": "Open Python debugger (pdb) on exceptions.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[PDB]",
+            "command-line-flag": "--pdb"
+        },
+        {
+            "id": "verbose_reports",
+            "name": "verbose_reports",
+            "description": "No description provided.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[VERBOSE_REPORTS]",
+            "command-line-flag": "--verbose-reports"
+        },
+        {
+            "id": "reports_only",
+            "name": "reports_only",
+            "description": "No description provided.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[REPORTS_ONLY]",
+            "command-line-flag": "--reports-only"
+        },
+        {
+            "id": "write_graph",
+            "name": "write_graph",
+            "description": "Write workflow graph.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[WRITE_GRAPH]",
+            "command-line-flag": "--write-graph"
+        },
+        {
+            "id": "dry_run",
+            "name": "dry_run",
+            "description": "Do not run the workflow.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[DRY_RUN]",
+            "command-line-flag": "--dry-run"
+        },
+        {
+            "id": "resource_monitor",
+            "name": "resource_monitor",
+            "description": "Hook up the resource profiler callback to nipype.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[RESOURCE_MONITOR]",
+            "command-line-flag": "--resource-monitor"
+        },
+        {
+            "id": "use_plugin",
+            "name": "use_plugin",
+            "description": "Nipype plugin configuration file.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[USE_PLUGIN]",
+            "command-line-flag": "--use-plugin"
+        },
+        {
+            "id": "no_sub",
+            "name": "no_sub",
+            "description": "Turn off submission of anonymized quality metrics to MRIQC's metrics repository.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[NO_SUB]",
+            "command-line-flag": "--no-sub"
+        },
+        {
+            "id": "email",
+            "name": "email",
+            "description": "Email address to include with quality metric submission.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[EMAIL]",
+            "command-line-flag": "--email"
+        },
+        {
+            "id": "webapi_url",
+            "name": "webapi_url",
+            "description": "IP address where the MRIQC WebAPI is listening.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[WEBAPI_URL]",
+            "command-line-flag": "--webapi-url"
+        },
+        {
+            "id": "webapi_port",
+            "name": "webapi_port",
+            "description": "Port where the MRIQC WebAPI is listening.",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[WEBAPI_PORT]",
+            "command-line-flag": "--webapi-port"
+        },
+        {
+            "id": "upload_strict",
+            "name": "upload_strict",
+            "description": "Upload will fail if upload is strict.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[UPLOAD_STRICT]",
+            "command-line-flag": "--upload-strict"
+        },
+        {
+            "id": "notrack",
+            "name": "notrack",
+            "description": "Opt-out of sending tracking information of this run to the NiPreps developers. This information helps to improve MRIQC and provides an indicator of real world usage  crucial for obtaining funding.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[NOTRACK]",
+            "command-line-flag": "--notrack"
+        },
+        {
+            "id": "ants_float",
+            "name": "ants_float",
+            "description": "Use float number precision on ANTs computations.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[ANTS_FLOAT]",
+            "command-line-flag": "--ants-float"
+        },
+        {
+            "id": "ants_settings",
+            "name": "ants_settings",
+            "description": "Path to JSON file with settings for ANTs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANTS_SETTINGS]",
+            "command-line-flag": "--ants-settings"
+        },
+        {
+            "id": "fft_spikes_detector",
+            "name": "fft_spikes_detector",
+            "description": "Turn on FFT based spike detector (slow).",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[FFT_SPIKES_DETECTOR]",
+            "command-line-flag": "--fft-spikes-detector"
+        },
+        {
+            "id": "fd_thres",
+            "name": "fd_thres",
+            "description": "Threshold on framewise displacement estimates to detect outliers.",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[FD_THRES]",
+            "default-value": 0.2,
+            "command-line-flag": "--fd_thres"
+        },
+        {
+            "id": "deoblique",
+            "name": "deoblique",
+            "description": "Deoblique the functional scans during head motion correction preprocessing.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[DEOBLIQUE]",
+            "command-line-flag": "--deoblique"
+        },
+        {
+            "id": "despike",
+            "name": "despike",
+            "description": "Despike the functional scans during head motion correction preprocessing.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[DESPIKE]",
+            "command-line-flag": "--despike"
+        },
+        {
+            "id": "start_idx",
+            "name": "start_idx",
+            "description": "DEPRECATED Initial volume in functional timeseries that should be considered for preprocessing.",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[START_IDX]",
+            "command-line-flag": "--start-idx"
+        },
+        {
+            "id": "stop_idx",
+            "name": "stop_idx",
+            "description": "DEPRECATED Final volume in functional timeseries that should be considered for preprocessing.",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[STOP_IDX]",
+            "command-line-flag": "--stop-idx"
+        }
+    ],
+    "tags": {},
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    }
+}

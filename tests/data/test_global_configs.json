@@ -15,12 +15,14 @@
         "heudiconv": {
             "VERSION": "0.11.6",    
             "CONTAINER": "heudiconv_{}.sif",
+            "INVOCATION_TEMPLATE": "heudiconv_{}.json",
             "URL": ""
         },
         "validator":{
+            "VERSION": "",
             "CONTAINER": "bids_validator.sif",
+            "INVOCATION_TEMPLATE": "bids_validator.json",
             "URL": ""
-
         }
     },
 
@@ -28,16 +30,19 @@
         "mriqc": {
             "VERSION": "23.1.0",
             "CONTAINER": "mriqc_{}.sif",
+            "INVOCATION_TEMPLATE": "mriqc_{}.json",
             "URL": ""
         },
         "fmriprep": {
             "VERSION": "20.2.7",
             "CONTAINER": "fmriprep_{}.sif",
+            "INVOCATION_TEMPLATE": "fmriprep_{}.json",
             "URL": ""
         },
         "freesurfer": {
             "VERSION": "6.0.1",
             "CONTAINER": "fmriprep_{}.sif",
+            "INVOCATION_TEMPLATE": "fmriprep_{}.json",
             "URL": ""
         }
     },
@@ -48,5 +53,7 @@
             "VERSION": "",
             "URL": ""
         }     
-    }
+    },
+    
+    "WORKFLOWS": []
 }
