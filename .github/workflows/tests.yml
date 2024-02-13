@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: ['*']
 
-# cancel previous runs if new one is triggered 
+# cancel previous runs if new one is triggered
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # only trigger on upstream repo
-    if: github.repository_owner == 'neurodatascience' && github.event.repository.name == 'nipoppy' 
+    if: github.repository_owner == 'neurodatascience' && github.event.repository.name == 'nipoppy'
 
     steps:
 
@@ -31,11 +31,25 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install 
+    - name: Install dependencies
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y git-annex
+
+    - name: Install nipoppy
       run: |
         pip install -U pip
         pip install .[tests]
 
+    - name: Install data
+      run: make -C tests data/ds004097
+
     - name: Test
-      run: |
-        python -m pytest
+      run: python -m pytest tests --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        name: codecov-umbrella
+        fail_ci_if_error: false

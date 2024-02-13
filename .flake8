@@ -1,0 +1,14 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+	env,
+	venv,
+per-file-ignores =
+    # - docstrings rules that should not be applied to tests
+	tests/*: D100, D103, D104
+    # allow "weird indentation"
+	tests/test_workflow_*.py: D100, D103, D104, E131, E127, E501
+max-line-length = 90

@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-cov", "datalad"]
 
 # alias in case of typo
 tests = ["nipoppy[test]"]
@@ -30,6 +30,7 @@ packages = ["nipoppy"]
 [tool.hatch.build]
 include = [
     "nipoppy/workflow/proc_pipe/tractoflow/tractoflow",
+    "nipoppy/workflow/proc_pipe/tractoflow",
 ]
 
 [tool.codespell]
@@ -37,5 +38,15 @@ skip = '.git,.github,*.pdf,*.svg,pyproject.toml,*.ipynb,*.html,ppmi_imaging_desc
 ignore-words-list = 'te,ines'
 
 [tool.pytest.ini_options]
-addopts = "-ra -q -vv "
+addopts = "-ra -q -vv --cov nipoppy"
 testpaths = ["tests/"]
+norecursedirs = ["tests/data"]
+
+[tool.isort]
+combine_as_imports = true
+line_length = 79
+profile = "black"
+skip_gitignore = true
+
+[tool.black]
+line-length = 79

@@ -17,11 +17,15 @@ share/python-wheels/
 nipoppy/notebooks/.ipynb_checkpoints/*
 
 # dataset-specific files
-bids_filter.json 
+bids_filter.json
 workflow/proc_pipe/fmriprep/scripts/fmriprep_sge.sh
 workflow/proc_pipe/fmriprep/scripts/fmriprep_slurm.sh
 
 # logs/testing
 *.out
 *.log
+.coverage
+htmlcov
+
+
 env/

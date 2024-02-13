@@ -88,6 +88,8 @@ def run(participant_id, global_configs, session_id, output_dir, modalities, bids
     except Exception as e:
         logger.error(f"mriqc run failed with exceptions: {e}")
 
+    return CMD
+
 
 if __name__ == '__main__':
 

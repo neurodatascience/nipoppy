@@ -3,7 +3,7 @@
     "DATASET_ROOT": "",
 
     "CONTAINER_STORE": "",
-    
+
     "SINGULARITY_PATH": "singularity",
 
     "TEMPLATEFLOW_DIR": "",
@@ -13,7 +13,7 @@
 
     "BIDS": {
         "heudiconv": {
-            "VERSION": "0.11.6",    
+            "VERSION": "0.11.6",
             "CONTAINER": "heudiconv_{}.sif",
             "URL": ""
         },
@@ -35,6 +35,11 @@
             "CONTAINER": "fmriprep_{}.sif",
             "URL": ""
         },
+        "tractoflow": {
+            "VERSION": "XX.X.X",
+            "CONTAINER": "tractoflow_{}.sif",
+            "URL": ""
+        },
         "freesurfer": {
             "VERSION": "6.0.1",
             "CONTAINER": "fmriprep_{}.sif",
@@ -47,6 +52,6 @@
             "PATH": "",
             "VERSION": "",
             "URL": ""
-        }     
+        }
     }
 }
