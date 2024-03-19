@@ -41,6 +41,7 @@ PIPELINE_REQUIRED_DATATYPES = {
     "fmriprep": ["anat"],
     "mriqc": ["anat"],
     "tractoflow": ["anat", "dwi"],
+    "maget_brain": ["anat"]
 }
 ALL_DATATYPES = sorted(["anat", "dwi", "func", "fmap"])
 BIDS_PIPES = ["mriqc","fmriprep"]
