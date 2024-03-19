@@ -20,6 +20,7 @@ nipoppy/notebooks/.ipynb_checkpoints/*
 bids_filter.json 
 workflow/proc_pipe/fmriprep/scripts/fmriprep_sge.sh
 workflow/proc_pipe/fmriprep/scripts/fmriprep_slurm.sh
+workflow/dicom_org/dicom_dir_func.py
 
 # logs/testing
 *.out
