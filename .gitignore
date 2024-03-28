@@ -25,3 +25,5 @@ workflow/proc_pipe/fmriprep/scripts/fmriprep_slurm.sh
 *.out
 *.log
 env/
+sourcedata
+raw

@@ -19,10 +19,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = [
+    "nipoppy[bidscoin]",
+    "pytest"
+]
 
 # alias in case of typo
 tests = ["nipoppy[test]"]
+
+bidscoin = ["bidscoin>3.7.1"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["nipoppy"]
