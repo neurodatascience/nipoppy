@@ -26,3 +26,5 @@ workflow/dicom_org/dicom_dir_func.py
 *.out
 *.log
 env/
+sourcedata
+raw
