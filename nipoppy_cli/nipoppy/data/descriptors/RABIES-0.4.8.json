@@ -1,0 +1,8 @@
+{
+    "name": "RABIES",
+    "description": "rabies fmri",
+    "tool-version": "0.4.8",
+    "schema-version": "0.1",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] "
+
+}
