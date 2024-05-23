@@ -1,10 +1,28 @@
 {
-    "name": "tool name",
+    "name": "RABIES",
     "description": "tool description",
-    "tool-version": "v0.1.0",
+    "tool-version": "v0.4.8",
     "schema-version": "0.5",
-    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] preprocess [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] preprocess [BIDS_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
+        {
+            "id": "bids_dir",
+            "name": "bids_dir",
+            "description": "The root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder).",
+            "optional": false,
+            "type": "String",
+            "value-key": "[BIDS_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_BIDS]]"
+        },
+        {
+            "id": "output_dir",
+            "name": "output_dir",
+            "description": "The directory where the output files should be stored. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUTPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
+        },
         {
             "id": "inclusion_ids",
             "name": "inclusion_ids",

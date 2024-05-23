@@ -1,7 +1,7 @@
 {
-    "name": "tool name",
+    "name": "RABIES",
     "description": "tool description",
-    "tool-version": "v0.1.0",
+    "tool-version": "v0.4.8",
     "schema-version": "0.5",
     "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] analysis [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
