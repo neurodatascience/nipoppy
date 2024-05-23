@@ -3,8 +3,128 @@
     "description": "tool description",
     "tool-version": "v0.4.8",
     "schema-version": "0.5",
-    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] preprocess [BIDS_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] preprocess [BIDS_FILTER] [BOLD_ONLY] [ANAT_AUTOBOX] [BOLD_AUTOBOX] [OBLIQUE2CARD] [APPLY_DESPIKING] [HMC_OPTION] [ISOTROPIC_HMC] [VOXELWISE_MOTION] [APPLY_SLICE_MC] [DETECT_DUMMY] [DATA_TYPE] [BIDS_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
+        {
+            "id": "bids_filter",
+            "name": "bids_filter",
+            "description": "Allows to provide additional BIDS specifications (found within the input BIDS directory) for selected a subset of functional and/or anatomical images. Takes as input a JSON file containing the set of parameters for functional image under 'func' and under 'anat' for the anatomical image. See online documentation for an example",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BIDS_FILTER]",
+            "command-line-flag": "--bids_filter",
+            "default-value": "{\"func\": {\"suffix\": [\"bold\", \"cbv\"]}, \"anat\": {\"suffix\": [\"T1w\", \"T2w\"]}}"
+        },
+        {
+            "id": "bold_only",
+            "name": "bold_only",
+            "description": "Apply preprocessing with only EPI scans. Commonspace registration is executed directly using the corrected EPI 3D reference images. The commonspace registration simultaneously applies distortion correction, this option will produce only commonspace outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BOLD_ONLY]",
+            "command-line-flag": "--bold_only",
+            "default-value": false 
+        },
+        {
+            "id": "anat_autobox",
+            "name": "anat_autobox",
+            "description": "Crops out extra space around the brain on the structural image using AFNI's 3dAutobox",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANAT_AUTOBOX]",
+            "command-line-flag": "--anat_autobox",
+            "default-value": false 
+        },
+        {
+            "id": "bold_autobox",
+            "name": "bold_autobox",
+            "description": "Crops out extra space around the brain on the structural image using AFNI's 3dAutobox",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BOLD_AUTOBOX]",
+            "command-line-flag": "--bold_autobox",
+            "default-value": false 
+        },
+        {
+            "id": "oblique2card",
+            "name": "oblique2card",
+            "description": "Correct for oblique coordinates on all structural and functional data. WARNING: these corrections are suboptimal, and may alter the data. Only apply if necessary.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[OBLIQUE2CARD]",
+            "command-line-flag": "--oblique2card",
+            "default-value": "none"
+        },
+        {
+            "id": "apply_despiking",
+            "name": "apply_despiking",
+            "description": "Applies AFNI's 3dDespike",
+            "optional": true,
+            "type": "String",
+            "value-key": "[APPLY_DESPIKING]",
+            "command-line-flag": "--apply_despiking",
+            "default-value": false 
+        },
+        {
+            "id": "HMC_option",
+            "name": "HMC_option",
+            "description": "Correct for oblique coordinates on all structural and functional data. WARNING: these corrections are suboptimal, and may alter the data. Only apply if necessary.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[HMC_OPTION]",
+            "command-line-flag": "--HMC_option",
+            "default-value": "optim"
+        },
+        {
+            "id": "isotropic_HMC",
+            "name": "isotropic_HMC",
+            "description": "Whether to resample the EPI to isotropic resolution (taking the size of the axis with highest resolution) for the estimation of motion parameters.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ISOTROPIC_HMC]",
+            "command-line-flag": "--isotropic_HMC",
+            "default-value": false 
+        },
+        {
+            "id": "voxelwise_motion",
+            "name": "voxelwise_motion",
+            "description": "Whether to output estimates of absolute displacement and framewise displacement at each voxel. This will generate 4D nifti files representing motion timeseries derived from the 6 motion parameters. This is handled by antsMotionCorrStats",
+            "optional": true,
+            "type": "String",
+            "value-key": "[VOXELWISE_MOTION]",
+            "command-line-flag": "--voxelwise_motion",
+            "default-value": false  
+        },
+        {
+            "id": "apply_slice_mc",
+            "name": "apply_slice_mc",
+            "description": "Whether to apply a slice-specific motion correction after initial volumetric HMC. This can correct for interslice misalignment resulting from within-TR motion. With this option, motion corrections and the subsequent resampling from registration are applied sequentially since the 2D slice registrations cannot be concatenate with 3D transforms. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[APPLY_SLICE_MC]",
+            "command-line-flag": "--apply_slice_mc",
+            "default-value": "False"  
+        },
+        {
+            "id": "detect_dummy",
+            "name": "detect_dummy",
+            "description": "Detect and remove initial dummy volumes from the EPI.",
+            "type": "String",
+            "command-line-flag": "--detect_dummy",
+            "value-key": "[DETECT_DUMMY]",
+            "optional": true,
+            "default-value": false
+        },
+        {
+            "id": "data_type",
+            "name": "data_type",
+            "description": "Specify data format outputs to control for file size.",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--data_type",
+            "value-key": "[DATA_TYPE]",
+            "default-value": "float32"
+        },
         {
             "id": "bids_dir",
             "name": "bids_dir",
@@ -116,8 +236,6 @@
             "default-value": "false"
         }
     ],
-    
-   
     "tags": {
     },
     "suggested-resources": {
