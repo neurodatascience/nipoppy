@@ -3,38 +3,56 @@
     "description": "tool description",
     "tool-version": "v0.1.0",
     "schema-version": "0.5",
-    "command-line": "echo [PARAM1] [PARAM2] [FLAG1] > [OUTPUT1]",
-    "container-image": {
-        "image": "user/image",
-        "index": "docker://",
-        "type": "singularity"
-    },
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
         {
-            "name": "The first parameter",
-            "id": "basic_param1",
-            "type": "File",
+            "id": "inclusion_ids",
+            "name": "inclusion_ids",
+            "description": "Define a list of BOLD scan to include",
             "optional": true,
-            "value-key": "[PARAM1]"
-        },
-        {
-            "name": "The second parameter",
-            "id": "basic_param2",
             "type": "String",
-            "optional": false,
-            "value-key": "[PARAM2]",
-            "value-choices": [
-                "mychoice1.log",
-                "mychoice2.log"
-            ]
+            "command-line-flag": "--inclusion_ids",
+            "value-key": "[INCLUSION_IDS]",
+            "default-value": "['all']"
         },
         {
-            "name": "The first flag",
-            "id": "basic_flag1",
-            "type": "Flag",
+            "id": "exclusion_ids",
+            "name": "exclusion_ids",
+            "description": "This argument provides a list of scans to exclude",
             "optional": true,
-            "command-line-flag": "-f",
-            "value-key": "[FLAG1]"
+            "type": "String",
+            "command-line-flag": "--exclusion_ids",
+            "value-key": "[EXCLUSION_IDS]",
+            "default-value": "['none']"
+        },
+        {
+            "id": "plugin",
+            "name": "plugin",
+            "description": "Specify the nipype plugin for workflow execution.",
+            "optional": true,
+            "type": "String",
+            "command-line-flag": "-p",
+            "value-key": "[EXCLUSION_IDS]",
+            "default-value": "linear"
+        },
+        
+        {
+            "id": "bids_dir",
+            "name": "bids_dir",
+            "description": "The root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder).",
+            "optional": false,
+            "type": "String",
+            "value-key": "[BIDS_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_BIDS]]"
+        },
+        {
+            "id": "output_dir",
+            "name": "output_dir",
+            "description": "The directory where the output files created by RABIES should be stored.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUTPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
         }
     ],
     "output-files": [
@@ -49,23 +67,8 @@
             "value-key": "[OUTPUT1]"
         }
     ],
-    "groups": [
-        {
-            "all-or-none": true,
-            "mutually-exclusive": false,
-            "one-is-required": false,
-            "name": "the param group",
-            "id": "group1",
-            "members": [
-                "basic_param1",
-                "basic_flag1"
-            ]
-        }
-    ],
+   
     "tags": {
-        "status": "example",
-        "purpose": "testing",
-        "foo": "bar"
     },
     "suggested-resources": {
         "cpu-cores": 1,
