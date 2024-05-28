@@ -131,7 +131,7 @@
         "description": "Select options for the inhomogeneity correction of the structural image. * method: specify which registration strategy is employed for providing a brain mask. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. *** N4_reg: previous correction script prior to version 0.3.1. *** disable: disables the inhomogeneity correction. * otsu_thresh: The inhomogeneity correction script necessitates an initial correction with a Otsu masking strategy (prior to registration of an anatomical mask). This option sets the Otsu threshold level to capture the right intensity distribution.*** Specify an integer among [0,1,2,3,4].* multiotsu: Select this option to perform a staged inhomogeneity correction, where only lower intensities are initially corrected, then higher intensities are iteratively included to eventually correct the whole image. This technique may help with images with particularly strong inhomogeneity gradients and very low intensities. *** Specify 'true' or 'false'. ", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["ANAT_INHO_COR"], 
+        "value_key": "[ANAT_INHO_COR]", 
         "command-line-flag": "--anat_inho_cor", 
         "default-value": "method=SyN,otsu_thresh=2,multiotsu=false"
         }, 
@@ -141,7 +141,7 @@
         "description": "When selecting this option, inhomogeneity correction is executed twice to optimizeoutcomes. After completing an initial inhomogeneity correction step, the corrected outputsare co-registered to generate an unbiased template, using the same method as the commonspaceregistration. This template is then masked, and is used as a new target for masking during asecond iteration of inhomogeneity correction. Using this dataset-specific template shouldimprove the robustness of masking for inhomogeneity correction. * apply: select 'true' to apply this option. *** Specify 'true' or 'false'.* masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration.*** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option.*** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to a reference template for masking. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["ANAT_ROBUST_INHO_COR"], 
+        "value_key": "[ANAT_ROBUST_INHO_COR]", 
         "command-line-flag": "--anat_robust_inho_cor", 
         "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
         }, 
@@ -151,7 +151,7 @@
         "description": "Same as --anat_robust_inho_cor, but for the EPI images.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["BOLD_INHO_COR"], 
+        "value_key": "[BOLD_INHO_COR]", 
         "command-line-flag": "--bold_inho_cor", 
         "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
         }, 
@@ -161,7 +161,7 @@
         "description": "Same as --anat_robust_inho_cor, but for the EPI images.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["BOLD_ROBUST_INHO_COR"], 
+        "value_key": "[BOLD_ROBUST_INHO_COR]", 
         "command-line-flag": "--bold_robust_inho_cor", 
         "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
         }, 
@@ -171,7 +171,7 @@
         "description": "Specify registration options for the commonspace registration. * masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to the commonspace atlas. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. * fast_commonspace: Skip the generation of a dataset-generated unbiased template, and instead, register each scan independently directly onto the commonspace atlas, using the template_registration. This option can be faster, but may decrease the quality of alignment between subjects.*** Specify 'true' or 'false'. ", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["COMMONSPACE_REG"], 
+        "value_key": "[COMMONSPACE_REG]", 
         "command-line-flag": "--commonspace_reg", 
         "default-value": "masking=false,brain_extraction=false,template_registration=SyN,fast_commonspace=false"
         }, 
@@ -181,7 +181,7 @@
         "description": "Specify the registration script for cross-modal alignment between the EPI and structural images. This operation is responsible for correcting EPI susceptibility distortions. * masking: With this option, the brain masks obtained from the EPI inhomogeneity correction step are used to support registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to registration using the EPI masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* registration: Specify a registration script. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. (default: masking=false,brain_extraction=false,registration=SyN)", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["BOLD2ANAT_COREG"], 
+        "value_key": "[BOLD2ANAT_COREG]", 
         "command-line-flag": "--bold2anat_coreg", 
         "default-value": "masking=false,brain_extraction=false,registration=SyN"
         }, 
@@ -191,7 +191,7 @@
         "description": "Can specify a resampling dimension for the nativespace fMRI outputs.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["NATIVESPACE_RESAMPLING"], 
+        "value_key": "[NATIVESPACE_RESAMPLING]", 
         "command-line-flag": "--nativespace_resampling", 
         "default-value": "inputs_defined"
         }, 
@@ -201,7 +201,7 @@
         "description": "Can specify a resampling dimension for the commonspace fMRI outputs.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["COMMONSPACE_RESAMPLING"], 
+        "value_key": "[COMMONSPACE_RESAMPLING]", 
         "command-line-flag": "--commonspace_resampling", 
         "default-value": "inputs_defined"
         }, 
@@ -211,7 +211,7 @@
         "description": "This specifies resampling dimensions for the anatomical registration targets. By default, images are resampled to isotropic resolution based on the smallest dimension among the provided anatomical images (EPI images instead if --bold_only is True). Increasing voxel resampling size will increase registration speed at the cost of accuracy.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["ANATOMICAL_RESAMPLING"], 
+        "value_key": "[ANATOMICAL_RESAMPLING]", 
         "command-line-flag": "--anatomical_resampling", 
         "default-value": "inputs_defined"
         }, 
@@ -221,7 +221,7 @@
         "description": "Select this option to apply the STC step.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["APPLY_STC"], 
+        "value_key": "[APPLY_STC]", 
         "command-line-flag": "--apply_STC", 
         "default-value": "False"
         }, 
@@ -231,7 +231,7 @@
         "description": "Specify repetition time (TR) in seconds. (e.g. --TR 1.2)", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["TR"], 
+        "value_key": "[TR]", 
         "command-line-flag": "--TR", 
         "default-value": "auto"
         }, 
@@ -241,7 +241,7 @@
         "description": "Specify if interleaved ('alt') or sequential ('seq') acquisition, and specify in whichdirection (- or +) to apply the correction. If slices were acquired from front to back,the correction should be in the negative (-) direction. Refer to this discussion on thetopic for more information https://github.com/CoBrALab/RABIES/discussions/217.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["TPATTERN"], 
+        "value_key": "[TPATTERN]", 
         "command-line-flag": "--tpattern", 
         "default-value": "alt-z"
         }, 
@@ -251,7 +251,7 @@
         "description": "should be over the Y axis, which corresponds to the anteroposterior axis in RAS convention.(default: Y) Template Files: Specify commonspace template and associated mask/label files. By default, RABIES provides the mouse DSURQE atlas", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["STC_AXIS"], 
+        "value_key": "[STC_AXIS]", 
         "command-line-flag": "--stc_axis", 
         "default-value": "Y"
         }, 
@@ -261,7 +261,7 @@
         "description": "Anatomical file for the commonspace atlas.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["ANAT_TEMPLATE"], 
+        "value_key": "[ANAT_TEMPLATE]", 
         "command-line-flag": "--anat_template", 
         "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_average.nii.gz"
         }, 
@@ -271,7 +271,7 @@
         "description": "Brain mask aligned with the template.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["BRAIN_MASK"], 
+        "value_key": "[BRAIN_MASK]", 
         "command-line-flag": "--brain_mask", 
         "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_mask.nii.gz"
         }, 
@@ -281,7 +281,7 @@
         "description": "White matter mask aligned with the template.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["WM_MASK"], 
+        "value_key": "[WM_MASK]", 
         "command-line-flag": "--WM_mask", 
         "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_WM_mask.nii.gz"
         }, 
@@ -291,7 +291,7 @@
         "description": "CSF mask aligned with the template.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["CSF_MASK"], 
+        "value_key": "[CSF_MASK]", 
         "command-line-flag": "--CSF_mask", 
         "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_CSF_mask.nii.gz"
         }, 
@@ -301,7 +301,7 @@
         "description": "Can provide a mask of major blood vessels to compute associated nuisance timeseries. The default mask was generated by applying MELODIC ICA and selecting the resultingcomponent mapping onto major brain vessels.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["VASCULAR_MASK"], 
+        "value_key": "[VASCULAR_MASK]", 
         "command-line-flag": "--vascular_mask", 
         "default-value": "/home/rabies/.local/share/rabies/vascular_mask.nii.gz"
         }, 
@@ -311,7 +311,7 @@
         "description": "Labels file providing the atlas anatomical annotations.", 
         "optional": true, 
         "type": "String", 
-        "value_key": ["LABELS"], 
+        "value_key": "[LABELS]", 
         "command-line-flag": "--labels", 
         "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_labels.nii.gz"
         }, 
