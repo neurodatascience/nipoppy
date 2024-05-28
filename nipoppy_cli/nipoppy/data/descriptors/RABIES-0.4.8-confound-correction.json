@@ -3,8 +3,148 @@
     "description": "tool description",
     "tool-version": "v0.4.8",
     "schema-version": "0.5",
-    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] confound_correction [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] confound_correction [NATIVESPACE_ANALYSIS] [IMAGE_SCALING] [DATA_DIAGNOSIS.] [DETRENDING_ORDER] [CONF_LIST] [FRAME_CENSORING] [TR] [HIGHPASS] [LOWPASS] [EDGE_CUTOFF] [SMOOTHING_FILTER] [MATCH_NUMBER_TIMEPOINTS] [ICA_AROMA] [READ_DATASINK] [TIMESERIES_INTERVAL]  [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
+        {
+            "id": "nativespace_analysis", 
+            "name": "nativespace_analysis", 
+            "description": "Conduct confound correction and analysis in native space.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[NATIVESPACE_ANALYSIS]", 
+            "command-line-flag": "--nativespace_analysis", 
+            "default-value": "False"
+           }, 
+           {
+            "id": "image_scaling", 
+            "name": "image_scaling", 
+            "description": "Select an option for scaling the image variance to match the intensity profile of ", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[IMAGE_SCALING]", 
+            "command-line-flag": "--image_scaling", 
+            "default-value": ""
+           }, 
+           {
+            "id": "detrending_order", 
+            "name": "detrending_order", 
+            "description": "Select between linear or quadratic (second-order) detrending of voxel timeseries.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[DETRENDING_ORDER]", 
+            "command-line-flag": "--detrending_order", 
+            "default-value": "linear"
+           }, 
+           {
+            "id": "conf_list", 
+            "name": "conf_list", 
+            "description": "Select list of nuisance regressors that will be applied on voxel timeseries, i.e., confound regression. *** WM/CSF/vascular/global_signal: correspond to mean signal from WM/CSF/vascular/brain masks. *** mot_6: 6 rigid head motion correction parameters. *** mot_24: mot_6 + their temporal derivative, then all 12 parameters squared, as in Friston et al. (1996, Magnetic Resonance in Medicine). *** aCompCor: method from Muschelli et al. (2014, Neuroimage), where component timeseriesare obtained using PCA, conducted on the combined WM and CSF masks voxel timeseries. Components adding up to 50 percent of the variance are included. *** mean_FD: the mean framewise displacement timecourse.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[CONF_LIST]", 
+            "command-line-flag": "--conf_list", 
+            "default-value": "[]"
+           }, 
+           {
+            "id": "frame_censoring", 
+            "name": "frame_censoring", 
+            "description": "Censor frames that are highly corrupted (i.e. 'scrubbing').* FD_censoring: Apply frame censoring based on a framewise displacement threshold. The frames that exceed the given threshold, together with 1 back and 2 forward frames will be masked out, as in Power et al. (2012, Neuroimage). *** Specify 'true' or 'false'.* FD_threshold: the FD threshold in mm.* DVARS_censoring: Will remove timepoints that present outlier values on the DVARS metric (temporal derivative of global signal). This method will censor timepoints until the distribution of DVARS values across time does not contain outliers values above or below 2.5 standard deviations. *** Specify 'true' or 'false'.* minimum_timepoint: Can set a minimum number of timepoints remaining after frame censoring. If the threshold is not met, an empty file is generated and the scan is not considered in further steps. ", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[FRAME_CENSORING]", 
+            "command-line-flag": "--frame_censoring", 
+            "default-value": "FD_censoring=false,FD_threshold=0.05,DVARS_censoring=false,minimum_timepoint=3"
+           }, 
+           {
+            "id": "TR", 
+            "name": "TR", 
+            "description": "Specify repetition time (TR) in seconds. (e.g. --TR 1.2)", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[TR]", 
+            "command-line-flag": "--TR", 
+            "default-value": "auto"
+           }, 
+           {
+            "id": "highpass", 
+            "name": "highpass", 
+            "description": "Specify highpass filter frequency.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[HIGHPASS]", 
+            "command-line-flag": "--highpass", 
+            "default-value": "None"
+           }, 
+           {
+            "id": "lowpass", 
+            "name": "lowpass", 
+            "description": "Specify lowpass filter frequency.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[LOWPASS]", 
+            "command-line-flag": "--lowpass", 
+            "default-value": "None"
+           }, 
+           {
+            "id": "edge_cutoff", 
+            "name": "edge_cutoff", 
+            "description": "Specify the number of seconds to cut at beginning and end of acquisition if applying a frequency filter. Frequency filters generate edge effects at begining and end of the timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hzhighpass.).", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[EDGE_CUTOFF]", 
+            "command-line-flag": "--edge_cutoff", 
+            "default-value": "0"
+           }, 
+           {
+            "id": "smoothing_filter", 
+            "name": "smoothing_filter", 
+            "description": "Specify filter size in mm for spatial smoothing. Will apply nilearn's function https://nilearn.github.io/modules/generated/nilearn.image.smooth_img.html", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[SMOOTHING_FILTER]", 
+            "command-line-flag": "--smoothing_filter", 
+            "default-value": "None"
+           }, 
+           {
+            "id": "match_number_timepoints", 
+            "name": "match_number_timepoints", 
+            "description": "With this option, only a subset of the timepoints are kept post-censoring to match the --minimum_timepoint number for all scans. This can be conducted to avoid inconsistent temporal degrees of freedom (tDOF) between scans during downstream analysis. We recommend selecting this option if a significant confounding effect of tDOF is detected during --data_diagnosis. The extra timepoints removed are randomly selected among the set available post-censoring.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[MATCH_NUMBER_TIMEPOINTS]", 
+            "command-line-flag": "--match_number_timepoints", 
+            "default-value": "False"
+           },
+           {
+            "id": "ica_aroma", 
+            "name": "ica_aroma", 
+            "description": "Apply ICA-AROMA denoising (Pruim et al. 2015). The original classifier was modified to incorporaterodent-adapted masks and classification hyperparameters. * apply: apply the denoising. *** Specify 'true' or 'false'.* dim: Specify a pre-determined number of MELODIC components to derive. '0' will use an automatic estimator.* random_seed: For reproducibility, this option sets a fixed random seed for MELODIC. ", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[ICA_AROMA]", 
+            "command-line-flag": "--ica_aroma", 
+            "default-value": "apply=false,dim=0,random_seed=1"
+           }, 
+           {
+            "id": "read_datasink", 
+            "name": "read_datasink", 
+            "description": "Choose this option to read preprocessing outputs from datasinks instead of the savedpreprocessing workflow graph. This allows to run confound correction without havingavailable RABIES preprocessing folders, but the targetted datasink folders must follow the structure of RABIES preprocessing.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[READ_DATASINK]", 
+            "command-line-flag": "--read_datasink", 
+            "default-value": "False"
+           }, 
+           {
+            "id": "timeseries_interval", 
+            "name": "timeseries_interval", 
+            "description": "Before confound correction, can crop the timeseries within a specific interval. e.g. '0,80' for timepoint 0 to 80.", 
+            "optional": true, 
+            "type": "String", 
+            "value-key": "[TIMESERIES_INTERVAL]", 
+            "command-line-flag": "--timeseries_interval", 
+            "default-value": "all"
+           }, 
         {
             "id": "inclusion_ids",
             "name": "inclusion_ids",
