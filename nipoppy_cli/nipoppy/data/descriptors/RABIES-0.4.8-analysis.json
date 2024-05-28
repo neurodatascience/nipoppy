@@ -3,7 +3,7 @@
     "description": "tool description",
     "tool-version": "v0.4.8",
     "schema-version": "0.5",
-    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] analysis  [SCAN_LIST] [PRIOR_MAPS] [PRIOR_BOLD_IDX] [PRIOR_CONFOUND_IDX] [DATA_DIAGNOSIS] [DATA_DIAGNOSIS] [OUTLIER_THRESHOLD]  [SEED_LIST] [SEED_PRIOR_LIST] [SEED_LIST] [FC_MATRIX] [ROI_TYPE] [FC_MATRIX] [ROI_CSV] [GROUP_ICA] [DR_ICA] [NPR_TEMPORAL_COMP] [NPR_SPATIAL_COMP] [NETWORK_WEIGHTING] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] analysis  [SCAN_LIST] [PRIOR_MAPS] [PRIOR_BOLD_IDX] [PRIOR_CONFOUND_IDX] [DATA_DIAGNOSIS] [DATA_DIAGNOSIS] [OUTLIER_THRESHOLD]  [SEED_LIST] [SEED_PRIOR_LIST] [SEED_LIST] [FC_MATRIX] [ROI_TYPE] [FC_MATRIX] [ROI_CSV] [GROUP_ICA] [DR_ICA] [NPR_TEMPORAL_COMP] [NPR_SPATIAL_COMP] [NETWORK_WEIGHTING] [INPUT_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
         {
             "id": "scan_list", 
@@ -165,6 +165,24 @@
             "command-line-flag": "--network_weighting", 
             "default-value": "absolute"
            }, 
+           {
+            "id": "input_dir",
+            "name": "input_dir",
+            "description": "The directory where the output files from the confound correction command should be stored. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[INPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
+        },
+        {
+            "id": "output_dir",
+            "name": "output_dir",
+            "description": "The directory where the output files should be stored after analysis If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUTPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
+        },
         {
             "id": "inclusion_ids",
             "name": "inclusion_ids",
