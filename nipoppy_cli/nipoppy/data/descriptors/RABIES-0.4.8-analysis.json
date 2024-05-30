@@ -6,166 +6,166 @@
     "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] analysis  [SCAN_LIST] [PRIOR_MAPS] [PRIOR_BOLD_IDX] [PRIOR_CONFOUND_IDX] [DATA_DIAGNOSIS] [DATA_DIAGNOSIS] [OUTLIER_THRESHOLD]  [SEED_LIST] [SEED_PRIOR_LIST] [SEED_LIST] [FC_MATRIX] [ROI_TYPE] [FC_MATRIX] [ROI_CSV] [GROUP_ICA] [DR_ICA] [NPR_TEMPORAL_COMP] [NPR_SPATIAL_COMP] [NETWORK_WEIGHTING] [INPUT_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
     "inputs": [
         {
-            "id": "scan_list", 
-            "name": "scan_list", 
-            "description": "This option offers to run the analysis on a subset of the scans. The scans are selected by providing the full path to the corresponding EPI file in the input BIDS folder. The list of scan can be specified manually as a list of file name '--scan_list scan1.nii.gz scan2.nii.gz ...' or the files can be imbedded into a .txt file with one filename per row. By default, 'all' will use all the scans previously processed.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[SCAN_LIST]", 
-            "command-line-flag": "--scan_list", 
+            "id": "scan_list",
+            "name": "scan_list",
+            "description": "This option offers to run the analysis on a subset of the scans. The scans are selected by providing the full path to the corresponding EPI file in the input BIDS folder. The list of scan can be specified manually as a list of file name '--scan_list scan1.nii.gz scan2.nii.gz ...' or the files can be imbedded into a .txt file with one filename per row. By default, 'all' will use all the scans previously processed.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[SCAN_LIST]",
+            "command-line-flag": "--scan_list",
             "default-value": "['all']"
-           }, 
-           {
-            "id": "prior_maps", 
-            "name": "prior_maps", 
-            "description": "Provide a 4D nifti image with a series of spatial priors representing common sources of signal (e.g. ICA components from a group-ICA run). This 4D prior map file will be used for Dual regression, Dual ICA and --data_diagnosis. The RABIES default corresponds to a MELODIC run on a combined group of anesthetized-ventilated and awake mice. Confound correction consisted of highpass at 0.01 Hz, FD censoring at 0.03mm, DVARS censoring, and mot_6,WM_signal,CSF_signal as regressors.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[PRIOR_MAPS]", 
-            "command-line-flag": "--prior_maps", 
+        },
+        {
+            "id": "prior_maps",
+            "name": "prior_maps",
+            "description": "Provide a 4D nifti image with a series of spatial priors representing common sources of signal (e.g. ICA components from a group-ICA run). This 4D prior map file will be used for Dual regression, Dual ICA and --data_diagnosis. The RABIES default corresponds to a MELODIC run on a combined group of anesthetized-ventilated and awake mice. Confound correction consisted of highpass at 0.01 Hz, FD censoring at 0.03mm, DVARS censoring, and mot_6,WM_signal,CSF_signal as regressors.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[PRIOR_MAPS]",
+            "command-line-flag": "--prior_maps",
             "default-value": "/home/rabies/.local/share/rabies/melodic_IC.nii.gz"
-           }, 
-           {
-            "id": "prior_bold_idx", 
-            "name": "prior_bold_idx", 
-            "description": "Specify the indices for the priors corresponding to BOLD sources from --prior_maps. These will be fitted during Dual ICA and provide the BOLD components during --data_diagnosis.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[PRIOR_BOLD_IDX]", 
-            "command-line-flag": "--prior_bold_idx", 
+        },
+        {
+            "id": "prior_bold_idx",
+            "name": "prior_bold_idx",
+            "description": "Specify the indices for the priors corresponding to BOLD sources from --prior_maps. These will be fitted during Dual ICA and provide the BOLD components during --data_diagnosis.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[PRIOR_BOLD_IDX]",
+            "command-line-flag": "--prior_bold_idx",
             "default-value": "[5, 12, 19]"
-           }, 
-           {
-            "id": "prior_confound_idx", 
-            "name": "prior_confound_idx", 
-            "description": "Specify the indices for the confound components from --prior_maps. This is pertinent for the --data_diagnosis outputs.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[PRIOR_CONFOUND_IDX]", 
-            "command-line-flag": "--prior_confound_idx", 
+        },
+        {
+            "id": "prior_confound_idx",
+            "name": "prior_confound_idx",
+            "description": "Specify the indices for the confound components from --prior_maps. This is pertinent for the --data_diagnosis outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[PRIOR_CONFOUND_IDX]",
+            "command-line-flag": "--prior_confound_idx",
             "default-value": "[0, 1, 2, 6, 7, 8, 9, 10, 11, 13, 14, 21, 22, 24, 26, 28, 29]"
-           }, 
-           {
-            "id": "data_diagnosis", 
-            "name": "data_diagnosis", 
-            "description": "This option carries out the spatiotemporal diagnosis as described in Desrosiers-Gregoire et al. The diagnosis generates key temporal and spatial features both at the scan level and the group level, allowing the identification of sources of confounds and data quality issues. We recommend using this data diagnosis workflow, more detailed in the publication, to improve the control for data quality issues and prevent the corruptions of analysis outputs.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[DATA_DIAGNOSIS]", 
-            "command-line-flag": "--data_diagnosis", 
+        },
+        {
+            "id": "data_diagnosis",
+            "name": "data_diagnosis",
+            "description": "This option carries out the spatiotemporal diagnosis as described in Desrosiers-Gregoire et al. The diagnosis generates key temporal and spatial features both at the scan level and the group level, allowing the identification of sources of confounds and data quality issues. We recommend using this data diagnosis workflow, more detailed in the publication, to improve the control for data quality issues and prevent the corruptions of analysis outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[DATA_DIAGNOSIS]",
+            "command-line-flag": "--data_diagnosis",
             "default-value": "False"
-           }, 
-           {
-            "id": "outlier_threshold", 
-            "name": "outlier_threshold", 
-            "description": "The modified Z-score threshold for detecting outliers during dataset QC when using --data_diagnosis. The default of 3.5 is recommended in https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h.htm.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[OUTLIER_THRESHOLD]", 
-            "command-line-flag": "--outlier_threshold", 
+        },
+        {
+            "id": "outlier_threshold",
+            "name": "outlier_threshold",
+            "description": "The modified Z-score threshold for detecting outliers during dataset QC when using --data_diagnosis. The default of 3.5 is recommended in https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h.htm.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[OUTLIER_THRESHOLD]",
+            "command-line-flag": "--outlier_threshold",
             "default-value": "3.5"
-           }, 
-           {
-            "id": "seed_list", 
-            "name": "seed_list", 
-            "description": "Can provide a list of Nifti files providing a mask for an anatomical seed, which will be used to evaluate seed-based connectivity maps using on Pearson's r. Each seed must consist of a binary mask representing the ROI in commonspace.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[SEED_LIST]", 
-            "command-line-flag": "--seed_list", 
+        },
+        {
+            "id": "seed_list",
+            "name": "seed_list",
+            "description": "Can provide a list of Nifti files providing a mask for an anatomical seed, which will be used to evaluate seed-based connectivity maps using on Pearson's r. Each seed must consist of a binary mask representing the ROI in commonspace.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[SEED_LIST]",
+            "command-line-flag": "--seed_list",
             "default-value": "[]"
-           }, 
-           {
-            "id": "seed_prior_list", 
-            "name": "seed_prior_list", 
-            "description": "For analysis QC of seed-based FC during --data_diagnosis, prior network maps are required for each seed provided in --seed_list. Provide the list of prior files in matching order of the --seed_list arguments to match corresponding seed maps.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[SEED_PRIOR_LIST]", 
-            "command-line-flag": "--seed_prior_list", 
+        },
+        {
+            "id": "seed_prior_list",
+            "name": "seed_prior_list",
+            "description": "For analysis QC of seed-based FC during --data_diagnosis, prior network maps are required for each seed provided in --seed_list. Provide the list of prior files in matching order of the --seed_list arguments to match corresponding seed maps.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[SEED_PRIOR_LIST]",
+            "command-line-flag": "--seed_prior_list",
             "default-value": "[]"
-           },
-           {
-            "id": "FC_matrix", 
-            "name": "FC_matrix", 
-            "description": "Compute whole-brain connectivity matrices using Pearson's r between ROI timeseries.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[FC_MATRIX]", 
-            "command-line-flag": "--FC_matrix", 
+        },
+        {
+            "id": "FC_matrix",
+            "name": "FC_matrix",
+            "description": "Compute whole-brain connectivity matrices using Pearson's r between ROI timeseries.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[FC_MATRIX]",
+            "command-line-flag": "--FC_matrix",
             "default-value": "False"
-           }, 
-           {
-            "id": "ROI_type", 
-            "name": "ROI_type", 
-            "description": "Define ROIs for --FC_matrix between 'parcellated' from the provided atlas during preprocessing, or 'voxelwise' to derive the correlations between every voxel.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[ROI_TYPE]", 
-            "command-line-flag": "--ROI_type", 
+        },
+        {
+            "id": "ROI_type",
+            "name": "ROI_type",
+            "description": "Define ROIs for --FC_matrix between 'parcellated' from the provided atlas during preprocessing, or 'voxelwise' to derive the correlations between every voxel.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ROI_TYPE]",
+            "command-line-flag": "--ROI_type",
             "default-value": "parcellated"
-           },  
-           {
-            "id": "ROI_csv", 
-            "name": "ROI_csv", 
-            "description": "A CSV file with the ROI names matching the ROI index numbers in the atlas labels Nifti file. A copy of this file is provided along the FC matrix generated for each subject.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[ROI_CSV]", 
-            "command-line-flag": "--ROI_csv", 
+        },
+        {
+            "id": "ROI_csv",
+            "name": "ROI_csv",
+            "description": "A CSV file with the ROI names matching the ROI index numbers in the atlas labels Nifti file. A copy of this file is provided along the FC matrix generated for each subject.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ROI_CSV]",
+            "command-line-flag": "--ROI_csv",
             "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_labels.nii.gz"
-           }, 
-           {
-            "id": "group_ica", 
-            "name": "group_ica", 
-            "description": "Perform group-ICA using FSL's MELODIC on the whole dataset's cleaned timeseries. Note that confound correction must have been conducted on commonspace outputs. * apply: compute group-ICA. *** Specify 'true' or 'false'.* dim: Specify a pre-determined number of MELODIC components to derive. '0' will use an automatic estimator.* random_seed: For reproducibility, this option sets a fixed random seed for MELODIC. ", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[GROUP_ICA]", 
-            "command-line-flag": "--group_ica", 
+        },
+        {
+            "id": "group_ica",
+            "name": "group_ica",
+            "description": "Perform group-ICA using FSL's MELODIC on the whole dataset's cleaned timeseries. Note that confound correction must have been conducted on commonspace outputs. * apply: compute group-ICA. *** Specify 'true' or 'false'.* dim: Specify a pre-determined number of MELODIC components to derive. '0' will use an automatic estimator.* random_seed: For reproducibility, this option sets a fixed random seed for MELODIC. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[GROUP_ICA]",
+            "command-line-flag": "--group_ica",
             "default-value": "apply=false,dim=0,random_seed=1"
-           }, 
-           {
-            "id": "DR_ICA", 
-            "name": "DR_ICA", 
-            "description": "Conduct dual regression on each subject timeseries, using the priors from --prior_maps. The linear coefficients from both the first and second regressions will be provided as outputs. Requires that confound correction was conducted on commonspace outputs.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[DR_ICA]", 
-            "command-line-flag": "--DR_ICA", 
+        },
+        {
+            "id": "DR_ICA",
+            "name": "DR_ICA",
+            "description": "Conduct dual regression on each subject timeseries, using the priors from --prior_maps. The linear coefficients from both the first and second regressions will be provided as outputs. Requires that confound correction was conducted on commonspace outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[DR_ICA]",
+            "command-line-flag": "--DR_ICA",
             "default-value": "False"
-           },
-           {
-            "id": "NPR_temporal_comp", 
-            "name": "NPR_temporal_comp", 
-            "description": "Option for performing Neural Prior Recovery (NPR). Specify with this option how many extra subject-specific sources will be computed to account for non-prior confounds. This options specifies the number of temporal components to compute. After computing these sources, NPR will provide a fit for each prior in --prior_maps indexed by --prior_bold_idx. Specify at least 0 extra sources to run NPR.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[NPR_TEMPORAL_COMP]", 
-            "command-line-flag": "--NPR_temporal_comp", 
+        },
+        {
+            "id": "NPR_temporal_comp",
+            "name": "NPR_temporal_comp",
+            "description": "Option for performing Neural Prior Recovery (NPR). Specify with this option how many extra subject-specific sources will be computed to account for non-prior confounds. This options specifies the number of temporal components to compute. After computing these sources, NPR will provide a fit for each prior in --prior_maps indexed by --prior_bold_idx. Specify at least 0 extra sources to run NPR.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[NPR_TEMPORAL_COMP]",
+            "command-line-flag": "--NPR_temporal_comp",
             "default-value": "-1"
-           },
-           {
-            "id": "NPR_spatial_comp", 
-            "name": "NPR_spatial_comp", 
-            "description": "Same as --NPR_temporal_comp, but specify how many spatial components to compute (which are additioned to the temporal components)", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[NPR_SPATIAL_COMP]", 
-            "command-line-flag": "--NPR_spatial_comp", 
+        },
+        {
+            "id": "NPR_spatial_comp",
+            "name": "NPR_spatial_comp",
+            "description": "Same as --NPR_temporal_comp, but specify how many spatial components to compute (which are additioned to the temporal components)",
+            "optional": true,
+            "type": "String",
+            "value-key": "[NPR_SPATIAL_COMP]",
+            "command-line-flag": "--NPR_spatial_comp",
             "default-value": "-1"
-           }, 
-           {
-            "id": "network_weighting", 
-            "name": "network_weighting", 
-            "description": "Whether to derive absolute or relative (variance-normalized) network maps, representing respectively network amplitude + shape or network shape only. This option applies to both dual regression (DR) and Neural Prior Recovery (NPR) analyses.", 
-            "optional": true, 
-            "type": "String", 
-            "value-key": "[NETWORK_WEIGHTING]", 
-            "command-line-flag": "--network_weighting", 
+        },
+        {
+            "id": "network_weighting",
+            "name": "network_weighting",
+            "description": "Whether to derive absolute or relative (variance-normalized) network maps, representing respectively network amplitude + shape or network shape only. This option applies to both dual regression (DR) and Neural Prior Recovery (NPR) analyses.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[NETWORK_WEIGHTING]",
+            "command-line-flag": "--network_weighting",
             "default-value": "absolute"
-           }, 
-           {
+        },
+        {
             "id": "input_dir",
             "name": "input_dir",
             "description": "The directory where the output files from the confound correction command should be stored. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
@@ -276,10 +276,7 @@
             "default-value": "false"
         }
     ],
-    
-   
-    "tags": {
-    },
+    "tags": {},
     "suggested-resources": {
         "cpu-cores": 1,
         "ram": 1,
@@ -290,5 +287,106 @@
             "code": 1,
             "description": "Crashed"
         }
-    ]
+    ],
+    "invocation-schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "RABIES.invocationSchema",
+        "description": "Invocation schema for rabies.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "scan_list": {
+                "type": "string"
+            },
+            "prior_maps": {
+                "type": "string"
+            },
+            "prior_bold_idx": {
+                "type": "string"
+            },
+            "prior_confound_idx": {
+                "type": "string"
+            },
+            "data_diagnosis": {
+                "type": "string"
+            },
+            "outlier_threshold": {
+                "type": "string"
+            },
+            "seed_list": {
+                "type": "string"
+            },
+            "seed_prior_list": {
+                "type": "string"
+            },
+            "FC_matrix": {
+                "type": "string"
+            },
+            "ROI_type": {
+                "type": "string"
+            },
+            "ROI_csv": {
+                "type": "string"
+            },
+            "group_ica": {
+                "type": "string"
+            },
+            "DR_ICA": {
+                "type": "string"
+            },
+            "NPR_temporal_comp": {
+                "type": "string"
+            },
+            "NPR_spatial_comp": {
+                "type": "string"
+            },
+            "network_weighting": {
+                "type": "string"
+            },
+            "input_dir": {
+                "type": "string"
+            },
+            "output_dir": {
+                "type": "string"
+            },
+            "inclusion_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "exclusion_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "plugin": {
+                "type": "string"
+            },
+            "local_threads": {
+                "type": "number"
+            },
+            "scale_min_memory": {
+                "type": "number"
+            },
+            "min_proc": {
+                "type": "number"
+            },
+            "figure_format": {
+                "type": "string"
+            },
+            "verbose": {
+                "type": "number"
+            },
+            "force": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "input_dir",
+            "output_dir"
+        ],
+        "dependencies": {}
+    }
 }
