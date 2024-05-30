@@ -23,7 +23,7 @@
             "type": "String",
             "value-key": "[BOLD_ONLY]",
             "command-line-flag": "--bold_only",
-            "default-value": false 
+            "default-value": false
         },
         {
             "id": "anat_autobox",
@@ -33,7 +33,7 @@
             "type": "String",
             "value-key": "[ANAT_AUTOBOX]",
             "command-line-flag": "--anat_autobox",
-            "default-value": false 
+            "default-value": false
         },
         {
             "id": "bold_autobox",
@@ -43,7 +43,7 @@
             "type": "String",
             "value-key": "[BOLD_AUTOBOX]",
             "command-line-flag": "--bold_autobox",
-            "default-value": false 
+            "default-value": false
         },
         {
             "id": "oblique2card",
@@ -63,7 +63,7 @@
             "type": "String",
             "value-key": "[APPLY_DESPIKING]",
             "command-line-flag": "--apply_despiking",
-            "default-value": false 
+            "default-value": false
         },
         {
             "id": "HMC_option",
@@ -83,7 +83,7 @@
             "type": "String",
             "value-key": "[ISOTROPIC_HMC]",
             "command-line-flag": "--isotropic_HMC",
-            "default-value": false 
+            "default-value": false
         },
         {
             "id": "voxelwise_motion",
@@ -93,7 +93,7 @@
             "type": "String",
             "value-key": "[VOXELWISE_MOTION]",
             "command-line-flag": "--voxelwise_motion",
-            "default-value": false  
+            "default-value": false
         },
         {
             "id": "apply_slice_mc",
@@ -103,7 +103,7 @@
             "type": "String",
             "value-key": "[APPLY_SLICE_MC]",
             "command-line-flag": "--apply_slice_mc",
-            "default-value": "False"  
+            "default-value": "False"
         },
         {
             "id": "detect_dummy",
@@ -126,195 +126,195 @@
             "default-value": "float32"
         },
         {
-        "id": "anat_inho_cor", 
-        "name": "anat_inho_cor", 
-        "description": "Select options for the inhomogeneity correction of the structural image. * method: specify which registration strategy is employed for providing a brain mask. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. *** N4_reg: previous correction script prior to version 0.3.1. *** disable: disables the inhomogeneity correction. * otsu_thresh: The inhomogeneity correction script necessitates an initial correction with a Otsu masking strategy (prior to registration of an anatomical mask). This option sets the Otsu threshold level to capture the right intensity distribution.*** Specify an integer among [0,1,2,3,4].* multiotsu: Select this option to perform a staged inhomogeneity correction, where only lower intensities are initially corrected, then higher intensities are iteratively included to eventually correct the whole image. This technique may help with images with particularly strong inhomogeneity gradients and very low intensities. *** Specify 'true' or 'false'. ", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[ANAT_INHO_COR]", 
-        "command-line-flag": "--anat_inho_cor", 
-        "default-value": "method=SyN,otsu_thresh=2,multiotsu=false"
-        }, 
+            "id": "anat_inho_cor",
+            "name": "anat_inho_cor",
+            "description": "Select options for the inhomogeneity correction of the structural image. * method: specify which registration strategy is employed for providing a brain mask. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. *** N4_reg: previous correction script prior to version 0.3.1. *** disable: disables the inhomogeneity correction. * otsu_thresh: The inhomogeneity correction script necessitates an initial correction with a Otsu masking strategy (prior to registration of an anatomical mask). This option sets the Otsu threshold level to capture the right intensity distribution.*** Specify an integer among [0,1,2,3,4].* multiotsu: Select this option to perform a staged inhomogeneity correction, where only lower intensities are initially corrected, then higher intensities are iteratively included to eventually correct the whole image. This technique may help with images with particularly strong inhomogeneity gradients and very low intensities. *** Specify 'true' or 'false'. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANAT_INHO_COR]",
+            "command-line-flag": "--anat_inho_cor",
+            "default-value": "method=SyN,otsu_thresh=2,multiotsu=false"
+        },
         {
-        "id": "anat_robust_inho_cor", 
-        "name": "anat_robust_inho_cor", 
-        "description": "When selecting this option, inhomogeneity correction is executed twice to optimizeoutcomes. After completing an initial inhomogeneity correction step, the corrected outputsare co-registered to generate an unbiased template, using the same method as the commonspaceregistration. This template is then masked, and is used as a new target for masking during asecond iteration of inhomogeneity correction. Using this dataset-specific template shouldimprove the robustness of masking for inhomogeneity correction. * apply: select 'true' to apply this option. *** Specify 'true' or 'false'.* masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration.*** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option.*** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to a reference template for masking. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[ANAT_ROBUST_INHO_COR]", 
-        "command-line-flag": "--anat_robust_inho_cor", 
-        "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
-        }, 
+            "id": "anat_robust_inho_cor",
+            "name": "anat_robust_inho_cor",
+            "description": "When selecting this option, inhomogeneity correction is executed twice to optimizeoutcomes. After completing an initial inhomogeneity correction step, the corrected outputsare co-registered to generate an unbiased template, using the same method as the commonspaceregistration. This template is then masked, and is used as a new target for masking during asecond iteration of inhomogeneity correction. Using this dataset-specific template shouldimprove the robustness of masking for inhomogeneity correction. * apply: select 'true' to apply this option. *** Specify 'true' or 'false'.* masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration.*** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option.*** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to a reference template for masking. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANAT_ROBUST_INHO_COR]",
+            "command-line-flag": "--anat_robust_inho_cor",
+            "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
+        },
         {
-        "id": "bold_inho_cor", 
-        "name": "bold_inho_cor", 
-        "description": "Same as --anat_robust_inho_cor, but for the EPI images.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[BOLD_INHO_COR]", 
-        "command-line-flag": "--bold_inho_cor", 
-        "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
-        }, 
+            "id": "bold_inho_cor",
+            "name": "bold_inho_cor",
+            "description": "Same as --anat_robust_inho_cor, but for the EPI images.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BOLD_INHO_COR]",
+            "command-line-flag": "--bold_inho_cor",
+            "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
+        },
         {
-        "id": "bold_robust_inho_cor", 
-        "name": "bold_robust_inho_cor", 
-        "description": "Same as --anat_robust_inho_cor, but for the EPI images.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[BOLD_ROBUST_INHO_COR]", 
-        "command-line-flag": "--bold_robust_inho_cor", 
-        "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
-        }, 
+            "id": "bold_robust_inho_cor",
+            "name": "bold_robust_inho_cor",
+            "description": "Same as --anat_robust_inho_cor, but for the EPI images.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BOLD_ROBUST_INHO_COR]",
+            "command-line-flag": "--bold_robust_inho_cor",
+            "default-value": "apply=false,masking=false,brain_extraction=false,template_registration=SyN"
+        },
         {
-        "id": "commonspace_reg", 
-        "name": "commonspace_reg", 
-        "description": "Specify registration options for the commonspace registration. * masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to the commonspace atlas. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. * fast_commonspace: Skip the generation of a dataset-generated unbiased template, and instead, register each scan independently directly onto the commonspace atlas, using the template_registration. This option can be faster, but may decrease the quality of alignment between subjects.*** Specify 'true' or 'false'. ", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[COMMONSPACE_REG]", 
-        "command-line-flag": "--commonspace_reg", 
-        "default-value": "masking=false,brain_extraction=false,template_registration=SyN,fast_commonspace=false"
-        }, 
+            "id": "commonspace_reg",
+            "name": "commonspace_reg",
+            "description": "Specify registration options for the commonspace registration. * masking: Combine masks derived from the inhomogeneity correction step to support registration during the generation of the unbiased template, and then during template registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to template registration based on the combined masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* template_registration: Specify a registration script for the alignment of the dataset-generated unbiased template to the commonspace atlas. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. * fast_commonspace: Skip the generation of a dataset-generated unbiased template, and instead, register each scan independently directly onto the commonspace atlas, using the template_registration. This option can be faster, but may decrease the quality of alignment between subjects.*** Specify 'true' or 'false'. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[COMMONSPACE_REG]",
+            "command-line-flag": "--commonspace_reg",
+            "default-value": "masking=false,brain_extraction=false,template_registration=SyN,fast_commonspace=false"
+        },
         {
-        "id": "bold2anat_coreg", 
-        "name": "bold2anat_coreg", 
-        "description": "Specify the registration script for cross-modal alignment between the EPI and structural images. This operation is responsible for correcting EPI susceptibility distortions. * masking: With this option, the brain masks obtained from the EPI inhomogeneity correction step are used to support registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to registration using the EPI masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* registration: Specify a registration script. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. (default: masking=false,brain_extraction=false,registration=SyN)", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[BOLD2ANAT_COREG]", 
-        "command-line-flag": "--bold2anat_coreg", 
-        "default-value": "masking=false,brain_extraction=false,registration=SyN"
-        }, 
+            "id": "bold2anat_coreg",
+            "name": "bold2anat_coreg",
+            "description": "Specify the registration script for cross-modal alignment between the EPI and structural images. This operation is responsible for correcting EPI susceptibility distortions. * masking: With this option, the brain masks obtained from the EPI inhomogeneity correction step are used to support registration. *** Specify 'true' or 'false'.* brain_extraction: conducts brain extraction prior to registration using the EPI masks from inhomogeneity correction. This will enhance brain edge-matching, but requires good quality masks. This should be selected along the 'masking' option. *** Specify 'true' or 'false'.* registration: Specify a registration script. *** Rigid: conducts only rigid registration. *** Affine: conducts Rigid then Affine registration. *** SyN: conducts Rigid, Affine then non-linear registration. *** no_reg: skip registration. (default: masking=false,brain_extraction=false,registration=SyN)",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BOLD2ANAT_COREG]",
+            "command-line-flag": "--bold2anat_coreg",
+            "default-value": "masking=false,brain_extraction=false,registration=SyN"
+        },
         {
-        "id": "nativespace_resampling", 
-        "name": "nativespace_resampling", 
-        "description": "Can specify a resampling dimension for the nativespace fMRI outputs.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[NATIVESPACE_RESAMPLING]", 
-        "command-line-flag": "--nativespace_resampling", 
-        "default-value": "inputs_defined"
-        }, 
+            "id": "nativespace_resampling",
+            "name": "nativespace_resampling",
+            "description": "Can specify a resampling dimension for the nativespace fMRI outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[NATIVESPACE_RESAMPLING]",
+            "command-line-flag": "--nativespace_resampling",
+            "default-value": "inputs_defined"
+        },
         {
-        "id": "commonspace_resampling", 
-        "name": "commonspace_resampling", 
-        "description": "Can specify a resampling dimension for the commonspace fMRI outputs.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[COMMONSPACE_RESAMPLING]", 
-        "command-line-flag": "--commonspace_resampling", 
-        "default-value": "inputs_defined"
-        }, 
+            "id": "commonspace_resampling",
+            "name": "commonspace_resampling",
+            "description": "Can specify a resampling dimension for the commonspace fMRI outputs.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[COMMONSPACE_RESAMPLING]",
+            "command-line-flag": "--commonspace_resampling",
+            "default-value": "inputs_defined"
+        },
         {
-        "id": "anatomical_resampling", 
-        "name": "anatomical_resampling", 
-        "description": "This specifies resampling dimensions for the anatomical registration targets. By default, images are resampled to isotropic resolution based on the smallest dimension among the provided anatomical images (EPI images instead if --bold_only is True). Increasing voxel resampling size will increase registration speed at the cost of accuracy.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[ANATOMICAL_RESAMPLING]", 
-        "command-line-flag": "--anatomical_resampling", 
-        "default-value": "inputs_defined"
-        }, 
+            "id": "anatomical_resampling",
+            "name": "anatomical_resampling",
+            "description": "This specifies resampling dimensions for the anatomical registration targets. By default, images are resampled to isotropic resolution based on the smallest dimension among the provided anatomical images (EPI images instead if --bold_only is True). Increasing voxel resampling size will increase registration speed at the cost of accuracy.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANATOMICAL_RESAMPLING]",
+            "command-line-flag": "--anatomical_resampling",
+            "default-value": "inputs_defined"
+        },
         {
-        "id": "apply_STC", 
-        "name": "apply_STC", 
-        "description": "Select this option to apply the STC step.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[APPLY_STC]", 
-        "command-line-flag": "--apply_STC", 
-        "default-value": "False"
-        }, 
+            "id": "apply_STC",
+            "name": "apply_STC",
+            "description": "Select this option to apply the STC step.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[APPLY_STC]",
+            "command-line-flag": "--apply_STC",
+            "default-value": "False"
+        },
         {
-        "id": "TR", 
-        "name": "TR", 
-        "description": "Specify repetition time (TR) in seconds. (e.g. --TR 1.2)", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[TR]", 
-        "command-line-flag": "--TR", 
-        "default-value": "auto"
-        }, 
+            "id": "TR",
+            "name": "TR",
+            "description": "Specify repetition time (TR) in seconds. (e.g. --TR 1.2)",
+            "optional": true,
+            "type": "String",
+            "value-key": "[TR]",
+            "command-line-flag": "--TR",
+            "default-value": "auto"
+        },
         {
-        "id": "tpattern", 
-        "name": "tpattern", 
-        "description": "Specify if interleaved ('alt') or sequential ('seq') acquisition, and specify in whichdirection (- or +) to apply the correction. If slices were acquired from front to back,the correction should be in the negative (-) direction. Refer to this discussion on thetopic for more information https://github.com/CoBrALab/RABIES/discussions/217.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[TPATTERN]", 
-        "command-line-flag": "--tpattern", 
-        "default-value": "alt-z"
-        }, 
+            "id": "tpattern",
+            "name": "tpattern",
+            "description": "Specify if interleaved ('alt') or sequential ('seq') acquisition, and specify in whichdirection (- or +) to apply the correction. If slices were acquired from front to back,the correction should be in the negative (-) direction. Refer to this discussion on thetopic for more information https://github.com/CoBrALab/RABIES/discussions/217.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[TPATTERN]",
+            "command-line-flag": "--tpattern",
+            "default-value": "alt-z"
+        },
         {
-        "id": "stc_axis", 
-        "name": "stc_axis", 
-        "description": "should be over the Y axis, which corresponds to the anteroposterior axis in RAS convention.(default: Y) Template Files: Specify commonspace template and associated mask/label files. By default, RABIES provides the mouse DSURQE atlas", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[STC_AXIS]", 
-        "command-line-flag": "--stc_axis", 
-        "default-value": "Y"
-        }, 
+            "id": "stc_axis",
+            "name": "stc_axis",
+            "description": "should be over the Y axis, which corresponds to the anteroposterior axis in RAS convention.(default: Y) Template Files: Specify commonspace template and associated mask/label files. By default, RABIES provides the mouse DSURQE atlas",
+            "optional": true,
+            "type": "String",
+            "value-key": "[STC_AXIS]",
+            "command-line-flag": "--stc_axis",
+            "default-value": "Y"
+        },
         {
-        "id": "anat_template", 
-        "name": "anat_template", 
-        "description": "Anatomical file for the commonspace atlas.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[ANAT_TEMPLATE]", 
-        "command-line-flag": "--anat_template", 
-        "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_average.nii.gz"
-        }, 
+            "id": "anat_template",
+            "name": "anat_template",
+            "description": "Anatomical file for the commonspace atlas.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ANAT_TEMPLATE]",
+            "command-line-flag": "--anat_template",
+            "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_average.nii.gz"
+        },
         {
-        "id": "brain_mask", 
-        "name": "brain_mask", 
-        "description": "Brain mask aligned with the template.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[BRAIN_MASK]", 
-        "command-line-flag": "--brain_mask", 
-        "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_mask.nii.gz"
-        }, 
+            "id": "brain_mask",
+            "name": "brain_mask",
+            "description": "Brain mask aligned with the template.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[BRAIN_MASK]",
+            "command-line-flag": "--brain_mask",
+            "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_mask.nii.gz"
+        },
         {
-        "id": "WM_mask", 
-        "name": "WM_mask", 
-        "description": "White matter mask aligned with the template.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[WM_MASK]", 
-        "command-line-flag": "--WM_mask", 
-        "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_WM_mask.nii.gz"
-        }, 
+            "id": "WM_mask",
+            "name": "WM_mask",
+            "description": "White matter mask aligned with the template.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[WM_MASK]",
+            "command-line-flag": "--WM_mask",
+            "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_WM_mask.nii.gz"
+        },
         {
-        "id": "CSF_mask", 
-        "name": "CSF_mask", 
-        "description": "CSF mask aligned with the template.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[CSF_MASK]", 
-        "command-line-flag": "--CSF_mask", 
-        "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_CSF_mask.nii.gz"
-        }, 
+            "id": "CSF_mask",
+            "name": "CSF_mask",
+            "description": "CSF mask aligned with the template.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[CSF_MASK]",
+            "command-line-flag": "--CSF_mask",
+            "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_eroded_CSF_mask.nii.gz"
+        },
         {
-        "id": "vascular_mask", 
-        "name": "vascular_mask", 
-        "description": "Can provide a mask of major blood vessels to compute associated nuisance timeseries. The default mask was generated by applying MELODIC ICA and selecting the resultingcomponent mapping onto major brain vessels.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[VASCULAR_MASK]", 
-        "command-line-flag": "--vascular_mask", 
-        "default-value": "/home/rabies/.local/share/rabies/vascular_mask.nii.gz"
-        }, 
+            "id": "vascular_mask",
+            "name": "vascular_mask",
+            "description": "Can provide a mask of major blood vessels to compute associated nuisance timeseries. The default mask was generated by applying MELODIC ICA and selecting the resultingcomponent mapping onto major brain vessels.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[VASCULAR_MASK]",
+            "command-line-flag": "--vascular_mask",
+            "default-value": "/home/rabies/.local/share/rabies/vascular_mask.nii.gz"
+        },
         {
-        "id": "labels", 
-        "name": "labels", 
-        "description": "Labels file providing the atlas anatomical annotations.", 
-        "optional": true, 
-        "type": "String", 
-        "value-key": "[LABELS]", 
-        "command-line-flag": "--labels", 
-        "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_labels.nii.gz"
-        }, 
+            "id": "labels",
+            "name": "labels",
+            "description": "Labels file providing the atlas anatomical annotations.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[LABELS]",
+            "command-line-flag": "--labels",
+            "default-value": "/home/rabies/.local/share/rabies/DSURQE_40micron_labels.nii.gz"
+        },
         {
             "id": "bids_dir",
             "name": "bids_dir",
@@ -426,8 +426,7 @@
             "default-value": "false"
         }
     ],
-    "tags": {
-    },
+    "tags": {},
     "suggested-resources": {
         "cpu-cores": 1,
         "ram": 1,
@@ -438,5 +437,151 @@
             "code": 1,
             "description": "Crashed"
         }
-    ]
+    ],
+    "invocation-schema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "RABIES.invocationSchema",
+        "description": "Invocation schema for rabies.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "bids_filter": {
+                "type": "string"
+            },
+            "bold_only": {
+                "type": "string"
+            },
+            "anat_autobox": {
+                "type": "string"
+            },
+            "bold_autobox": {
+                "type": "string"
+            },
+            "oblique2card": {
+                "type": "string"
+            },
+            "apply_despiking": {
+                "type": "string"
+            },
+            "HMC_option": {
+                "type": "string"
+            },
+            "isotropic_HMC": {
+                "type": "string"
+            },
+            "voxelwise_motion": {
+                "type": "string"
+            },
+            "apply_slice_mc": {
+                "type": "string"
+            },
+            "detect_dummy": {
+                "type": "string"
+            },
+            "data_type": {
+                "type": "string"
+            },
+            "anat_inho_cor": {
+                "type": "string"
+            },
+            "anat_robust_inho_cor": {
+                "type": "string"
+            },
+            "bold_inho_cor": {
+                "type": "string"
+            },
+            "bold_robust_inho_cor": {
+                "type": "string"
+            },
+            "commonspace_reg": {
+                "type": "string"
+            },
+            "bold2anat_coreg": {
+                "type": "string"
+            },
+            "nativespace_resampling": {
+                "type": "string"
+            },
+            "commonspace_resampling": {
+                "type": "string"
+            },
+            "anatomical_resampling": {
+                "type": "string"
+            },
+            "apply_STC": {
+                "type": "string"
+            },
+            "TR": {
+                "type": "string"
+            },
+            "tpattern": {
+                "type": "string"
+            },
+            "stc_axis": {
+                "type": "string"
+            },
+            "anat_template": {
+                "type": "string"
+            },
+            "brain_mask": {
+                "type": "string"
+            },
+            "WM_mask": {
+                "type": "string"
+            },
+            "CSF_mask": {
+                "type": "string"
+            },
+            "vascular_mask": {
+                "type": "string"
+            },
+            "labels": {
+                "type": "string"
+            },
+            "bids_dir": {
+                "type": "string"
+            },
+            "output_dir": {
+                "type": "string"
+            },
+            "inclusion_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "exclusion_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "plugin": {
+                "type": "string"
+            },
+            "local_threads": {
+                "type": "number"
+            },
+            "scale_min_memory": {
+                "type": "number"
+            },
+            "min_proc": {
+                "type": "number"
+            },
+            "figure_format": {
+                "type": "string"
+            },
+            "verbose": {
+                "type": "number"
+            },
+            "force": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "bids_dir",
+            "output_dir"
+        ],
+        "dependencies": {}
+    }
 }
