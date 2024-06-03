@@ -23,7 +23,7 @@
             "type": "String",
             "value-key": "[BOLD_ONLY]",
             "command-line-flag": "--bold_only",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "anat_autobox",
@@ -33,7 +33,7 @@
             "type": "String",
             "value-key": "[ANAT_AUTOBOX]",
             "command-line-flag": "--anat_autobox",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "bold_autobox",
@@ -43,7 +43,7 @@
             "type": "String",
             "value-key": "[BOLD_AUTOBOX]",
             "command-line-flag": "--bold_autobox",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "oblique2card",
@@ -63,7 +63,7 @@
             "type": "String",
             "value-key": "[APPLY_DESPIKING]",
             "command-line-flag": "--apply_despiking",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "HMC_option",
@@ -83,7 +83,7 @@
             "type": "String",
             "value-key": "[ISOTROPIC_HMC]",
             "command-line-flag": "--isotropic_HMC",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "voxelwise_motion",
@@ -93,7 +93,7 @@
             "type": "String",
             "value-key": "[VOXELWISE_MOTION]",
             "command-line-flag": "--voxelwise_motion",
-            "default-value": false
+           "default-value": "False"
         },
         {
             "id": "apply_slice_mc",
@@ -113,7 +113,7 @@
             "command-line-flag": "--detect_dummy",
             "value-key": "[DETECT_DUMMY]",
             "optional": true,
-            "default-value": false
+            "default-value": "False"
         },
         {
             "id": "data_type",

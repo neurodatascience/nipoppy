@@ -90,7 +90,7 @@
             "name": "edge_cutoff",
             "description": "Specify the number of seconds to cut at beginning and end of acquisition if applying a frequency filter. Frequency filters generate edge effects at begining and end of the timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hzhighpass.).",
             "optional": true,
-            "type": "String",
+            "type": "Number",
             "value-key": "[EDGE_CUTOFF]",
             "command-line-flag": "--edge_cutoff",
             "default-value": "0"

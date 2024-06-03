@@ -60,7 +60,7 @@
             "name": "outlier_threshold",
             "description": "The modified Z-score threshold for detecting outliers during dataset QC when using --data_diagnosis. The default of 3.5 is recommended in https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h.htm.",
             "optional": true,
-            "type": "String",
+            "type": "Number",
             "value-key": "[OUTLIER_THRESHOLD]",
             "command-line-flag": "--outlier_threshold",
             "default-value": "3.5"
@@ -140,7 +140,7 @@
             "name": "NPR_temporal_comp",
             "description": "Option for performing Neural Prior Recovery (NPR). Specify with this option how many extra subject-specific sources will be computed to account for non-prior confounds. This options specifies the number of temporal components to compute. After computing these sources, NPR will provide a fit for each prior in --prior_maps indexed by --prior_bold_idx. Specify at least 0 extra sources to run NPR.",
             "optional": true,
-            "type": "String",
+            "type": "Number",
             "value-key": "[NPR_TEMPORAL_COMP]",
             "command-line-flag": "--NPR_temporal_comp",
             "default-value": "-1"
@@ -150,7 +150,7 @@
             "name": "NPR_spatial_comp",
             "description": "Same as --NPR_temporal_comp, but specify how many spatial components to compute (which are additioned to the temporal components)",
             "optional": true,
-            "type": "String",
+            "type": "Number",
             "value-key": "[NPR_SPATIAL_COMP]",
             "command-line-flag": "--NPR_spatial_comp",
             "default-value": "-1"
