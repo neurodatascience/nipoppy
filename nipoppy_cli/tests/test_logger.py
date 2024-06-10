@@ -16,6 +16,25 @@ def test_get_logger(level: int, name: str):
     assert logger.name == name
 
 
+def test_get_logger_stdout(capsys: pytest.CaptureFixture):
+    logger = get_logger(level=logging.DEBUG)
+    logger.debug("debug")
+    logger.info("info")
+    captured = capsys.readouterr()
+    assert captured.out
+    assert not captured.err
+
+
+def test_get_logger_stderr(capsys: pytest.CaptureFixture):
+    logger = get_logger(level=logging.DEBUG)
+    logger.warning("warning")
+    logger.error("error")
+    logger.critical("critical")
+    captured = capsys.readouterr()
+    assert not captured.out
+    assert captured.err
+
+
 @pytest.mark.parametrize(
     "level", [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR]
 )

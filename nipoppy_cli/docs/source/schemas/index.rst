@@ -11,27 +11,25 @@ This page contains auto-generated :term:`JSON` schemas [#f1]_ for the text files
 Global configuration file
 -------------------------
 
+.. tip::
+
+    See the :ref:`Quickstart guide <customizing-config>` for an example config file.
+
 .. include:: schema_howto.md
     :parser: myst_parser.sphinx_
-
-.. admonition:: Info
-
-    ``PROC_PIPELINES`` and ``BIDS`` are nested objects (i.e. dictionaries),
-    where the final "leaf" values are ``PipelineConfig`` objects. All keys should
-    be strings.
-
-    ``PROC_PIPELINES`` expects two levels of nesting: one for the **pipeline name**,
-    and the other for the **pipeline version**.
-
-    ``BIDS`` expects three levels of nesting: one for the **pipeline name**, one for
-    the **pipeline version**, and the last one for the **name of the** :term:`BIDS` **conversion step**.
-
-    See the :ref:`Quickstart guide <customizing-config>` for an example config file
-    that shows these nested structures.
 
 Below is the schema used for the global configuration :term:`JSON` file.
 
 .. jsonschema:: config.json
+
+Tracker configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The tracker configuration file specified in the `PipelineConfig`_ should be a :term:`JSON` file that contains **a list** of tracker configurations.
+The schema for each individual tracker configuration is shown below.
+
+.. jsonschema:: tracker.json
+    :lift_title: False
 
 .. _manifest-schema:
 

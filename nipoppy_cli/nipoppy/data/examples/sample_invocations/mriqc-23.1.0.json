@@ -1,0 +1,8 @@
+{
+    "modalities": [
+        "T1w",
+        "T2w"
+    ],
+    "no_sub": true,
+    "nprocs": "4"
+}

@@ -4,6 +4,9 @@ For the full list of built-in configuration values, see the documentation:
 https://www.sphinx-doc.org/en/master/usage/configuration.html
 """
 
+# for substitutions
+from nipoppy.layout import DEFAULT_LAYOUT_INFO
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -56,7 +59,12 @@ intersphinx_mapping = {
 
 # -- MyST configuration -------------------------------------------------------
 
-myst_enable_extensions = ["fieldlist"]
+myst_enable_extensions = ["fieldlist", "substitution"]
+
+myst_substitutions = {
+    "fpath_manifest": f"`{DEFAULT_LAYOUT_INFO.fpath_manifest}`",
+    "fpath_config": f"`{DEFAULT_LAYOUT_INFO.fpath_config}`",
+}
 
 # -- Autodoc/AutoAPI configuration ----------------------------------------------------
 

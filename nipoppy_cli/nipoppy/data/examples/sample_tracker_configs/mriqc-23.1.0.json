@@ -1,0 +1,9 @@
+[
+    {
+        "NAME": "pipeline_complete",
+        "PATHS": [
+            "[[NIPOPPY_BIDS_ID]]/[[NIPOPPY_SESSION]]/anat/[[NIPOPPY_BIDS_ID]]_[[NIPOPPY_SESSION]]_*_T1w.json",
+            "[[NIPOPPY_BIDS_ID]]_[[NIPOPPY_SESSION]]_*_T1w.html"
+        ]
+    }
+]

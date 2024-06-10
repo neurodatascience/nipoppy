@@ -9,12 +9,13 @@ import pytest
 
 from nipoppy.config.main import Config
 from nipoppy.logger import get_logger
+from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.manifest import Manifest
 from nipoppy.utils import FPATH_SAMPLE_CONFIG, FPATH_SAMPLE_MANIFEST
 from nipoppy.workflows.base import BaseWorkflow
 
 from .conftest import datetime_fixture  # noqa F401
-from .conftest import create_empty_dataset, get_config
+from .conftest import DPATH_TEST_DATA, create_empty_dataset, get_config, prepare_dataset
 
 
 @pytest.fixture(params=[get_logger("my_logger"), None], scope="function")
@@ -27,6 +28,8 @@ def workflow(request: pytest.FixtureRequest, tmp_path: Path):
     workflow = DummyWorkflow(
         dpath_root=dpath_root, name="my_workflow", logger=request.param
     )
+    manifest = prepare_dataset(participants_and_sessions_manifest={})
+    manifest.save_with_backup(workflow.layout.fpath_manifest)
     workflow.logger.setLevel(logging.DEBUG)  # capture all logs
     return workflow
 
@@ -119,15 +122,30 @@ def test_run_cleanup(workflow: BaseWorkflow, caplog: pytest.LogCaptureFixture):
     assert "END" in caplog.text
 
 
-def test_config(workflow: BaseWorkflow):
+@pytest.mark.parametrize(
+    "fpath_config",
+    [
+        FPATH_SAMPLE_CONFIG,
+        DPATH_TEST_DATA / "config1.json",
+        DPATH_TEST_DATA / "config2.json",
+        DPATH_TEST_DATA / "config3.json",
+    ],
+)
+def test_config(workflow: BaseWorkflow, fpath_config):
     workflow.layout.fpath_config.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(FPATH_SAMPLE_CONFIG, workflow.layout.fpath_config)
+    shutil.copy(fpath_config, workflow.layout.fpath_config)
     assert isinstance(workflow.config, Config)
 
 
 def test_config_not_found(workflow: BaseWorkflow):
     with pytest.raises(FileNotFoundError):
         workflow.config
+
+
+def test_config_replacement(workflow: BaseWorkflow):
+    config = get_config(dataset_name="[[NIPOPPY_DPATH_ROOT]]")
+    config.save(workflow.layout.fpath_config)
+    assert str(workflow.config.DATASET_NAME) == str(workflow.dpath_root)
 
 
 def test_manifest(workflow: BaseWorkflow):
@@ -144,3 +162,21 @@ def test_manifest(workflow: BaseWorkflow):
 def test_manifest_not_found(workflow: BaseWorkflow):
     with pytest.raises(FileNotFoundError):
         workflow.manifest
+
+
+def test_dicom_dir_map(workflow: BaseWorkflow):
+    workflow.config = get_config()
+    assert isinstance(workflow.dicom_dir_map, DicomDirMap)
+
+
+def test_dicom_dir_map_custom(workflow: BaseWorkflow):
+    workflow.config = get_config()
+    workflow.config.DICOM_DIR_MAP_FILE = DPATH_TEST_DATA / "dicom_dir_map1.csv"
+    assert isinstance(workflow.dicom_dir_map, DicomDirMap)
+
+
+def test_dicom_dir_map_not_found(workflow: BaseWorkflow):
+    workflow.config = get_config()
+    workflow.config.DICOM_DIR_MAP_FILE = "fake_path"
+    with pytest.raises(FileNotFoundError, match="DICOM directory map file not found"):
+        workflow.dicom_dir_map

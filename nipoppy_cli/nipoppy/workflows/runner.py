@@ -1,6 +1,8 @@
 """PipelineRunner workflow."""
 
 import logging
+from functools import cached_property
+from pathlib import Path
 from typing import Optional
 
 from boutiques import bosh
@@ -18,7 +20,8 @@ class PipelineRunner(BasePipelineWorkflow):
         self,
         dpath_root: StrOrPathLike,
         pipeline_name: str,
-        pipeline_version: str,
+        pipeline_version: Optional[str] = None,
+        pipeline_step: Optional[str] = None,
         participant: str = None,
         session: str = None,
         simulate: bool = False,
@@ -31,6 +34,7 @@ class PipelineRunner(BasePipelineWorkflow):
             name="run",
             pipeline_name=pipeline_name,
             pipeline_version=pipeline_version,
+            pipeline_step=pipeline_step,
             participant=participant,
             session=session,
             fpath_layout=fpath_layout,
@@ -38,9 +42,14 @@ class PipelineRunner(BasePipelineWorkflow):
             dry_run=dry_run,
         )
         self.simulate = simulate
-        self.dpaths_to_check.extend(
-            [self.dpath_pipeline_output, self.dpath_pipeline_work]
-        )
+
+    @cached_property
+    def dpaths_to_check(self) -> list[Path]:
+        """Directory paths to create if needed during the setup phase."""
+        return super().dpaths_to_check + [
+            self.dpath_pipeline_output,
+            self.dpath_pipeline_work,
+        ]
 
     def process_container_config(
         self,
@@ -64,10 +73,9 @@ class PipelineRunner(BasePipelineWorkflow):
         self.logger.debug(f"Initial container config: {container_config}")
 
         # get and process Boutiques config
-        boutiques_config = self.get_boutiques_config(participant, session)
         boutiques_config = BoutiquesConfig(
             **self.process_template_json(
-                boutiques_config.model_dump(),
+                self.boutiques_config.model_dump(),
                 participant=participant,
                 session=session,
             )
@@ -77,9 +85,7 @@ class PipelineRunner(BasePipelineWorkflow):
         self.logger.debug(f"Boutiques config: {boutiques_config}")
         if boutiques_config != BoutiquesConfig():
             self.logger.info("Updating container config with config from descriptor")
-            container_config.merge_args_and_env_vars(
-                boutiques_config.get_container_config()
-            )
+            container_config.merge(boutiques_config.get_container_config())
 
         # add bind paths
         for bind_path in bind_paths:
@@ -88,7 +94,10 @@ class PipelineRunner(BasePipelineWorkflow):
         self.logger.info(f"Using container config: {container_config}")
 
         container_command = prepare_container(
-            container_config, check=True, logger=self.logger
+            container_config,
+            subcommand=boutiques_config.CONTAINER_SUBCOMMAND,
+            check=True,
+            logger=self.logger,
         )
 
         return container_command

@@ -25,7 +25,11 @@ def dpath_root(request: pytest.FixtureRequest, tmp_path: Path) -> Path:
 def create_invalid_dataset(dpath_root: Path, paths_to_delete: list[str]):
     create_empty_dataset(dpath_root)
     for path in paths_to_delete:
-        shutil.rmtree(dpath_root / path, ignore_errors=True)
+        path_to_delete = dpath_root / path
+        if path_to_delete.is_file():
+            path_to_delete.unlink()
+        else:
+            shutil.rmtree(path_to_delete, ignore_errors=True)
 
 
 def test_config_path_infos():
@@ -110,7 +114,7 @@ def test_fpaths(dpath_root: Path):
             "proc/descriptors",
             "proc/invocations",
             "proc/scripts",
-            "proc/global_configs.json",
+            "global_config.json",
             "proc/pybids",
             "proc/pybids/bids_db",
             "proc/pybids/ignore_patterns",
@@ -122,7 +126,7 @@ def test_fpaths(dpath_root: Path):
         ],
         [
             "tabular",
-            "tabular/manifest.csv",
+            "manifest.csv",
             "tabular/assessments",
             "tabular/demographics",
         ],
@@ -155,14 +159,14 @@ def test_dpath_descriptions():
     [
         ["sourcedata", "downloads"],
         ["bids", "derivatives"],
-        ["proc", "proc/global_configs.json"],
+        ["proc", "proc/global_config.json"],
         [
             "proc",
             "proc/containers",
             "proc/descriptors",
             "proc/invocations",
             "proc/scripts",
-            "proc/global_configs.json",
+            "proc/global_config.json",
             "proc/pybids",
             "proc/pybids/bids_db",
             "proc/pybids/ignore_patterns",

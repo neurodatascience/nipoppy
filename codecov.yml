@@ -1,0 +1,4 @@
+coverage:
+  ignore:
+    - nipoppy/ # legacy code
+    - nipoppy_cli/docs/ # documentation

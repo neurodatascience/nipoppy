@@ -17,8 +17,8 @@ from nipoppy.tabular.doughnut import Doughnut
 from nipoppy.tabular.manifest import Manifest
 from nipoppy.utils import StrOrPathLike, strip_session
 
-FPATH_CONFIG = "proc/global_configs.json"
-FPATH_MANIFEST = "tabular/manifest.csv"
+FPATH_CONFIG = "global_config.json"
+FPATH_MANIFEST = "manifest.csv"
 DPATH_TEST_DATA = Path(__file__).parent / "data"
 
 ATTR_TO_DPATH_MAP = {
@@ -31,7 +31,7 @@ ATTR_TO_DPATH_MAP = {
     "dpath_containers": "proc/containers",
     "dpath_descriptors": "proc/descriptors",
     "dpath_invocations": "proc/invocations",
-    "dpath_scripts": "proc/scripts",
+    "dpath_tracker_configs": "proc/tracker_configs",
     "dpath_pybids": "proc/pybids",
     "dpath_bids_db": "proc/pybids/bids_db",
     "dpath_bids_ignore_patterns": "proc/pybids/ignore_patterns",
@@ -74,7 +74,7 @@ def get_config(
     dataset_name="my_dataset",
     sessions=None,
     visits=None,
-    bids=None,
+    bids_pipelines=None,
     proc_pipelines=None,
     container_config=None,
 ):
@@ -84,10 +84,10 @@ def get_config(
         sessions = []
     if visits is None:
         visits = []
-    if bids is None:
-        bids = {}
+    if bids_pipelines is None:
+        bids_pipelines = []
     if proc_pipelines is None:
-        proc_pipelines = {}
+        proc_pipelines = []
     if container_config is None:
         container_config = {}
 
@@ -95,7 +95,7 @@ def get_config(
         DATASET_NAME=dataset_name,
         VISITS=visits,
         SESSIONS=sessions,
-        BIDS=bids,
+        BIDS_PIPELINES=bids_pipelines,
         PROC_PIPELINES=proc_pipelines,
         CONTAINER_CONFIG=container_config,
     )
@@ -136,7 +136,7 @@ def _fake_dicoms(
     max_n_files_per_image: int = 5,
     min_n_subdir_levels: int = 1,
     max_n_subdir_levels: int = 2,
-    participant_first: bool = False,
+    participant_first: bool = True,
     max_dname_dicom: int = 1000000,
     rng_seed: int = 3791,
 ):
@@ -200,7 +200,7 @@ def fake_dicoms_downloaded(
     max_n_files_per_image: int = 5,
     min_n_subdir_levels: int = 1,
     max_n_subdir_levels: int = 2,
-    participant_first: bool = False,
+    participant_first: bool = True,
     max_dname_dicom: int = 1000000,
     rng_seed: int = 3791,
 ):
@@ -229,7 +229,7 @@ def fake_dicoms_organized(
     n_images: int = 3,
     min_n_files_per_image: int = 1,
     max_n_files_per_image: int = 5,
-    participant_first: bool = False,
+    participant_first: bool = True,
     max_dname_dicom: int = 1000000,
     rng_seed: int = 3791,
 ):

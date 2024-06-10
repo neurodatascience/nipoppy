@@ -84,7 +84,7 @@ def test_cli_bids_conversion(tmp_path: Path):
         len(
             list(
                 (dpath_root / ATTR_TO_DPATH_MAP["dpath_logs"]).glob(
-                    "bids_conversion/my_pipeline-1.0-step1/*.log"
+                    "bids_conversion/my_pipeline-1.0/*.log"
                 )
             )
         )

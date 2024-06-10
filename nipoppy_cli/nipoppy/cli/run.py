@@ -1,5 +1,6 @@
 """Command-line interface."""
 
+import logging
 import sys
 from typing import Sequence
 
@@ -14,7 +15,7 @@ from nipoppy.cli.parser import (
     COMMAND_PIPELINE_TRACK,
     get_global_parser,
 )
-from nipoppy.logger import add_logfile, get_logger
+from nipoppy.logger import add_logfile, capture_warnings, get_logger
 from nipoppy.workflows.bids_conversion import BidsConversionRunner
 from nipoppy.workflows.dataset_init import InitWorkflow
 from nipoppy.workflows.dicom_reorg import DicomReorgWorkflow
@@ -76,6 +77,7 @@ def cli(argv: Sequence[str] = None) -> None:
                 dpath_root=dpath_root,
                 pipeline_name=args.pipeline,
                 pipeline_version=args.pipeline_version,
+                pipeline_step=args.pipeline_step,
                 participant=args.participant,
                 session=args.session,
                 simulate=args.simulate,
@@ -96,6 +98,10 @@ def cli(argv: Sequence[str] = None) -> None:
         # cannot log to file in init since the dataset doesn't exist yet
         if command != COMMAND_INIT:
             add_logfile(logger, workflow.generate_fpath_log())
+
+        # capture warnings
+        logging.captureWarnings(True)
+        capture_warnings(workflow.logger)
 
         # run the workflow
         workflow.run()

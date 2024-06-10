@@ -4,6 +4,7 @@ import logging
 from argparse import ArgumentParser, HelpFormatter, _ActionsContainer, _SubParsersAction
 from pathlib import Path
 
+from nipoppy.layout import DEFAULT_LAYOUT_INFO
 from nipoppy.utils import (
     BIDS_SESSION_PREFIX,
     BIDS_SUBJECT_PREFIX,
@@ -72,13 +73,24 @@ def add_args_pipeline(parser: _ActionsContainer) -> _ActionsContainer:
         "--pipeline",
         type=str,
         required=True,
-        help="Pipeline name.",
+        help="Pipeline name, as specified in the config file.",
     )
     parser.add_argument(
         "--pipeline-version",
         type=str,
         required=False,
-        help="Pipeline version.",
+        help="Pipeline version, as specified in the config file.",
+    )
+    return parser
+
+
+def add_arg_pipeline_step(parser: _ActionsContainer) -> _ActionsContainer:
+    """Add a --pipeline-step argument to the parser."""
+    parser.add_argument(
+        "--pipeline-step",
+        type=str,
+        required=False,
+        help="Pipeline step, as specified in the config file (default: first step).",
     )
     return parser
 
@@ -178,7 +190,7 @@ def add_subparser_doughnut(
         action="store_true",
         help=(
             "Set all statuses to False in newly added records"
-            " (regardless of what is on disk)."
+            " (regardless of what is on disk). May be useful to reduce runtime."
         ),
     )
     parser.add_argument(
@@ -197,7 +209,11 @@ def add_subparser_dicom_reorg(
     formatter_class: type[HelpFormatter] = HelpFormatter,
 ) -> ArgumentParser:
     """Add subparser for reorg command."""
-    description = "(Re)organize raw DICOM files."  # TODO give paths in layout model
+    description = (
+        "(Re)organize raw (DICOM) files, from the raw DICOM directory "
+        f"({DEFAULT_LAYOUT_INFO.dpath_raw_dicom}) to the organized "
+        f"sourcedata directory ({DEFAULT_LAYOUT_INFO.dpath_sourcedata})."
+    )
     parser = subparsers.add_parser(
         COMMAND_DICOM_REORG,
         description=description,
@@ -209,7 +225,16 @@ def add_subparser_dicom_reorg(
     parser.add_argument(
         "--copy-files",
         action="store_true",
-        help=("Copy files when reorganizing (default: create symlinks)."),
+        help="Copy files when reorganizing (default: create symlinks).",
+    )
+    parser.add_argument(
+        "--check-dicoms",
+        action="store_true",
+        help=(
+            "Read DICOM file headers when reorganizing and check if they have the "
+            '"DERIVED" image type (which can be problematic for some BIDS '
+            "converters). The paths to the derived DICOMs will be written to the log."
+        ),
     )
     return parser
 
@@ -228,12 +253,7 @@ def add_subparser_bids_conversion(
     )
     parser = add_arg_dataset_root(parser)
     parser = add_args_pipeline(parser)
-    parser.add_argument(
-        "--pipeline-step",
-        type=str,
-        required=False,
-        help="Pipeline step.",
-    )
+    parser = add_arg_pipeline_step(parser)
     parser = add_args_participant_and_session(parser)
     parser = add_arg_simulate(parser)
     return parser
@@ -253,6 +273,7 @@ def add_subparser_pipeline_run(
     )
     parser = add_arg_dataset_root(parser)
     parser = add_args_pipeline(parser)
+    parser = add_arg_pipeline_step(parser)
     parser = add_args_participant_and_session(parser)
     parser = add_arg_simulate(parser)
     return parser

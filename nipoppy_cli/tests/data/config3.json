@@ -1,0 +1,41 @@
+{
+    "DATASET_NAME": "my_dataset",
+    "VISITS": [
+        "V01",
+        "V02"
+    ],
+    "DICOM_DIR_MAP_FILE": "dicom_dir_map.csv",
+    "PROC_PIPELINES": [
+        {
+            "NAME": "mriqc",
+            "VERSION": "23.1.0",
+            "CONTAINER_INFO": {
+                "FILE": "mriqc_23.1.0.sif",
+                "URI": "docker://nipreps/mriqc:23.1.0"
+            },
+            "STEPS": [
+                {
+                    "INVOCATION_FILE": "some/path"
+                }
+            ]
+        },
+        {
+            "NAME": "fmriprep",
+            "VERSION": "20.2.7",
+            "CONTAINER_INFO": {
+                "FILE": "fmriprep_20.2.7.sif",
+                "URI": "docker://nipreps/fmriprep:20.2.7"
+            },
+            "STEPS": [
+                {
+                    "INVOCATION_FILE": "some/path"
+                }
+            ]
+        },
+        {
+            "NAME": "freesurfer",
+            "VERSION": "6.0.1",
+            "DESCRIPTION": "FreeSurfer version associated with fMRIPrep 20.2.7"
+        }
+    ]
+}

@@ -29,15 +29,15 @@
     },
     "dpath_descriptors": {
         "path": "proc/descriptors",
-        "description": "This directory is for storing Boutiques descriptors for user-added pipelines. Descriptors can also be directly specified in the JSON config file."
+        "description": "This directory is for storing Boutiques descriptors for user-added pipelines"
     },
     "dpath_invocations": {
         "path": "proc/invocations",
-        "description": "This directory is for storing Boutiques invocations for processing pipelines. Invocations can also be directly specified in the JSON config file."
+        "description": "This directory is for storing Boutiques invocations for processing pipelines."
     },
-    "dpath_scripts": {
-        "path": "proc/scripts",
-        "description": "This directory is for custom, dataset-specific scripts."
+    "dpath_tracker_configs": {
+        "path": "proc/tracker_configs",
+        "description": "This directory is for storing tracker configurations for processing pipelines."
     },
     "dpath_pybids": {
         "path": "proc/pybids",
@@ -49,7 +49,7 @@
     },
     "dpath_bids_ignore_patterns": {
         "path": "proc/pybids/ignore_patterns",
-        "description": "This directory is for storing ignore patterns to be used by PyBIDS during dataset indexing. Ignore patterns can also be directly specified in the JSON config file."
+        "description": "This directory is for storing ignore patterns to be used by PyBIDS during dataset indexing."
     },
     "dpath_scratch": {
         "path": "scratch",
@@ -76,15 +76,15 @@
         "description": "This directory is for demographics data."
     },
     "fpath_config": {
-        "path": "proc/global_configs.json",
-        "description": "The configuration for a dataset is where all data processing is configured."
+        "path": "global_config.json",
+        "description": "The configuration file for a dataset is where all data processing is configured."
     },
     "fpath_doughnut": {
         "path": "scratch/raw_dicom/doughnut.csv",
         "description": "The doughnut file is generated/updated internally and is used to keep track of the raw data organization and BIDS conversion process."
     },
     "fpath_manifest": {
-        "path": "tabular/manifest.csv",
+        "path": "manifest.csv",
         "description": "The manifest file lists all expected study participants and visits."
     },
     "fpath_imaging_bagel": {

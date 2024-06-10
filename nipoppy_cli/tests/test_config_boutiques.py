@@ -8,7 +8,7 @@ from nipoppy.config.boutiques import (
     get_boutiques_config_from_descriptor,
 )
 
-FIELDS_BOUTIQUES = ["CONTAINER_CONFIG"]
+FIELDS_BOUTIQUES = ["CONTAINER_CONFIG", "CONTAINER_SUBCOMMAND"]
 
 
 def test_boutiques_config():
@@ -16,6 +16,7 @@ def test_boutiques_config():
     boutiques_config = BoutiquesConfig()
     for field in FIELDS_BOUTIQUES:
         assert hasattr(boutiques_config, field)
+    assert len(boutiques_config.model_fields) == len(FIELDS_BOUTIQUES)
 
 
 def test_boutiques_config_no_extra_fields():

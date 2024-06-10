@@ -48,6 +48,7 @@ class DoughnutWorkflow(BaseWorkflow):
             doughnut = update_doughnut(
                 doughnut=old_doughnut,
                 manifest=self.manifest,
+                dicom_dir_map=self.dicom_dir_map,
                 dpath_downloaded=dpath_downloaded,
                 dpath_organized=dpath_organized,
                 dpath_bidsified=dpath_bidsified,
@@ -62,6 +63,7 @@ class DoughnutWorkflow(BaseWorkflow):
                 logger.info(f"Did not find existing doughnut at {fpath_doughnut}")
             doughnut = generate_doughnut(
                 manifest=self.manifest,
+                dicom_dir_map=self.dicom_dir_map,
                 dpath_downloaded=dpath_downloaded,
                 dpath_organized=dpath_organized,
                 dpath_bidsified=dpath_bidsified,

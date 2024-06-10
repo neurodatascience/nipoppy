@@ -15,7 +15,7 @@
             "command-line-flag": "-d",
             "value-key": "[DICOM_DIR]",
             "default-value": [
-                "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_SESSION]]/[[NIPOPPY_PARTICIPANT]]"
+                "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]"
             ]
         },
         {

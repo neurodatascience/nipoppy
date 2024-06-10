@@ -6,8 +6,9 @@ import pytest
 import pytest_mock
 from boutiques import bosh
 
+from nipoppy.config.main import Config
 from nipoppy.layout import DatasetLayout
-from nipoppy.utils import DPATH_DESCRIPTORS, FPATH_SAMPLE_CONFIG
+from nipoppy.utils import DPATH_DESCRIPTORS, DPATH_INVOCATIONS, FPATH_SAMPLE_CONFIG_FULL
 from nipoppy.workflows import BidsConversionRunner, PipelineRunner
 
 from .conftest import create_empty_dataset, prepare_dataset
@@ -21,10 +22,14 @@ def single_subject_dataset(
     participant = "01"
     session = "ses-01"
     container_command = "apptainer"
-    config_files_map = {
-        "<PATH_TO_FREESURFER_LICENSE_FILE>": "freesurfer_license.txt",
-        "<PATH_TO_HEURISTIC_FILE>": "heuristic.py",
-        "<PATH_TO_CONFIG_FILE>": "dcm2bids_config.json",
+    substitutions = {
+        "[[NIPOPPY_DPATH_DESCRIPTORS]]": str(DPATH_DESCRIPTORS),
+        "[[NIPOPPY_DPATH_INVOCATIONS]]": str(DPATH_INVOCATIONS),
+        "[[NIPOPPY_DPATH_CONTAINERS]]": "[[NIPOPPY_DPATH_CONTAINERS]]",
+        "[[HEUDICONV_HEURISTIC_FILE]]": str(tmp_path / "heuristic.py"),
+        "[[DCM2BIDS_CONFIG_FILE]]": str(tmp_path / "dcm2bids_config.json"),
+        "[[FREESURFER_LICENSE_FILE]]": str(tmp_path / "freesurfer_license.txt"),
+        "[[TEMPLATEFLOW_HOME]]": str(tmp_path / "templateflow"),
     }
 
     participants_and_sessions = {participant: [session]}
@@ -38,12 +43,13 @@ def single_subject_dataset(
     )
     manifest.save_with_backup(layout.fpath_manifest)
 
-    config_text = FPATH_SAMPLE_CONFIG.read_text()
-    for placeholder, fname in config_files_map.items():
-        fpath = layout.dpath_root / fname
-        config_text = config_text.replace(placeholder, str(fpath))
-        fpath.touch()
-    layout.fpath_config.write_text(config_text)
+    config = Config.load(FPATH_SAMPLE_CONFIG_FULL, apply_substitutions=False)
+    config.SUBSTITUTIONS = substitutions
+    config.save(layout.fpath_config)
+
+    for placeholder, fpath in substitutions.items():
+        if "FILE" in placeholder:
+            Path(fpath).touch()
 
     # patch so that the test runs even if the command is not available
     mocker.patch(
@@ -81,8 +87,7 @@ def test_pipeline_runner(pipeline_name, pipeline_version, single_subject_dataset
         simulate=True,
     )
 
-    fpath_container: Path = layout.dpath_containers / runner.pipeline_config.CONTAINER
-    fpath_container.touch()
+    runner.pipeline_config.get_fpath_container().touch()
 
     runner.run_single(participant=participant, session=session)
 
@@ -109,7 +114,7 @@ def test_bids_conversion_runner(
         simulate=True,
     )
 
-    fpath_container: Path = layout.dpath_containers / runner.pipeline_config.CONTAINER
-    fpath_container.touch()
+    runner.pipeline_config.get_fpath_container().touch()
 
+    print(runner.invocation)
     runner.run_single(participant=participant, session=session)

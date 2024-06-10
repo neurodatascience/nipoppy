@@ -1,0 +1,130 @@
+{
+    "DATASET_NAME": "<DATASET_NAME>",
+    "VISITS": [
+        "<VISIT_LABEL>",
+        "<OTHER_VISIT_LABEL>"
+    ],
+    "SESSIONS": [
+        "ses-<SESSION_LABEL>",
+        "ses-<OTHER_SESSION_LABEL>"
+    ],
+    "SUBSTITUTIONS": {
+        "[[NIPOPPY_DPATH_CONTAINERS]]": "<PATH_TO_CONTAINER_STORE_DIRECTORY>",
+        "[[HEUDICONV_HEURISTIC_FILE]]": "<PATH_TO_HEURISTIC_FILE>",
+        "[[DCM2BIDS_CONFIG_FILE]]": "<PATH_TO_CONFIG_FILE>",
+        "[[FREESURFER_LICENSE_FILE]]": "<PATH_TO_FREESURFER_LICENSE_FILE>",
+        "[[TEMPLATEFLOW_HOME]]": "<PATH_TO_TEMPLATEFLOW_DIRECTORY>"
+    },
+    "CONTAINER_CONFIG": {
+        "COMMAND": "apptainer",
+        "ARGS": [
+            "--cleanenv"
+        ]
+    },
+    "BIDS_PIPELINES": [
+        {
+            "NAME": "heudiconv",
+            "VERSION": "0.12.2",
+            "CONTAINER_INFO": {
+                "FILE": "[[NIPOPPY_DPATH_CONTAINERS]]/[[NIPOPPY_PIPELINE_NAME]]_[[NIPOPPY_PIPELINE_VERSION]].sif",
+                "URI": "docker://nipy/[[NIPOPPY_PIPELINE_NAME]]:[[NIPOPPY_PIPELINE_VERSION]]"
+            },
+            "STEPS": [
+                {
+                    "NAME": "prepare",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json"
+                },
+                {
+                    "NAME": "convert",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "CONTAINER_CONFIG": {
+                        "ARGS": [
+                            "--bind",
+                            "[[HEUDICONV_HEURISTIC_FILE]]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "NAME": "dcm2bids",
+            "VERSION": "3.1.0",
+            "CONTAINER_INFO": {
+                "FILE": "[[NIPOPPY_DPATH_CONTAINERS]]/[[NIPOPPY_PIPELINE_NAME]]_[[NIPOPPY_PIPELINE_VERSION]].sif",
+                "URI": "docker://unfmontreal/[[NIPOPPY_PIPELINE_NAME]]:[[NIPOPPY_PIPELINE_VERSION]]"
+            },
+            "STEPS": [
+                {
+                    "NAME": "prepare",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json"
+                },
+                {
+                    "NAME": "convert",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "CONTAINER_CONFIG": {
+                        "ARGS": [
+                            "--bind",
+                            "[[DCM2BIDS_CONFIG_FILE]]"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "PROC_PIPELINES": [
+        {
+            "NAME": "fmriprep",
+            "VERSION": "23.1.3",
+            "CONTAINER_INFO": {
+                "FILE": "[[NIPOPPY_DPATH_CONTAINERS]]/[[NIPOPPY_PIPELINE_NAME]]_[[NIPOPPY_PIPELINE_VERSION]].sif",
+                "URI": "docker://nipreps/[[NIPOPPY_PIPELINE_NAME]]:[[NIPOPPY_PIPELINE_VERSION]]"
+            },
+            "CONTAINER_CONFIG": {
+                "ENV_VARS": {
+                    "TEMPLATEFLOW_HOME": "[[TEMPLATEFLOW_HOME]]"
+                },
+                "ARGS": [
+                    "--bind",
+                    "[[FREESURFER_LICENSE_FILE]]",
+                    "--bind",
+                    "[[TEMPLATEFLOW_HOME]]"
+                ]
+            },
+            "STEPS": [
+                {
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
+                }
+            ]
+        },
+        {
+            "NAME": "mriqc",
+            "VERSION": "23.1.0",
+            "CONTAINER_INFO": {
+                "FILE": "[[NIPOPPY_DPATH_CONTAINERS]]/[[NIPOPPY_PIPELINE_NAME]]_[[NIPOPPY_PIPELINE_VERSION]].sif",
+                "URI": "docker://nipreps/[[NIPOPPY_PIPELINE_NAME]]:[[NIPOPPY_PIPELINE_VERSION]]"
+            },
+            "CONTAINER_CONFIG": {
+                "ENV_VARS": {
+                    "TEMPLATEFLOW_HOME": "[[TEMPLATEFLOW_HOME]]"
+                },
+                "ARGS": [
+                    "--bind",
+                    "[[TEMPLATEFLOW_HOME]]"
+                ]
+            },
+            "STEPS": [
+                {
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
+                }
+            ],
+            "TRACKER_CONFIG_FILE": "[[NIPOPPY_DPATH_TRACKER_CONFIGS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
+        }
+    ],
+    "CUSTOM": {}
+}

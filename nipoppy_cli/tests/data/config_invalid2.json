@@ -1,0 +1,31 @@
+{
+    "DATASET_NAME": "my_dataset",
+    "VISITS": [
+        "V01",
+        "V02"
+    ],
+    "SESSIONS": [
+        "V01"
+    ],
+    "PROC_PIPELINES": {
+        "mriqc": {
+            "23.1.0": {
+                "CONTAINER": "mriqc_{}.sif",
+                "URI": "docker://nipreps/mriqc:{version}",
+                "INVOCATION": {}
+            }
+        },
+        "fmriprep": {
+            "20.2.7": {
+                "CONTAINER": "fmriprep_{}.sif",
+                "URI": "docker://nipreps/fmriprep:{version}",
+                "INVOCATION": {}
+            }
+        },
+        "freesurfer": {
+            "6.0.1": {
+                "DESCRIPTION": "FreeSurfer version associated with fMRIPrep 20.2.7"
+            }
+        }
+    }
+}

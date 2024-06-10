@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import shlex
@@ -17,9 +18,10 @@ from nipoppy.config.main import Config
 from nipoppy.layout import DatasetLayout
 from nipoppy.logger import get_logger
 from nipoppy.tabular.base import BaseTabular
+from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.doughnut import Doughnut, generate_doughnut
 from nipoppy.tabular.manifest import Manifest
-from nipoppy.utils import StrOrPathLike, add_path_timestamp
+from nipoppy.utils import StrOrPathLike, add_path_timestamp, process_template_str
 
 LOG_SUFFIX = ".log"
 
@@ -32,6 +34,10 @@ class BaseWorkflow(Base, ABC):
     log_prefix_run_stdout = "[RUN STDOUT]"
     log_prefix_run_stderr = "[RUN STDERR]"
     validate_layout = True
+
+    # hack to avoid errors when loading/processing the default config
+    pipeline_name = "[[NIPOPPY_PIPELINE_NAME]]"
+    pipeline_version = "[[NIPOPPY_PIPELINE_VERSION]]"
 
     def __init__(
         self,
@@ -260,17 +266,32 @@ class BaseWorkflow(Base, ABC):
         """Load the configuration."""
         fpath_config = self.layout.fpath_config
         try:
+            # load and apply user-defined substitutions
             self.logger.info(f"Loading config from {fpath_config}")
-            return Config.load(fpath_config)
+            config = Config.load(fpath_config)
         except FileNotFoundError:
             raise FileNotFoundError(
                 f"Config file not found: {self.layout.fpath_config}"
             )
 
+        # replace path placeholders in the config
+        config = Config(
+            **json.loads(
+                process_template_str(
+                    config.model_dump_json(),
+                    objs=[self, self.layout],
+                )
+            )
+        )
+
+        config.propagate_container_config()
+
+        return config
+
     @cached_property
     def manifest(self) -> Manifest:
         """Load the manifest."""
-        fpath_manifest = self.layout.fpath_manifest
+        fpath_manifest = Path(self.layout.fpath_manifest)
         expected_sessions = self.config.SESSIONS
         expected_visits = self.config.VISITS
         try:
@@ -286,7 +307,7 @@ class BaseWorkflow(Base, ABC):
     def doughnut(self) -> Doughnut:
         """Load the doughnut."""
         logger = self.logger
-        fpath_doughnut = self.layout.fpath_doughnut
+        fpath_doughnut = Path(self.layout.fpath_doughnut)
         try:
             return Doughnut.load(fpath_doughnut)
         except FileNotFoundError:
@@ -296,6 +317,7 @@ class BaseWorkflow(Base, ABC):
             )
             doughnut = generate_doughnut(
                 manifest=self.manifest,
+                dicom_dir_map=self.dicom_dir_map,
                 dpath_downloaded=self.layout.dpath_raw_dicom,
                 dpath_organized=self.layout.dpath_sourcedata,
                 dpath_bidsified=self.layout.dpath_bids,
@@ -314,3 +336,21 @@ class BaseWorkflow(Base, ABC):
                 )
 
             return doughnut
+
+    @cached_property
+    def dicom_dir_map(self) -> DicomDirMap:
+        """Get the DICOM directory mapping."""
+        fpath_dicom_dir_map = self.config.DICOM_DIR_MAP_FILE
+        if fpath_dicom_dir_map is not None:
+            fpath_dicom_dir_map = Path(fpath_dicom_dir_map)
+            if not fpath_dicom_dir_map.exists():
+                raise FileNotFoundError(
+                    "DICOM directory map file not found"
+                    f": {self.config.DICOM_DIR_MAP_FILE}"
+                )
+
+        return DicomDirMap.load_or_generate(
+            manifest=self.manifest,
+            fpath_dicom_dir_map=fpath_dicom_dir_map,
+            participant_first=self.config.DICOM_DIR_PARTICIPANT_FIRST,
+        )

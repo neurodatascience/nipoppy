@@ -38,6 +38,8 @@ def test_load_keep_extra_cols():
         (DPATH_TEST_DATA / "manifest2.csv", True),
         (DPATH_TEST_DATA / "manifest_invalid1.csv", False),
         (DPATH_TEST_DATA / "manifest_invalid2.csv", False),
+        (DPATH_TEST_DATA / "manifest_invalid3.csv", False),
+        (DPATH_TEST_DATA / "manifest_invalid4.csv", False),
     ],
 )
 def test_validate(fpath, is_valid):

@@ -509,7 +509,7 @@
             "type": "String",
             "value-key": "[FS_SUBJECTS_DIR]",
             "command-line-flag": "--fs-subjects-dir",
-            "default-value": "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer-6.0.1/output/[[NIPOPPY_SESSION]]"
+            "default-value": "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/7.3.2/output/[[NIPOPPY_SESSION]]"
         },
         {
             "id": "hires",
@@ -663,14 +663,14 @@
             "CONTAINER_CONFIG": {
                 "ARGS": [
                     "--bind",
-                    "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer-7.3.2/output/[[NIPOPPY_SESSION]]"
+                    "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/7.3.2/output/[[NIPOPPY_SESSION]]"
                 ]
             }
         },
         "nipoppy_old": {
             "paths_to_tar": [
                 "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]/sub-[[NIPOPPY_PARTICIPANT]]/ses-[[NIPOPPY_SESSION]]",
-                "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer-7.3.2/output/[[NIPOPPY_SESSION]]/sub-[[NIPOPPY_PARTICIPANT]]"
+                "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/7.3.2/output/[[NIPOPPY_SESSION]]/sub-[[NIPOPPY_PARTICIPANT]]"
             ]
         }
     }

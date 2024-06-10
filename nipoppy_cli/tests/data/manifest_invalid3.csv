@@ -1,0 +1,6 @@
+participant_id,visit,session,datatype
+01,BL,ses-BL,"['anat']"
+01,M12,ses-M12,"['anat']"
+02,BL,ses-BL,"['anat','dwi']"
+02,M12,ses-M12,"['anat','dwi']"
+sub-01,BL,ses-BL,"['anat']"

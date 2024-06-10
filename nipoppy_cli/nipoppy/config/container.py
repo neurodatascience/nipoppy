@@ -20,14 +20,15 @@ APPTAINER_ENVVAR_PREFIXES = ["APPTAINERENV_", "SINGULARITYENV_"]
 
 
 class ContainerConfig(BaseModel):
-    """Model for container configuration."""
+    """
+    Schema for container configuration.
+
+    Does not include information about the container image.
+    """
 
     COMMAND: str = Field(
         default="apptainer",
         description="Name of or path to Apptainer/Singularity executable",
-    )
-    SUBCOMMAND: str = Field(
-        default="run", description="Subcommand for Apptainer/Singularity call"
     )
     ARGS: list[str] = Field(
         default=[],
@@ -46,7 +47,7 @@ class ContainerConfig(BaseModel):
         default=True,
         description=(
             "Whether this config should inherit from higher-lever container configs."
-            " If false, will override higher-level configs"
+            " If false, will ignore higher-level configs"
         ),
     )
 
@@ -66,18 +67,26 @@ class ContainerConfig(BaseModel):
             mode=mode,
         )
 
-    def merge_args_and_env_vars(self, other: Any):
+    def merge(self, other: Any, overwrite_command=False):
         """
-        Merge arguments and environment variables with another instance.
+        Combine with another ContainerConfig instance.
 
-        Arguments from other are appended to arguments of the current instance,
-        but environment variables from other do not overwrite those of the current
-        instance.
+        By default this only changes arguments and environment variables, and no
+        information is overwritten:
+        - Arguments from other are appended to arguments of the current instance
+        - Environment variables from other do not overwrite those of the current
+        instance
+
+        If overwrite_command is True, the command of the current instance is
+        replaced with that of the other instance.
         """
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"Cannot merge {self.__class__} with object of type {type(other)}"
             )
+
+        if overwrite_command:
+            self.COMMAND = other.COMMAND
 
         if self.ARGS != other.ARGS:
             self.ARGS.extend(other.ARGS)
@@ -89,10 +98,31 @@ class ContainerConfig(BaseModel):
         return self
 
 
-class ModelWithContainerConfig(BaseModel):
-    """To be inherited by configs that have a ContaienrConfig sub-config."""
+class ContainerInfo(BaseModel):
+    """Schema for container image (i.e., file) information."""
 
-    CONTAINER_CONFIG: ContainerConfig = ContainerConfig()
+    FILE: Optional[Path] = Field(
+        default=None,
+        description=(
+            "Path to the container associated with the pipeline"
+            ", relative to the root directory of the dataset"
+        ),
+    )
+    URI: Optional[str] = Field(
+        default=None,
+        description="The Docker or Apptainer/Singularity URI for the container",
+    )
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class SchemaWithContainerConfig(BaseModel):
+    """To be inherited by configs that have a ContainerConfig sub-config."""
+
+    CONTAINER_CONFIG: ContainerConfig = Field(
+        default=ContainerConfig(),
+        description="Configuration for running a container",
+    )
 
     def get_container_config(self) -> ContainerConfig:
         """Return the pipeline's ContainerConfig object."""
@@ -222,6 +252,7 @@ def check_container_command(command: str) -> str:
 
 def prepare_container(
     container_config: ContainerConfig,
+    subcommand: str = "run",
     check=True,
     logger: Optional[logging.Logger] = None,
 ) -> str:
@@ -243,7 +274,6 @@ def prepare_container(
         The command string
     """
     command = container_config.COMMAND
-    subcommand = container_config.SUBCOMMAND
     args = container_config.ARGS
     env_vars = container_config.ENV_VARS
 

@@ -1,7 +1,7 @@
 {
     "name": "dcm2bids",
     "description": "dcm2bids",
-    "tool-version": "3.1.1",
+    "tool-version": "3.1.0",
     "schema-version": "0.5",
     "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] dcm2bids [DICOM_DIR] [PARTICIPANT] [SESSION] [CONFIG] [OUTPUT_DIR] [AUTO_EXTRACT_ENTITIES] [BIDS_VALIDATE] [FORCE_DCM2BIDS] [SKIP_DCM2NIIX] [CLOBBER] [LOG_LEVEL] [VERSION]",
     "inputs": [
@@ -15,7 +15,7 @@
             "command-line-flag": "-d",
             "value-key": "[DICOM_DIR]",
             "default-value": [
-                "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_SESSION]]/[[NIPOPPY_PARTICIPANT]]"
+                "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]"
             ]
         },
         {

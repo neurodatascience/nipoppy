@@ -27,8 +27,8 @@
     "dpath_invocations": {
         "path": "proc/invocations"
     },
-    "dpath_scripts": {
-        "path": "proc/scripts"
+    "dpath_tracker_configs": {
+        "path": "code/tracker_configs"
     },
     "dpath_pybids": {
         "path": "proc/pybids"
@@ -58,7 +58,7 @@
         "path": "tabular/demographics"
     },
     "fpath_config": {
-        "path": "proc/global_configs.json"
+        "path": "proc/global_config.json"
     },
     "fpath_doughnut": {
         "path": "scratch/raw_dicom/doughnut.csv"

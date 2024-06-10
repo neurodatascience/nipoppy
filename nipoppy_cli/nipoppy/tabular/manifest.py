@@ -5,15 +5,24 @@ from __future__ import annotations
 from typing import Optional
 
 import pandas as pd
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 from typing_extensions import Self
 
 from nipoppy.tabular.base import BaseTabular, BaseTabularModel
-from nipoppy.utils import FIELD_DESCRIPTION_MAP
+from nipoppy.utils import (
+    FIELD_DESCRIPTION_MAP,
+    check_participant_id_strict,
+    check_session_strict,
+)
 
 
 class ManifestModel(BaseTabularModel):
-    """A user-provided listing of participant and visits available in the dataset."""
+    """
+    A user-provided listing of participant and visits available in the dataset.
+
+    Note: This class is called "model" to be consistent with Pydantic nomenclature,
+    but it can be thought of as a schema for each row in the manifest file.
+    """
 
     participant_id: str = Field(
         title="Participant ID", description=FIELD_DESCRIPTION_MAP["participant_id"]
@@ -28,7 +37,7 @@ class ManifestModel(BaseTabularModel):
     )
 
     @classmethod
-    def validate_fields(cls, data: dict):
+    def _validate_before_fields(cls, data: dict):
         """Validate manifest-specific fields."""
         datatype = data.get(Manifest.col_datatype)
         if datatype is not None and not isinstance(datatype, list):
@@ -41,6 +50,13 @@ class ManifestModel(BaseTabularModel):
                     ", or left empty"
                 )
         return data
+
+    @model_validator(mode="after")
+    def validate_after(self) -> Self:
+        """Validate fields after instance creation."""
+        check_participant_id_strict(self.participant_id)
+        check_session_strict(self.session)
+        return self
 
     # allow extra columns
     model_config = ConfigDict(extra="allow")

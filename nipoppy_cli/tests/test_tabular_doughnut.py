@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.doughnut import Doughnut, generate_doughnut, update_doughnut
 from nipoppy.utils import StrOrPathLike
 
@@ -208,6 +209,9 @@ def test_generate_and_update(
     # generate the doughnut
     doughnut1 = generate_doughnut(
         manifest=manifest1,
+        dicom_dir_map=DicomDirMap.load_or_generate(
+            manifest=manifest1, fpath_dicom_dir_map=None, participant_first=True
+        ),
         dpath_downloaded=dpath_downloaded,
         dpath_organized=dpath_organized,
         dpath_bidsified=dpath_bidsified,
@@ -230,6 +234,9 @@ def test_generate_and_update(
     doughnut2 = update_doughnut(
         doughnut=doughnut1,
         manifest=manifest2,
+        dicom_dir_map=DicomDirMap.load_or_generate(
+            manifest=manifest2, fpath_dicom_dir_map=None, participant_first=True
+        ),
         dpath_downloaded=dpath_downloaded,
         dpath_organized=dpath_organized,
         dpath_bidsified=dpath_bidsified,
@@ -270,6 +277,9 @@ def test_generate_missing_paths(tmp_path: Path):
 
     doughnut = generate_doughnut(
         manifest=manifest,
+        dicom_dir_map=DicomDirMap.load_or_generate(
+            manifest=manifest, fpath_dicom_dir_map=None, participant_first=True
+        ),
         dpath_downloaded=dpath_downloaded,
         dpath_organized=dpath_organized,
         dpath_bidsified=dpath_bidsified,

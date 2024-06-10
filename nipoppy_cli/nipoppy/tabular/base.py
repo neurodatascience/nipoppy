@@ -19,12 +19,15 @@ class BaseTabularModel(BaseModel):
     Helper class for validating tabular data.
 
     Subclasses should define fields and their types,
-    and optionally override the _validate_fields() method.
+    and optionally override the _validate_before_fields() method.
+
+    Note: This class is called "model" to be consistent with Pydantic nomenclature,
+    but it can be thought of as a schema for each row in the tabular file.
     """
 
     @model_validator(mode="before")
     @classmethod
-    def validate_input(cls, data: Any):
+    def validate_before(cls, data: Any):
         """Validate the raw input."""
         if isinstance(data, dict):
             # generic validation
@@ -52,12 +55,12 @@ class BaseTabularModel(BaseModel):
 
             # model-specific validation
             # to be overridden in subclass if needed
-            data = cls.validate_fields(data)
+            data = cls._validate_before_fields(data)
 
         return data
 
     @classmethod
-    def validate_fields(cls, data: dict):
+    def _validate_before_fields(cls, data: dict):
         """Validate model-specific fields. To be overridden in subclass if needed."""
         return data
 

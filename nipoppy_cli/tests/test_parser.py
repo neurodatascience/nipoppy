@@ -7,6 +7,7 @@ import pytest
 from nipoppy.cli.parser import (
     add_arg_dataset_root,
     add_arg_dry_run,
+    add_arg_pipeline_step,
     add_arg_simulate,
     add_arg_verbosity,
     add_args_participant_and_session,
@@ -45,6 +46,12 @@ def test_add_args_pipeline(args):
     parser = ArgumentParser()
     parser = add_args_pipeline(parser)
     assert parser.parse_args(args)
+
+
+def test_add_arg_pipeline_step():
+    parser = ArgumentParser()
+    parser = add_arg_pipeline_step(parser)
+    assert parser.parse_args(["--pipeline-step", "step1"])
 
 
 @pytest.mark.parametrize(
@@ -112,6 +119,7 @@ def test_add_subparser_doughnut(args):
     [
         ["--dataset-root", "my_dataset"],
         ["--dataset-root", "my_dataset", "--copy-files"],
+        ["--dataset-root", "my_dataset", "--check-dicoms"],
     ],
 )
 def test_add_subparser_dicom_reorg(args):
@@ -155,6 +163,16 @@ def test_add_subparser_bids_conversion(args):
             "pipeline1",
             "--pipeline-version",
             "1.2.3",
+        ],
+        [
+            "--dataset-root",
+            "my_dataset",
+            "--pipeline",
+            "pipeline1",
+            "--pipeline-version",
+            "1.2.3",
+            "--pipeline-step",
+            "step1",
         ],
         [
             "--dataset-root",

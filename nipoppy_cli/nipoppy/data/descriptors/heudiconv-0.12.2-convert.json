@@ -22,7 +22,7 @@
             "optional": true,
             "command-line-flag": "-d",
             "value-key": "[DICOM_DIR_TEMPLATE]",
-            "default-value": "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_SESSION]]/[[NIPOPPY_PARTICIPANT]]/*"
+            "default-value": "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]/*"
         },
         {
             "name": "files",

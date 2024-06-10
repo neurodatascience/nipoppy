@@ -5,8 +5,21 @@ import os
 from pathlib import Path
 from typing import Optional
 
+import pydicom
+
 from nipoppy.utils import StrOrPathLike
 from nipoppy.workflows.base import BaseWorkflow
+
+
+def is_derived_dicom(fpath: Path) -> bool:
+    """
+    Read a DICOM file's header and check if it is a derived file.
+
+    Some BIDS converters (e.g. Heudiconv) do not support derived DICOM files.
+    """
+    dcm_info = pydicom.dcmread(fpath)
+    img_types = dcm_info.ImageType
+    return "DERIVED" in img_types
 
 
 class DicomReorgWorkflow(BaseWorkflow):
@@ -16,6 +29,7 @@ class DicomReorgWorkflow(BaseWorkflow):
         self,
         dpath_root: StrOrPathLike,
         copy_files: bool = False,
+        check_dicoms: bool = False,
         fpath_layout: Optional[StrOrPathLike] = None,
         logger: Optional[logging.Logger] = None,
         dry_run: bool = False,
@@ -29,21 +43,18 @@ class DicomReorgWorkflow(BaseWorkflow):
             dry_run=dry_run,
         )
         self.copy_files = copy_files
+        self.check_dicoms = check_dicoms
 
     def get_fpaths_to_reorg(
-        self, participant: str, session: str, participant_first=True
+        self,
+        participant: str,
+        session: str,
     ) -> list[Path]:
-        """
-        Get file paths to reorganize for a single participant and session.
-
-        This method can be overridden if the raw DICOM layout is different than what
-        is typically expected.
-        """
-        # support both participant-first and session-first raw DICOM layouts
-        if participant_first:
-            dpath_downloaded = self.layout.dpath_raw_dicom / participant / session
-        else:
-            dpath_downloaded = self.layout.dpath_raw_dicom / session / participant
+        """Get file paths to reorganize for a single participant and session."""
+        dpath_downloaded = (
+            self.layout.dpath_raw_dicom
+            / self.dicom_dir_map.get_dicom_dir(participant=participant, session=session)
+        )
 
         # make sure directory exists
         if not dpath_downloaded.exists():
@@ -73,15 +84,24 @@ class DicomReorgWorkflow(BaseWorkflow):
     def run_single(self, participant: str, session: str):
         """Reorganize downloaded DICOM files for a single participant and session."""
         # get paths to reorganize
-        # TODO add config option for session-first or participant-first raw DICOM layout
-        fpaths_to_reorg = self.get_fpaths_to_reorg(
-            participant, session, participant_first=False
-        )
+        fpaths_to_reorg = self.get_fpaths_to_reorg(participant, session)
 
         # do reorg
         dpath_reorganized: Path = self.layout.dpath_sourcedata / participant / session
         self.mkdir(dpath_reorganized)
         for fpath_source in fpaths_to_reorg:
+            # check file (though only error out if DICOM cannot be read)
+            if self.check_dicoms:
+                try:
+                    if is_derived_dicom(fpath_source):
+                        self.logger.warning(
+                            f"Derived DICOM file detected: {fpath_source}"
+                        )
+                except Exception as exception:
+                    raise RuntimeError(
+                        f"Error checking DICOM file {fpath_source}: {exception}"
+                    )
+
             fpath_dest = dpath_reorganized / self.apply_fname_mapping(
                 fpath_source.name, participant=participant, session=session
             )

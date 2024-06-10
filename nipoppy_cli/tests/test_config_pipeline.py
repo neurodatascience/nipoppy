@@ -1,97 +1,168 @@
 """Tests for the pipeline configuration class."""
 
-import re
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from nipoppy.config.pipeline import PipelineConfig
+from nipoppy.config.pipeline import PipelineConfig, PipelineStepConfig
 
 FIELDS_PIPELINE = [
-    "CONTAINER",
-    "URI",
+    "NAME",
+    "VERSION",
+    "DESCRIPTION",
+    "CONTAINER_INFO",
     "CONTAINER_CONFIG",
-    "DESCRIPTOR",
-    "DESCRIPTOR_FILE",
-    "INVOCATION",
-    "INVOCATION_FILE",
-    "PYBIDS_IGNORE",
+    "STEPS",
+    "TRACKER_CONFIG_FILE",
 ]
 
 
+@pytest.fixture(scope="function")
+def valid_data() -> dict:
+    return {
+        "NAME": "my_pipeline",
+        "VERSION": "1.0.0",
+    }
+
+
 @pytest.mark.parametrize(
-    "data",
+    "additional_data",
     [
         {},
         {"DESCRIPTION": "My pipeline"},
-        {"CONTAINER": "/my/container"},
-        {"URI": "docker://container"},
         {"CONTAINER_CONFIG": {"ARGS": ["--cleanenv"]}},
-        {"DESCRIPTOR": {}},
-        {"INVOCATION": {"arg1": "val1", "arg2": "val2"}},
-        {"PYBIDS_IGNORE": ["ignore1", "ignore2"]},
-        {"TRACKER_CONFIG": {"pipeline_complete": ["pattern1", "pattern2"]}},
+        {"STEPS": []},
+        {"TRACKER_CONFIG_FILE": "path/to/tracker/config/file"},
     ],
 )
-def test_pipeline_config(data):
+def test_fields(valid_data, additional_data):
+    pipeline_config = PipelineConfig(**valid_data, **additional_data)
     for field in FIELDS_PIPELINE:
-        assert hasattr(PipelineConfig(**data), field)
+        assert hasattr(pipeline_config, field)
+
+    assert len(set(pipeline_config.model_fields.keys())) == len(FIELDS_PIPELINE)
 
 
 @pytest.mark.parametrize(
     "data",
-    [
-        {"DESCRIPTOR": {}, "INVOCATION_FILE": "invocation.json"},
-        {"DESCRIPTOR_FILE": "descriptor.json", "INVOCATION": {}},
-    ],
+    [{}, {"NAME": "my_pipeline"}, {"VERSION": "1.0.0"}],
 )
-def test_file_or_json(data):
-    assert PipelineConfig(**data).check_fields() is not None
-
-
-@pytest.mark.parametrize(
-    "field_json,field_file",
-    [("DESCRIPTOR", "DESCRIPTOR_FILE"), ("INVOCATION", "INVOCATION_FILE")],
-)
-def test_file_and_json_not_allowed(field_json: str, field_file: str):
-    data = {
-        field_json: {"arg": "val"},
-        field_file: "path.json",
-    }
-    with pytest.raises(ValidationError, match="Cannot specify both"):
+def test_fields_missing_required(data):
+    with pytest.raises(ValidationError):
         PipelineConfig(**data)
 
 
+def test_fields_no_extra(valid_data):
+    with pytest.raises(ValidationError):
+        PipelineConfig(**valid_data, not_a_field="a")
+
+
+def test_step_names_error_none(valid_data):
+    with pytest.raises(
+        ValidationError, match="Found at least one step with undefined NAME field"
+    ):
+        PipelineConfig(**valid_data, STEPS=[{}, {}])
+
+
+def test_step_names_error_duplicate(valid_data):
+    with pytest.raises(ValidationError, match="Found at least two steps with NAME"):
+        PipelineConfig(
+            **valid_data,
+            STEPS=[
+                {"NAME": "step1"},
+                {"NAME": "step1"},
+            ],
+        )
+
+
 @pytest.mark.parametrize("container", ["my_container.sif", "my_other_container.sif"])
-def test_get_container(container):
-    pipeline_config = PipelineConfig(CONTAINER=container)
-    assert pipeline_config.get_container() == Path(container)
-
-
-def test_get_container_error():
-    pipeline_config = PipelineConfig()
-    with pytest.raises(RuntimeError, match="No container specified for the pipeline"):
-        pipeline_config.get_container()
+def test_get_fpath_container(valid_data, container):
+    pipeline_config = PipelineConfig(**valid_data, CONTAINER_INFO={"FILE": container})
+    assert pipeline_config.get_fpath_container() == Path(container)
 
 
 @pytest.mark.parametrize(
-    "orig_patterns,new_patterns,expected",
+    "step_name,expected_name",
     [
-        ([], [], []),
-        (["a"], "b", [re.compile("a"), re.compile("b")]),
-        (["a"], ["b"], [re.compile("a"), re.compile("b")]),
-        (["a"], ["b", "c"], [re.compile("a"), re.compile("b"), re.compile("c")]),
-        (["a"], "a", [re.compile("a")]),
-        ([re.compile("a")], ["b"], [re.compile("a"), re.compile("b")]),
+        ("step1", "step1"),
+        ("step2", "step2"),
+        (None, "step1"),
     ],
 )
-def test_add_pybids_ignore_patterns(orig_patterns, new_patterns, expected):
-    pipeline_config = PipelineConfig(PYBIDS_IGNORE=orig_patterns)
-    pipeline_config.add_pybids_ignore_patterns(new_patterns)
-    assert pipeline_config.PYBIDS_IGNORE == expected
+def test_get_step_config(valid_data, step_name, expected_name):
+    pipeling_config = PipelineConfig(
+        **valid_data,
+        STEPS=[
+            PipelineStepConfig(NAME="step1", INVOCATION_FILE="step1.json"),
+            PipelineStepConfig(NAME="step2", INVOCATION_FILE="step2.json"),
+        ],
+    )
+
+    assert pipeling_config.get_step_config(step_name).NAME == expected_name
 
 
-def test_pipeline_config_no_extra_fields():
-    with pytest.raises(ValidationError):
-        PipelineConfig(not_a_field="a")
+def test_get_step_config_no_steps(valid_data):
+    pipeline_config = PipelineConfig(**valid_data, STEPS=[])
+    with pytest.raises(ValueError, match="No steps specified for pipeline"):
+        pipeline_config.get_step_config()
+
+
+def test_get_step_config_invalid(valid_data):
+    pipeline_config = PipelineConfig(
+        **valid_data,
+        STEPS=[
+            PipelineStepConfig(NAME="step1", INVOCATION_FILE="step1.json"),
+            PipelineStepConfig(NAME="step2", INVOCATION_FILE="step2.json"),
+        ],
+    )
+    with pytest.raises(ValueError, match="not found in pipeline"):
+        pipeline_config.get_step_config("invalid_step")
+
+
+@pytest.mark.parametrize(
+    "step_name,invocation_file",
+    [("step1", Path("step1.json")), ("step2", Path("step2.json"))],
+)
+def test_get_invocation_file(valid_data, step_name, invocation_file):
+    pipeline_config = PipelineConfig(
+        **valid_data,
+        STEPS=[
+            PipelineStepConfig(NAME="step1", INVOCATION_FILE="step1.json"),
+            PipelineStepConfig(NAME="step2", INVOCATION_FILE="step2.json"),
+        ],
+    )
+
+    assert pipeline_config.get_invocation_file(step_name) == invocation_file
+
+
+@pytest.mark.parametrize(
+    "step_name,descriptor_file",
+    [("step1", Path("step1.json")), ("step2", Path("step2.json"))],
+)
+def test_get_descriptor_file(valid_data, step_name, descriptor_file):
+    pipeline_config = PipelineConfig(
+        **valid_data,
+        STEPS=[
+            PipelineStepConfig(NAME="step1", DESCRIPTOR_FILE="step1.json"),
+            PipelineStepConfig(NAME="step2", DESCRIPTOR_FILE="step2.json"),
+        ],
+    )
+
+    assert pipeline_config.get_descriptor_file(step_name) == descriptor_file
+
+
+@pytest.mark.parametrize(
+    "step_name,pybids_ignore_file",
+    [("step1", Path("patterns1.json")), ("step2", Path("patterns2.json"))],
+)
+def test_get_pybids_ignore(valid_data, step_name, pybids_ignore_file):
+    pipeline_config = PipelineConfig(
+        **valid_data,
+        STEPS=[
+            PipelineStepConfig(NAME="step1", PYBIDS_IGNORE_FILE="patterns1.json"),
+            PipelineStepConfig(NAME="step2", PYBIDS_IGNORE_FILE="patterns2.json"),
+        ],
+    )
+
+    assert pipeline_config.get_pybids_ignore_file(step_name) == pybids_ignore_file

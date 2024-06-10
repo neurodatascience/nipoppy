@@ -1,0 +1,4 @@
+participant_id,session,participant_dicom_dir
+01,ses-1,path/for/sub-01/ses-1
+01,ses-2,path/for/sub-01/ses-2
+02,1,path/for/sub-02/ses-1

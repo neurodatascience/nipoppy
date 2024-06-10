@@ -4,7 +4,14 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from nipoppy.utils import FPATH_SAMPLE_CONFIG, FPATH_SAMPLE_MANIFEST, StrOrPathLike
+from nipoppy.utils import (
+    DPATH_DESCRIPTORS,
+    DPATH_INVOCATIONS,
+    DPATH_TRACKER_CONFIGS,
+    FPATH_SAMPLE_CONFIG,
+    FPATH_SAMPLE_MANIFEST,
+    StrOrPathLike,
+)
 from nipoppy.workflows.base import BaseWorkflow
 
 
@@ -47,6 +54,30 @@ class InitWorkflow(BaseWorkflow):
                 fpath_readme.write_text(f"{description}\n")
 
         self.logger.info(f"Created an empty dataset at {self.dpath_root}")
+
+        # copy descriptor files
+        for fpath_descriptor in DPATH_DESCRIPTORS.iterdir():
+            self.copy(
+                fpath_descriptor,
+                self.layout.dpath_descriptors / fpath_descriptor.name,
+                log_level=logging.DEBUG,
+            )
+
+        # copy sample invocation files
+        for fpath_invocation in DPATH_INVOCATIONS.iterdir():
+            self.copy(
+                fpath_invocation,
+                self.layout.dpath_invocations / fpath_invocation.name,
+                log_level=logging.DEBUG,
+            )
+
+        # copy sample tracker config files
+        for fpath_tracker_config in DPATH_TRACKER_CONFIGS.iterdir():
+            self.copy(
+                fpath_tracker_config,
+                self.layout.dpath_tracker_configs / fpath_tracker_config.name,
+                log_level=logging.DEBUG,
+            )
 
         # copy sample config and manifest files
         self.copy(

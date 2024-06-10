@@ -1,10 +1,13 @@
 """PipelineTracker workflow."""
 
 import logging
-from typing import Optional
+from typing import List, Optional
 
+from pydantic import TypeAdapter
+
+from nipoppy.config.tracker import TrackerConfig, check_tracker_configs
 from nipoppy.tabular.bagel import Bagel
-from nipoppy.utils import StrOrPathLike
+from nipoppy.utils import StrOrPathLike, load_json
 from nipoppy.workflows.pipeline import BasePipelineWorkflow
 
 
@@ -15,7 +18,7 @@ class PipelineTracker(BasePipelineWorkflow):
         self,
         dpath_root: StrOrPathLike,
         pipeline_name: str,
-        pipeline_version: str,
+        pipeline_version: Optional[str] = None,
         participant: str = None,
         session: str = None,
         fpath_layout: Optional[StrOrPathLike] = None,
@@ -48,7 +51,7 @@ class PipelineTracker(BasePipelineWorkflow):
             self.logger.info("Initialized empty bagel")
         return super().run_setup(**kwargs)
 
-    def check_status(self, relative_paths):
+    def check_status(self, relative_paths: StrOrPathLike):
         """Check the processing status based on a list of expected paths."""
         for relative_path in relative_paths:
             self.logger.debug(
@@ -56,7 +59,7 @@ class PipelineTracker(BasePipelineWorkflow):
             )
 
             # TODO handle potentially zipped archives
-            matches = list(self.dpath_pipeline_output.glob(relative_path))
+            matches = list(self.dpath_pipeline_output.glob(str(relative_path)))
             self.logger.debug(f"Matches: {matches}")
             if not matches:
                 return Bagel.status_fail
@@ -65,15 +68,35 @@ class PipelineTracker(BasePipelineWorkflow):
 
     def run_single(self, participant: str, session: str):
         """Run tracker on a single participant/session."""
-        # get list of paths from global config
-        tracker_config = self.process_template_json(
-            self.pipeline_config.TRACKER_CONFIG,
+        # load tracker configs from file
+        fpath_tracker_config = self.pipeline_config.TRACKER_CONFIG_FILE
+        if fpath_tracker_config is None:
+            raise ValueError(
+                f"No tracker config file specified for pipeline {self.pipeline_name}"
+                f" {self.pipeline_version}"
+            )
+        # replace template strings
+        tracker_configs = self.process_template_json(
+            load_json(fpath_tracker_config),
             participant=participant,
             session=session,
         )
+        # convert to list of TrackerConfig objects and validate
+        tracker_configs = TypeAdapter(List[TrackerConfig]).validate_python(
+            tracker_configs
+        )
+        tracker_configs = check_tracker_configs(tracker_configs)
+
+        if len(tracker_configs) > 1:
+            self.logger.warning(
+                f"{len(tracker_configs)} tracker configs found for"
+                f" pipeline {self.pipeline_name} {self.pipeline_version}"
+                ". Currently only one config is supported (will use the first one)"
+            )
+        tracker_config = tracker_configs[0]
 
         # check status and update bagel
-        status = self.check_status(tracker_config["pipeline_complete"])
+        status = self.check_status(tracker_config.PATHS)
         self.bagel = self.bagel.add_or_update_records(
             {
                 Bagel.col_participant_id: participant,

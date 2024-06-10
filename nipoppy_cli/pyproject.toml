@@ -24,6 +24,7 @@ dependencies = [
     "pandas",
     "pybids",
     "pydantic",
+    "pydicom",
     "rich",
     "rich_argparse",
     "typing-extensions",
@@ -65,7 +66,7 @@ allow-direct-references = true
 skip = '.git,.github,pyproject.toml'
 
 [tool.pytest.ini_options]
-addopts = "-ra -q -vv "
+addopts = "-ra -q -vv"
 testpaths = ["tests/"]
 minversion = "6.0"
 xfail_strict = true

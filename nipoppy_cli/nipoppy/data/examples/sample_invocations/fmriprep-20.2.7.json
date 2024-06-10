@@ -1,0 +1,12 @@
+{
+    "anat_only": true,
+    "fs_license_file": "[[FREESURFER_LICENSE_FILE]]",
+    "skip_bids_validation": true,
+    "regressors_all_comps": true,
+    "write_graph": true,
+    "notrack": true,
+    "nprocs": "8",
+    "omp_nthreads": "4",
+    "memory_gb": "4G",
+    "verbose_count": "-v"
+}

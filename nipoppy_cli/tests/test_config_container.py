@@ -8,7 +8,8 @@ from pydantic import ValidationError
 
 from nipoppy.config.container import (
     ContainerConfig,
-    ModelWithContainerConfig,
+    ContainerInfo,
+    SchemaWithContainerConfig,
     add_bind_path_to_args,
     check_container_args,
     check_container_command,
@@ -16,7 +17,14 @@ from nipoppy.config.container import (
     set_container_env_vars,
 )
 
-FIELDS_CONTAINER = ["COMMAND", "SUBCOMMAND", "ARGS", "ENV_VARS", "INHERIT"]
+FIELDS_CONTAINER_CONFIG = [
+    "COMMAND",
+    "ARGS",
+    "ENV_VARS",
+    "INHERIT",
+]
+
+FIELDS_CONTAINER_INFO = ["FILE", "URI"]
 
 
 @pytest.mark.parametrize(
@@ -29,8 +37,10 @@ FIELDS_CONTAINER = ["COMMAND", "SUBCOMMAND", "ARGS", "ENV_VARS", "INHERIT"]
     ],
 )
 def test_container_config(data):
-    for field in FIELDS_CONTAINER:
-        assert hasattr(ContainerConfig(**data), field)
+    container_config = ContainerConfig(**data)
+    for field in FIELDS_CONTAINER_CONFIG:
+        assert hasattr(container_config, field)
+    assert len(container_config.model_fields) == len(FIELDS_CONTAINER_CONFIG)
 
 
 @pytest.mark.parametrize(
@@ -68,14 +78,40 @@ def test_container_config(data):
         ),
     ],
 )
-def test_container_config_merge_args_and_env_vars(data1, data2, data_expected):
-    merged = ContainerConfig(**data1).merge_args_and_env_vars(ContainerConfig(**data2))
+def test_container_config_merge(data1, data2, data_expected):
+    merged = ContainerConfig(**data1).merge(ContainerConfig(**data2))
     assert merged == ContainerConfig(**data_expected)
 
 
-def test_container_config_merge_args_and_env_vars_error():
+@pytest.mark.parametrize(
+    "data1,data2,overwrite_command,data_expected",
+    [
+        (
+            {"COMMAND": "apptainer"},
+            {"COMMAND": "singularity"},
+            True,
+            {"COMMAND": "singularity"},
+        ),
+        (
+            {"COMMAND": "apptainer"},
+            {"COMMAND": "singularity"},
+            False,
+            {"COMMAND": "apptainer"},
+        ),
+    ],
+)
+def test_container_config_merge_overwrite_command(
+    data1, data2, overwrite_command, data_expected
+):
+    merged = ContainerConfig(**data1).merge(
+        ContainerConfig(**data2), overwrite_command=overwrite_command
+    )
+    assert merged == ContainerConfig(**data_expected)
+
+
+def test_container_config_merge_error():
     with pytest.raises(TypeError, match="Cannot merge"):
-        ContainerConfig().merge_args_and_env_vars("bad_arg")
+        ContainerConfig().merge("bad_arg")
 
 
 def test_container_config_no_extra_fields():
@@ -83,8 +119,28 @@ def test_container_config_no_extra_fields():
         ContainerConfig(not_a_field="a")
 
 
-def test_container_config_mixin():
-    class ClassWithContainerConfig(ModelWithContainerConfig):
+@pytest.mark.parametrize(
+    "data",
+    [
+        {},
+        {"FILE": "path/to/container.sif"},
+        {"URI": "docker://my/container"},
+    ],
+)
+def test_container_info(data):
+    container_info = ContainerInfo(**data)
+    for field in FIELDS_CONTAINER_INFO:
+        assert hasattr(container_info, field)
+    assert len(container_info.model_fields) == len(FIELDS_CONTAINER_INFO)
+
+
+def test_container_info_no_extra_fields():
+    with pytest.raises(ValidationError):
+        ContainerInfo(not_a_field="a")
+
+
+def test_schema_with_container_config():
+    class ClassWithContainerConfig(SchemaWithContainerConfig):
         pass
 
     assert isinstance(
@@ -148,15 +204,15 @@ def test_check_container_args(args):
     assert check_container_args(args=args) == args
 
 
-def test_check_container_args_relative():
+def test_check_container_args_relative(caplog: pytest.LogCaptureFixture):
     assert check_container_args(args=["--bind", "."]) == [
         "--bind",
         str(Path(".").resolve()),
     ]
-    # assert "Resolving path" in caplog.text
+    assert "Resolving path" in caplog.text
 
 
-def test_check_container_args_symlink(tmp_path: Path):
+def test_check_container_args_symlink(tmp_path: Path, caplog: pytest.LogCaptureFixture):
     path_symlink = tmp_path / "symlink"
     path_real = tmp_path / "file.txt"
     path_real.touch()
@@ -165,14 +221,14 @@ def test_check_container_args_symlink(tmp_path: Path):
         "--bind",
         str(path_real),
     ]
-    # assert "Resolving path" in caplog.text
+    assert "Resolving path" in caplog.text
 
 
-def test_check_container_args_missing(tmp_path: Path):
+def test_check_container_args_missing(tmp_path: Path, caplog: pytest.LogCaptureFixture):
     dpath = tmp_path / "missing"
     check_container_args(args=["--bind", str(dpath)])
     assert dpath.exists()
-    # assert "Creating missing directory" in caplog.text
+    assert "Creating missing directory" in caplog.text
 
 
 def test_check_container_args_error():
@@ -199,10 +255,9 @@ def test_check_container_command_error(command):
         (
             {
                 "COMMAND": "/path/to/singularity",
-                "SUBCOMMAND": "exec",
                 "ARGS": ["--cleanenv"],
             },
-            "/path/to/singularity exec --cleanenv",
+            "/path/to/singularity run --cleanenv",
         ),
     ],
 )

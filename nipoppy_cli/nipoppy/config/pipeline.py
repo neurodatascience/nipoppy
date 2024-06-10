@@ -2,70 +2,114 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 
-from pydantic import ConfigDict, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
-from nipoppy.config.container import ModelWithContainerConfig
+from nipoppy.config.container import ContainerInfo, SchemaWithContainerConfig
+from nipoppy.config.pipeline_step import PipelineStepConfig
 
 
-class PipelineConfig(ModelWithContainerConfig):
-    """Model for workflow configuration."""
+class PipelineConfig(SchemaWithContainerConfig):
+    """Schema for processing pipeline configuration."""
 
-    DESCRIPTION: Optional[str] = None
-    CONTAINER: Optional[Path] = None
-    URI: Optional[str] = None
-    DESCRIPTOR: Optional[dict] = None
-    DESCRIPTOR_FILE: Optional[Path] = None
-    INVOCATION: Optional[dict] = None
-    INVOCATION_FILE: Optional[Path] = None
-    PYBIDS_IGNORE: list[re.Pattern] = []
-    TRACKER_CONFIG: dict[str, list[str]] = {}
+    NAME: str = Field(description="Name of the pipeline")
+    VERSION: str = Field(description="Version of the pipeline")
+    DESCRIPTION: Optional[str] = Field(
+        default=None, description="Free description field"
+    )
+    CONTAINER_INFO: ContainerInfo = Field(
+        default=ContainerInfo(),
+        description="Information about the container image file",
+    )
+    STEPS: list[PipelineStepConfig] = Field(
+        default=[],
+        description="List of pipeline step configurations",
+    )
+    TRACKER_CONFIG_FILE: Optional[Path] = Field(
+        default=None,
+        description=(
+            "Path to the tracker configuration file associated with the pipeline"
+            ". This file must contain a list of tracker configurations"
+            ", each of which must be a dictionary with a NAME field (string)"
+            " and a PATHS field (non-empty list of strings)"
+        ),
+    )
 
     model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="after")
-    def check_fields(self):
+    def validate_after(self):
         """
-        Check that <FIELD> and <FIELD>_FILE fields are not both set.
+        Validate the pipeline configuration after creation.
 
-        Also add an empty invocation if none is provided.
+        Specifically:
+        - If STEPS has more than one item, make sure that each step has a unique name.
         """
-        field_pairs = [
-            ("DESCRIPTOR", "DESCRIPTOR_FILE"),
-            ("INVOCATION", "INVOCATION_FILE"),
-        ]
-        for field_json, field_file in field_pairs:
-            value_json = getattr(self, field_json)
-            value_file = getattr(self, field_file)
-            if value_json is not None and value_file is not None:
-                raise ValueError(
-                    f"Cannot specify both {field_json} and {field_file}"
-                    f". Got {value_json} and {value_file} respectively."
-                )
-
-        if self.INVOCATION is None and self.INVOCATION_FILE is None:
-            self.INVOCATION = {}
+        if len(self.STEPS) > 1:
+            step_names = []
+            for step in self.STEPS:
+                if step.NAME is None:
+                    raise ValueError(
+                        "Found at least one step with undefined NAME field"
+                        f" for pipeline {self.NAME} {self.VERSION}"
+                        ". Pipeline steps must have names except "
+                        "if there is only one step"
+                    )
+                if step.NAME in step_names:
+                    raise ValueError(
+                        f'Found at least two steps with NAME "{step.NAME}"'
+                        f" for pipeline {self.NAME} {self.VERSION}"
+                        ". Step names must be unique"
+                    )
+                step_names.append(step.NAME)
 
         return self
 
-    def get_container(self) -> Path:
+    def get_fpath_container(self) -> Path:
         """Return the path to the pipeline's container."""
-        if self.CONTAINER is None:
-            raise RuntimeError("No container specified for the pipeline")
-        return self.CONTAINER
+        return self.CONTAINER_INFO.FILE
 
-    def add_pybids_ignore_patterns(
-        self,
-        patterns: Sequence[str | re.Pattern] | str | re.Pattern,
-    ):
-        """Add pattern(s) to ignore for PyBIDS."""
-        if isinstance(patterns, (str, re.Pattern)):
-            patterns = [patterns]
-        for pattern in patterns:
-            if isinstance(pattern, str):
-                pattern = re.compile(pattern)
-            if pattern not in self.PYBIDS_IGNORE:
-                self.PYBIDS_IGNORE.append(pattern)
+    def get_step_config(self, step_name: Optional[str] = None) -> PipelineStepConfig:
+        """
+        Return the configuration for the given step.
+
+        If step_name is None, return the configuration for the first step.
+        """
+        if len(self.STEPS) == 0:
+            raise ValueError(
+                f"No steps specified for pipeline {self.NAME} {self.VERSION}"
+            )
+        elif step_name is None:
+            return self.STEPS[0]
+        for step in self.STEPS:
+            if step.NAME == step_name:
+                return step
+        raise ValueError(
+            f"Step {step_name} not found in pipeline {self.NAME} {self.VERSION}"
+        )
+
+    def get_invocation_file(self, step_name: Optional[str] = None) -> Path | None:
+        """
+        Return the path to the invocation file for the given step.
+
+        Is step is None, return the invocation file for the first step.
+        """
+        return self.get_step_config(step_name).INVOCATION_FILE
+
+    def get_descriptor_file(self, step_name: Optional[str] = None) -> Path | None:
+        """
+        Return the path to the descriptor file for the given step.
+
+        If step is None, return the descriptor file for the first step.
+        """
+        return self.get_step_config(step_name).DESCRIPTOR_FILE
+
+    def get_pybids_ignore_file(self, step_name: Optional[str] = None) -> Path | None:
+        """
+        Return the list of regex patterns to ignore when building the PyBIDS layout.
+
+        If step is None, return the patterns for the first step.
+        """
+        return self.get_step_config(step_name).PYBIDS_IGNORE_FILE

@@ -1,5 +1,7 @@
 """Tests for the PipelineTracker class."""
 
+import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -36,20 +38,27 @@ def tracker(tmp_path: Path):
     )
     manifest.save_with_backup(tracker.layout.fpath_manifest)
 
+    fpath_tracker_config = tmp_path / "tracker_config.json"
+    tracker_config = [
+        {
+            "NAME": "pipeline_complete",
+            "PATHS": [
+                "[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]/results.txt",
+                "file.txt",
+            ],
+        },
+    ]
+    fpath_tracker_config.write_text(json.dumps(tracker_config))
+
     config: Config = get_config(
         visits=["1", "2"],
-        proc_pipelines={
-            pipeline_name: {
-                pipeline_version: {
-                    "TRACKER_CONFIG": {
-                        "pipeline_complete": [
-                            "[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]/results.txt",
-                            "file.txt",
-                        ]
-                    }
-                }
-            }
-        },
+        proc_pipelines=[
+            {
+                "NAME": pipeline_name,
+                "VERSION": pipeline_version,
+                "TRACKER_CONFIG_FILE": fpath_tracker_config,
+            },
+        ],
     )
     config.save(tracker.layout.fpath_config)
 
@@ -115,6 +124,31 @@ def test_run_single(participant, session, expected_status, tracker: PipelineTrac
         .loc[:, Bagel.col_pipeline_complete]
         .item()
     ) == expected_status
+
+
+def test_run_single_multiple_configs(
+    tracker: PipelineTracker, caplog: pytest.LogCaptureFixture
+):
+    tracker_configs = [
+        {"NAME": "tracker1", "PATHS": ["path1"]},
+        {"NAME": "tracker2", "PATHS": ["path2"]},
+    ]
+    tracker.pipeline_config.TRACKER_CONFIG_FILE.write_text(json.dumps(tracker_configs))
+    tracker.run_single("01", "ses-1")
+
+    assert any(
+        [
+            record.levelno == logging.WARNING
+            and "Currently only one config is supported" in record.message
+            for record in caplog.records
+        ]
+    )
+
+
+def test_run_single_no_config(tracker: PipelineTracker):
+    tracker.pipeline_config.TRACKER_CONFIG_FILE = None
+    with pytest.raises(ValueError, match="No tracker config file specified for"):
+        tracker.run_single("01", "ses-1")
 
 
 @pytest.mark.parametrize(
