@@ -10,7 +10,7 @@
             "name": "nativespace_analysis",
             "description": "Conduct confound correction and analysis in native space.",
             "optional": true,
-            "type": "String",
+            "type": "FLAG",
             "value-key": "[NATIVESPACE_ANALYSIS]",
             "command-line-flag": "--nativespace_analysis"
         },
@@ -100,7 +100,7 @@
             "name": "match_number_timepoints",
             "description": "With this option, only a subset of the timepoints are kept post-censoring to match the --minimum_timepoint number for all scans. This can be conducted to avoid inconsistent temporal degrees of freedom (tDOF) between scans during downstream analysis. We recommend selecting this option if a significant confounding effect of tDOF is detected during --data_diagnosis. The extra timepoints removed are randomly selected among the set available post-censoring.",
             "optional": true,
-            "type": "String",
+            "type": "Flag",
             "value-key": "[MATCH_NUMBER_TIMEPOINTS]",
             "command-line-flag": "--match_number_timepoints"
         },
@@ -118,7 +118,7 @@
             "name": "read_datasink",
             "description": "Choose this option to read preprocessing outputs from datasinks instead of the savedpreprocessing workflow graph. This allows to run confound correction without havingavailable RABIES preprocessing folders, but the targetted datasink folders must follow the structure of RABIES preprocessing.",
             "optional": true,
-            "type": "String",
+            "type": "Flag",
             "value-key": "[READ_DATASINK]",
             "command-line-flag": "--read_datasink"
         },
