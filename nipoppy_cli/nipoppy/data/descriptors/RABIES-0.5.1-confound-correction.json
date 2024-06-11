@@ -3,7 +3,7 @@
     "description": "tool description",
     "tool-version": "v0.5.1",
     "schema-version": "0.5",
-    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] confound_correction [NATIVESPACE_ANALYSIS] [IMAGE_SCALING] [DATA_DIAGNOSIS.] [DETRENDING_ORDER] [CONF_LIST] [FRAME_CENSORING] [TR] [HIGHPASS] [LOWPASS] [EDGE_CUTOFF] [SMOOTHING_FILTER] [MATCH_NUMBER_TIMEPOINTS] [ICA_AROMA] [READ_DATASINK] [TIMESERIES_INTERVAL] [INPUT_DIR] [OUTPUT_DIR] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE]",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE] confound_correction [NATIVESPACE_ANALYSIS] [IMAGE_SCALING] [DATA_DIAGNOSIS.] [DETRENDING_ORDER] [CONF_LIST] [FRAME_CENSORING] [TR] [HIGHPASS] [LOWPASS] [EDGE_CUTOFF] [SMOOTHING_FILTER] [MATCH_NUMBER_TIMEPOINTS] [ICA_AROMA] [READ_DATASINK] [TIMESERIES_INTERVAL] [INPUT_DIR] [OUTPUT_DIR]",
     "inputs": [
         {
             "id": "nativespace_analysis",
@@ -12,8 +12,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[NATIVESPACE_ANALYSIS]",
-            "command-line-flag": "--nativespace_analysis",
-            "default-value": "False"
+            "command-line-flag": "--nativespace_analysis"
         },
         {
             "id": "image_scaling",
@@ -22,8 +21,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[IMAGE_SCALING]",
-            "command-line-flag": "--image_scaling",
-            "default-value": ""
+            "command-line-flag": "--image_scaling"
         },
         {
             "id": "detrending_order",
@@ -32,8 +30,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[DETRENDING_ORDER]",
-            "command-line-flag": "--detrending_order",
-            "default-value": "linear"
+            "command-line-flag": "--detrending_order"
         },
         {
             "id": "conf_list",
@@ -42,8 +39,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[CONF_LIST]",
-            "command-line-flag": "--conf_list",
-            "default-value": "[]"
+            "command-line-flag": "--conf_list"
         },
         {
             "id": "frame_censoring",
@@ -52,8 +48,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[FRAME_CENSORING]",
-            "command-line-flag": "--frame_censoring",
-            "default-value": "FD_censoring=false,FD_threshold=0.05,DVARS_censoring=false,minimum_timepoint=3"
+            "command-line-flag": "--frame_censoring"
         },
         {
             "id": "TR",
@@ -62,8 +57,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[TR]",
-            "command-line-flag": "--TR",
-            "default-value": "auto"
+            "command-line-flag": "--TR"
         },
         {
             "id": "highpass",
@@ -72,8 +66,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[HIGHPASS]",
-            "command-line-flag": "--highpass",
-            "default-value": "None"
+            "command-line-flag": "--highpass"
         },
         {
             "id": "lowpass",
@@ -82,8 +75,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[LOWPASS]",
-            "command-line-flag": "--lowpass",
-            "default-value": "None"
+            "command-line-flag": "--lowpass"
         },
         {
             "id": "edge_cutoff",
@@ -92,8 +84,7 @@
             "optional": true,
             "type": "Number",
             "value-key": "[EDGE_CUTOFF]",
-            "command-line-flag": "--edge_cutoff",
-            "default-value": "0"
+            "command-line-flag": "--edge_cutoff"
         },
         {
             "id": "smoothing_filter",
@@ -102,8 +93,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[SMOOTHING_FILTER]",
-            "command-line-flag": "--smoothing_filter",
-            "default-value": "None"
+            "command-line-flag": "--smoothing_filter"
         },
         {
             "id": "match_number_timepoints",
@@ -112,8 +102,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[MATCH_NUMBER_TIMEPOINTS]",
-            "command-line-flag": "--match_number_timepoints",
-            "default-value": "False"
+            "command-line-flag": "--match_number_timepoints"
         },
         {
             "id": "ica_aroma",
@@ -122,8 +111,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[ICA_AROMA]",
-            "command-line-flag": "--ica_aroma",
-            "default-value": "apply=false,dim=0,random_seed=1"
+            "command-line-flag": "--ica_aroma"
         },
         {
             "id": "read_datasink",
@@ -132,8 +120,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[READ_DATASINK]",
-            "command-line-flag": "--read_datasink",
-            "default-value": "False"
+            "command-line-flag": "--read_datasink"
         },
         {
             "id": "timeseries_interval",
@@ -142,8 +129,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[TIMESERIES_INTERVAL]",
-            "command-line-flag": "--timeseries_interval",
-            "default-value": "all"
+            "command-line-flag": "--timeseries_interval"
         },
         {
             "id": "input_dir",
@@ -169,10 +155,8 @@
             "description": "Define a list of BOLD scan to include",
             "optional": true,
             "type": "String",
-            "list": true,
             "command-line-flag": "--inclusion_ids",
-            "value-key": "[INCLUSION_IDS]",
-            "default-value": "['all']"
+            "value-key": "[INCLUSION_IDS]"
         },
         {
             "id": "exclusion_ids",
@@ -180,10 +164,8 @@
             "description": "This argument provides a list of scans to exclude",
             "optional": true,
             "type": "String",
-            "list": true,
             "command-line-flag": "--exclusion_ids",
-            "value-key": "[EXCLUSION_IDS]",
-            "default-value": "['none']"
+            "value-key": "[EXCLUSION_IDS]"
         },
         {
             "id": "plugin",
@@ -192,8 +174,7 @@
             "optional": true,
             "type": "String",
             "command-line-flag": "-p",
-            "value-key": "[PLUGIN]",
-            "default-value": "linear"
+            "value-key": "[PLUGIN]"
         },
         {
             "id": "local_threads",
@@ -202,8 +183,7 @@
             "optional": true,
             "type": "Number",
             "command-line-flag": "--local_threads",
-            "value-key": "[LOCAL_THREADS]",
-            "default-value": "24"
+            "value-key": "[LOCAL_THREADS]"
         },
         {
             "id": "scale_min_memory",
@@ -212,8 +192,7 @@
             "optional": true,
             "type": "Number",
             "command-line-flag": "--scale_min_memory",
-            "value-key": "[SCALE_MIN_MEMORY]",
-            "default-value": "1.0"
+            "value-key": "[SCALE_MIN_MEMORY]"
         },
         {
             "id": "min_proc",
@@ -222,8 +201,7 @@
             "optional": true,
             "type": "Number",
             "command-line-flag": "--min_proc",
-            "value-key": "[MIN_PROC]",
-            "default-value": "1"
+            "value-key": "[MIN_PROC]"
         },
         {
             "id": "figure_format",
@@ -232,8 +210,7 @@
             "optional": true,
             "type": "String",
             "command-line-flag": "--figure_format",
-            "value-key": "[FIGURE_FORMAT]",
-            "default-value": "png"
+            "value-key": "[FIGURE_FORMAT]"
         },
         {
             "id": "verbose",
@@ -242,8 +219,7 @@
             "optional": true,
             "type": "Number",
             "command-line-flag": "--figure_format",
-            "value-key": "[VERBOSE]",
-            "default-value": "1"
+            "value-key": "[VERBOSE]"
         },
         {
             "id": "force",
@@ -252,8 +228,7 @@
             "optional": true,
             "type": "String",
             "command-line-flag": "--force",
-            "value-key": "[FORCE]",
-            "default-value": "false"
+            "value-key": "[FORCE]"
         }
     ],
     "tags": {},
@@ -267,100 +242,5 @@
             "code": 1,
             "description": "Crashed"
         }
-    ],
-    "invocation-schema": {
-        "$schema": "http://json-schema.org/draft-04/schema#",
-        "title": "RABIES.invocationSchema",
-        "description": "Invocation schema for rabies.",
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-            "nativespace_analysis": {
-                "type": "string"
-            },
-            "image_scaling": {
-                "type": "string"
-            },
-            "detrending_order": {
-                "type": "string"
-            },
-            "conf_list": {
-                "type": "string"
-            },
-            "frame_censoring": {
-                "type": "string"
-            },
-            "TR": {
-                "type": "string"
-            },
-            "highpass": {
-                "type": "string"
-            },
-            "lowpass": {
-                "type": "string"
-            },
-            "edge_cutoff": {
-                "type": "string"
-            },
-            "smoothing_filter": {
-                "type": "string"
-            },
-            "match_number_timepoints": {
-                "type": "string"
-            },
-            "ica_aroma": {
-                "type": "string"
-            },
-            "read_datasink": {
-                "type": "string"
-            },
-            "timeseries_interval": {
-                "type": "string"
-            },
-            "input_dir": {
-                "type": "string"
-            },
-            "output_dir": {
-                "type": "string"
-            },
-            "inclusion_ids": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "exclusion_ids": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            },
-            "plugin": {
-                "type": "string"
-            },
-            "local_threads": {
-                "type": "number"
-            },
-            "scale_min_memory": {
-                "type": "number"
-            },
-            "min_proc": {
-                "type": "number"
-            },
-            "figure_format": {
-                "type": "string"
-            },
-            "verbose": {
-                "type": "number"
-            },
-            "force": {
-                "type": "string"
-            }
-        },
-        "required": [
-            "input_dir",
-            "output_dir"
-        ],
-        "dependencies": {}
-    }
+    ]
 }
