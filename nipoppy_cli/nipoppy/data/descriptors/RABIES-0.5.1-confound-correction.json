@@ -10,7 +10,7 @@
             "name": "nativespace_analysis",
             "description": "Conduct confound correction and analysis in native space.",
             "optional": true,
-            "type": "FLAG",
+            "type": "Flag",
             "value-key": "[NATIVESPACE_ANALYSIS]",
             "command-line-flag": "--nativespace_analysis"
         },
