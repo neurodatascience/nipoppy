@@ -1,0 +1,7 @@
+{
+    "sourcefolder": "[[NIPOPPY_DPATH_SOURCEDATA]]",
+    "bidsfolder": "[[NIPOPPY_DPATH_BIDS]]",
+    "participant_label": [
+        "[[NIPOPPY_PARTICIPANT_ID]]"
+    ]
+}

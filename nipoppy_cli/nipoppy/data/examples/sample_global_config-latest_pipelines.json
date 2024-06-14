@@ -59,18 +59,43 @@
                 {
                     "NAME": "prepare",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json"
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/dcm2bids_helper-[[NIPOPPY_PIPELINE_VERSION]].json"
                 },
                 {
                     "NAME": "convert",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/dcm2bids-[[NIPOPPY_PIPELINE_VERSION]].json",
                     "CONTAINER_CONFIG": {
                         "ARGS": [
                             "--bind",
                             "[[DCM2BIDS_CONFIG_FILE]]"
                         ]
                     }
+                }
+            ]
+        },
+        {
+            "NAME": "bidscoin",
+            "VERSION": "4.3.2",
+            "CONTAINER_INFO": {
+                "FILE": "[[NIPOPPY_DPATH_CONTAINERS]]/[[NIPOPPY_PIPELINE_NAME]]_[[NIPOPPY_PIPELINE_VERSION]].sif",
+                "URI": "docker://marcelzwiers/[[NIPOPPY_PIPELINE_NAME]]:[[NIPOPPY_PIPELINE_VERSION]]"
+            },
+            "STEPS": [
+                {
+                    "NAME": "prepare",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidsmapper-[[NIPOPPY_PIPELINE_VERSION]].json"
+                },
+                {
+                    "NAME": "edit",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-edit.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidseditor-[[NIPOPPY_PIPELINE_VERSION]].json"
+                },
+                {
+                    "NAME": "convert",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidscoiner-[[NIPOPPY_PIPELINE_VERSION]].json"
                 }
             ]
         }

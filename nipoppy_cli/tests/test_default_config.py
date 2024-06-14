@@ -116,6 +116,9 @@ def test_pipeline_runner(
         ("heudiconv", "0.12.2", "convert"),
         ("dcm2bids", "3.1.0", "prepare"),
         ("dcm2bids", "3.1.0", "convert"),
+        ("bidscoin", "4.3.2", "prepare"),
+        ("bidscoin", "4.3.2", "edit"),
+        ("bidscoin", "4.3.2", "convert"),
     ],
 )
 def test_bids_conversion_runner(
