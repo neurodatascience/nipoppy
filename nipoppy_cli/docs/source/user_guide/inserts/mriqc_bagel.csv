@@ -1,0 +1,2 @@
+participant_id,bids_id,session,pipeline_name,pipeline_version,pipeline_complete
+001,sub-001,ses-1,mriqc,23.1.0,SUCCESS

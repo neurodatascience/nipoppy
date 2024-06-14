@@ -12,6 +12,7 @@ per-file-ignores =
     __init__.py:F401
     # allow "weird indentation"
 	tests/test_workflow_*.py: D100, D103, D104, E131, E127, E501
+    **/docs/source/conf.py: E501
 docstring-convention = numpy
 max_complexity = 12
 max_function_length = 150

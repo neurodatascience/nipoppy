@@ -59,6 +59,7 @@ def cli(argv: Sequence[str] = None) -> None:
             workflow = DicomReorgWorkflow(
                 dpath_root=dpath_root,
                 copy_files=args.copy_files,
+                check_dicoms=args.check_dicoms,
                 **workflow_kwargs,
             )
         elif command == COMMAND_BIDS_CONVERSION:

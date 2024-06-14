@@ -1,0 +1,4 @@
+└── <PIPELINE_NAME>
+    └── <PIPELINE_VERSION>
+        ├── output         # output files
+        └── work           # temporary/intermediate files (if any)

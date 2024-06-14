@@ -4,16 +4,21 @@ import pytest
 
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.manifest import Manifest
+from nipoppy.utils import FPATH_SAMPLE_DICOM_DIR_MAP
 
 from .conftest import DPATH_TEST_DATA
 
 
 @pytest.mark.parametrize(
-    "fname",
-    ["dicom_dir_map1.csv", "dicom_dir_map2.csv"],
+    "fpath",
+    [
+        FPATH_SAMPLE_DICOM_DIR_MAP,
+        DPATH_TEST_DATA / "dicom_dir_map1.csv",
+        DPATH_TEST_DATA / "dicom_dir_map2.csv",
+    ],
 )
-def test_load(fname):
-    assert isinstance(DicomDirMap.load(DPATH_TEST_DATA / fname), DicomDirMap)
+def test_load(fpath):
+    assert isinstance(DicomDirMap.load(fpath), DicomDirMap)
 
 
 @pytest.mark.parametrize(

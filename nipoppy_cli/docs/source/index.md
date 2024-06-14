@@ -17,15 +17,7 @@ caption: Overview
 ---
 installation
 quickstart
-```
-
-```{toctree}
----
-hidden:
-includehidden:
-titlesonly:
-caption: Detailed user guide
----
+user_guide/index
 ```
 
 ```{toctree}

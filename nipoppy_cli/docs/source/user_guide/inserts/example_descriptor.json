@@ -1,0 +1,35 @@
+{
+    "name": "example",
+    "description": "An example tool",
+    "tool-version": "0.1.0",
+    "schema-version": "0.5",
+    "command-line": "echo [PARAM1] [PARAM2] [FLAG1]",
+    "inputs": [
+        {
+            "name": "The first parameter",
+            "id": "basic_param1",
+            "type": "File",
+            "optional": true,
+            "value-key": "[PARAM1]"
+        },
+        {
+            "name": "The second parameter",
+            "id": "basic_param2",
+            "type": "String",
+            "optional": false,
+            "value-key": "[PARAM2]",
+            "value-choices": [
+                "choice1",
+                "choice2"
+            ]
+        },
+        {
+            "name": "The first flag",
+            "id": "basic_flag1",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "-f",
+            "value-key": "[FLAG1]"
+        }
+    ]
+}

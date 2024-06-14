@@ -10,11 +10,10 @@ titlesonly:
 init.md
 doughnut.md
 reorg.md
-convert.md
+bidsify.md
 run.md
 track.md
 ```
-<!-- TODO figure out if can use template for above -->
 
 ```{argparse}
 ---

@@ -1,0 +1,4 @@
+participant_id,session_id,participant_dicom_dir
+01,1,01/ses-1
+01,2,01/ses-2
+02,1,02/ses-1
