@@ -83,6 +83,7 @@ def test_boutiques_descriptors(fpath_descriptor):
         ("fmriprep", "20.2.7"),
         ("fmriprep", "23.1.3"),
         ("mriqc", "23.1.0"),
+        ("qsiprep", "0.21.4"),
     ],
 )
 def test_pipeline_runner(
