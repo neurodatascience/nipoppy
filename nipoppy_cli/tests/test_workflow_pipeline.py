@@ -32,8 +32,6 @@ class PipelineWorkflow(BasePipelineWorkflow):
         logger: Optional[logging.Logger] = None,
         dry_run: bool = False,
     ):
-        self._n_runs = 0
-        self._n_errors = 0
         super().__init__(
             dpath_root=dpath_root,
             name="test",
@@ -55,12 +53,10 @@ class PipelineWorkflow(BasePipelineWorkflow):
             participant_id=participant_id, session_id=session_id
         )
 
-    def run_single(self, subject: str, session_id: str):
+    def run_single(self, participant_id: str, session_id: str):
         """Run on a single participant_id/session_id."""
-        self._n_runs += 1
-        self.logger.info(f"Running on {subject}/{session_id}")
-        if subject == "FAIL":
-            self._n_errors += 1
+        self.logger.info(f"Running on {participant_id}/{session_id}")
+        if participant_id == "FAIL":
             raise RuntimeError("FAIL")
 
 
@@ -553,7 +549,8 @@ def test_run_main(
     )
     manifest.save_with_backup(workflow.layout.fpath_manifest)
     workflow.run_main()
-    assert workflow._n_runs == expected_count
+    assert workflow.n_total == expected_count
+    assert workflow.n_success == expected_count
 
 
 def test_run_main_catch_errors(workflow: PipelineWorkflow):
@@ -568,8 +565,41 @@ def test_run_main_catch_errors(workflow: PipelineWorkflow):
     )
     manifest.save_with_backup(workflow.layout.fpath_manifest)
     workflow.run_main()
-    assert workflow._n_runs == 1
-    assert workflow._n_errors == 1
+    assert workflow.n_total == 1
+    assert workflow.n_success == 0
+    assert workflow.return_code == 1
+
+
+@pytest.mark.parametrize(
+    "n_success,n_total,expected_message",
+    [
+        (0, 0, "No participant-session pairs to run"),
+        (0, 1, "[red]Ran"),
+        (1, 2, "[yellow]Ran"),
+        (2, 2, "[green]Successfully ran"),
+    ],
+)
+def test_run_cleanup(
+    n_success,
+    n_total,
+    expected_message,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+):
+    workflow = PipelineWorkflow(
+        dpath_root=tmp_path / "my_dataset",
+        pipeline_name="my_pipeline",
+        pipeline_version="1.0",
+    )
+
+    workflow.n_success = n_success
+    workflow.n_total = n_total
+    workflow.dpath_pipeline_work.mkdir(parents=True, exist_ok=True)
+
+    workflow.run_cleanup()
+
+    assert not workflow.dpath_pipeline_work.exists()
+    assert expected_message in caplog.text
 
 
 @pytest.mark.parametrize(

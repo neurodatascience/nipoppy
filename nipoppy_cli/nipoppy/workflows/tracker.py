@@ -38,7 +38,7 @@ class PipelineTracker(BasePipelineWorkflow):
         )
         self.bagel: Bagel = Bagel()  # may get overwritten
 
-    def run_setup(self, **kwargs):
+    def run_setup(self):
         """Load/initialize the bagel file."""
         if self.layout.fpath_imaging_bagel.exists():
             self.bagel = Bagel.load(self.layout.fpath_imaging_bagel)
@@ -49,7 +49,7 @@ class PipelineTracker(BasePipelineWorkflow):
         else:
             self.bagel = Bagel()
             self.logger.info("Initialized empty bagel")
-        return super().run_setup(**kwargs)
+        return super().run_setup()
 
     def check_status(self, relative_paths: StrOrPathLike):
         """Check the processing status based on a list of expected paths."""
@@ -115,8 +115,8 @@ class PipelineTracker(BasePipelineWorkflow):
         )
         return status
 
-    def run_cleanup(self, **kwargs):
+    def run_cleanup(self):
         """Save the bagel file."""
         self.logger.info(f"New/updated bagel shape: {self.bagel.shape}")
         self.save_tabular_file(self.bagel, self.layout.fpath_imaging_bagel)
-        return super().run_cleanup(**kwargs)
+        return super().run_cleanup()

@@ -106,6 +106,9 @@ def cli(argv: Sequence[str] = None) -> None:
         # run the workflow
         workflow.run()
 
+        # exit with the workflow's return code
+        sys.exit(workflow.return_code)
+
     except Exception:
         logger.exception("Error when creating/running a workflow")
         sys.exit(1)

@@ -70,6 +70,12 @@ def test_custom_layout(dpath_root: Path):
     assert (dpath_root / "dicom").exists()
 
 
+def test_run_cleanup(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    workflow = InitWorkflow(dpath_root=tmp_path)
+    workflow.run_cleanup()
+    assert "Successfully initialized a dataset at" in caplog.text
+
+
 @pytest.mark.parametrize("attr", ["config", "manifest", "doughnut"])
 def test_config_attrs_error(attr):
     with pytest.raises(

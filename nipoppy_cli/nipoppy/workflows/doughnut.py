@@ -73,3 +73,10 @@ class DoughnutWorkflow(BaseWorkflow):
 
         logger.info(f"New/updated doughnut shape: {doughnut.shape}")
         self.save_tabular_file(doughnut, fpath_doughnut)
+
+    def run_cleanup(self):
+        """Log a success message."""
+        self.logger.info(
+            "[green]Successfully generated/updated the dataset's doughnut file![/]"
+        )
+        return super().run_cleanup()

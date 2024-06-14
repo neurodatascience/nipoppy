@@ -15,6 +15,14 @@ from nipoppy.workflows.dicom_reorg import DicomReorgWorkflow, is_derived_dicom
 from .conftest import DPATH_TEST_DATA, create_empty_dataset, get_config, prepare_dataset
 
 
+def test_init_attributes(tmp_path: Path):
+    workflow = DicomReorgWorkflow(dpath_root=tmp_path)
+    assert workflow.copy_files is False
+    assert workflow.check_dicoms is False
+    assert workflow.n_success == 0
+    assert workflow.n_total == 0
+
+
 @pytest.mark.parametrize(
     "fpath,expected_result",
     [
@@ -210,18 +218,6 @@ def test_run_single_error_dicom_read(tmp_path: Path):
 
     with pytest.raises(RuntimeError, match="Error checking DICOM file"):
         workflow.run_single(participant_id, session_id)
-
-
-def test_copy_files_default(tmp_path: Path):
-    dataset_name = "my_dataset"
-    workflow = DicomReorgWorkflow(dpath_root=tmp_path / dataset_name)
-    assert workflow.copy_files is False
-
-
-def test_check_dicoms_default(tmp_path: Path):
-    dataset_name = "my_dataset"
-    workflow = DicomReorgWorkflow(dpath_root=tmp_path / dataset_name)
-    assert workflow.check_dicoms is False
 
 
 @pytest.mark.parametrize(
@@ -432,6 +428,41 @@ def test_run_main(
             else:
                 assert not dpath_to_check.exists()
 
+    assert workflow.n_total != 0
+    assert workflow.n_success == workflow.n_total
+
+
+def test_run_main_error(tmp_path: Path):
+    dataset_name = "my_dataset"
+    workflow = DicomReorgWorkflow(dpath_root=tmp_path / dataset_name)
+    create_empty_dataset(workflow.layout.dpath_root)
+
+    manifest: Manifest = prepare_dataset(
+        participants_and_sessions_manifest={
+            "S01": ["1", "2", "3"],
+            "S02": ["1", "2", "3"],
+            "S03": ["1", "2", "3"],
+        },
+    )
+
+    config = get_config(
+        dataset_name=dataset_name,
+        visit_ids=list(manifest[Manifest.col_visit_id].unique()),
+    )
+
+    manifest.save_with_backup(workflow.layout.fpath_manifest)
+    config.save(workflow.layout.fpath_config)
+
+    # will cause the workflow to fail because the directories cannot be found
+    workflow.doughnut[workflow.doughnut.col_in_raw_imaging] = True
+
+    try:
+        workflow.run_main()
+    except Exception:
+        pass
+
+    assert workflow.return_code == 1
+
 
 @pytest.mark.parametrize(
     "doughnut",
@@ -451,7 +482,7 @@ def test_run_main(
         ).validate(),
     ],
 )
-def test_cleanup(doughnut: Doughnut, tmp_path: Path):
+def test_cleanup_doughnut(doughnut: Doughnut, tmp_path: Path):
     workflow = DicomReorgWorkflow(dpath_root=tmp_path / "my_dataset")
     workflow.doughnut = doughnut
 
@@ -459,3 +490,30 @@ def test_cleanup(doughnut: Doughnut, tmp_path: Path):
 
     assert workflow.layout.fpath_doughnut.exists()
     assert Doughnut.load(workflow.layout.fpath_doughnut).equals(doughnut)
+
+
+@pytest.mark.parametrize(
+    "n_success,n_total,expected_message",
+    [
+        (0, 0, "No participant-session pairs to reorganize"),
+        (0, 1, "[red]Reorganized files for"),
+        (1, 2, "[yellow]Reorganized files for"),
+        (2, 2, "[green]Successfully reorganized files for"),
+    ],
+)
+def test_run_cleanup_message(
+    n_success,
+    n_total,
+    expected_message,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+):
+    dataset_name = "my_dataset"
+    workflow = DicomReorgWorkflow(dpath_root=tmp_path / dataset_name)
+    workflow.doughnut = Doughnut()  # empty doughnut to avoid error
+
+    workflow.n_success = n_success
+    workflow.n_total = n_total
+    workflow.run_cleanup()
+
+    assert expected_message in caplog.text

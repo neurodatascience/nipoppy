@@ -49,7 +49,7 @@ from .conftest import (
     ],
 )
 @pytest.mark.parametrize("empty", [True, False])
-def test_run(
+def test_run_main(
     participants_and_sessions_manifest1: dict[str, list[str]],
     participants_and_sessions_manifest2: dict[str, list[str]],
     participants_and_sessions_downloaded: dict[str, list[str]],
@@ -86,7 +86,7 @@ def test_run(
     save_json(config.model_dump(mode="json"), fpath_config)
 
     # generate the doughnut
-    DoughnutWorkflow(dpath_root=dpath_root, empty=empty).run()
+    DoughnutWorkflow(dpath_root=dpath_root, empty=empty).run_main()
     doughnut1 = Doughnut.load(fpath_doughnut)
 
     assert len(doughnut1) == len(manifest1)
@@ -141,7 +141,7 @@ def test_run(
     ],
 )
 @pytest.mark.parametrize("empty", [True, False])
-def test_run_regenerate(
+def test_run_main_regenerate(
     participants_and_sessions_manifest: dict[str, list[str]],
     participants_and_sessions_downloaded: dict[str, list[str]],
     participants_and_sessions_organized: dict[str, list[str]],
@@ -196,7 +196,7 @@ def test_run_regenerate(
     assert doughnut_old.save_with_backup(fpath_doughnut) is not None
 
     # regenerate the doughnut
-    DoughnutWorkflow(dpath_root=dpath_root, empty=empty, regenerate=True).run()
+    DoughnutWorkflow(dpath_root=dpath_root, empty=empty, regenerate=True).run_main()
     doughnut = Doughnut.load(fpath_doughnut)
 
     assert len(doughnut) == len(manifest)
@@ -208,3 +208,8 @@ def test_run_regenerate(
         participants_and_sessions_bidsified=participants_and_sessions_bidsified,
         empty=empty,
     )
+
+
+def test_run_cleanup(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    DoughnutWorkflow(dpath_root=tmp_path).run_cleanup()
+    assert "Successfully generated/updated the dataset's doughnut file!" in caplog.text

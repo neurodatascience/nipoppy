@@ -53,8 +53,6 @@ class InitWorkflow(BaseWorkflow):
             if description is not None and not self.dry_run:
                 fpath_readme.write_text(f"{description}\n")
 
-        self.logger.info(f"Created an empty dataset at {self.dpath_root}")
-
         # copy descriptor files
         for fpath_descriptor in DPATH_DESCRIPTORS.iterdir():
             self.copy(
@@ -94,11 +92,18 @@ class InitWorkflow(BaseWorkflow):
             " to match your dataset"
         )
 
+    def run_cleanup(self):
+        """Log a success message."""
+        self.logger.info(
+            f"[green]Successfully initialized a dataset at {self.dpath_root}![/]"
+        )
+        return super().run_cleanup()
+
     @property
     def config(self):
         """Raise an error because the dataset/config file does not yet exist."""
         raise RuntimeError(
             "The config property (and any other that require loading the config)"
             " is not available in this workflow since the dataset does not exist yet"
-            " (and so does not have an associated with a config file)"
+            " (and so does not have an associated config file)"
         )

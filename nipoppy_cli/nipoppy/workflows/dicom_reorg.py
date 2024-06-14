@@ -50,6 +50,11 @@ class DicomReorgWorkflow(BaseWorkflow):
         self.copy_files = copy_files
         self.check_dicoms = check_dicoms
 
+        # the message logged in run_cleanup will depend on
+        # the final values for these attributes (updated in run_main)
+        self.n_success = 0
+        self.n_total = 0
+
     def get_fpaths_to_reorg(
         self,
         participant_id: str,
@@ -168,9 +173,12 @@ class DicomReorgWorkflow(BaseWorkflow):
             participant_id,
             session_id,
         ) in self.get_participants_sessions_to_run():
+            self.n_total += 1
             try:
                 self.run_single(participant_id, session_id)
+                self.n_success += 1
             except Exception as exception:
+                self.return_code = 1
                 self.logger.error(
                     "Error reorganizing DICOM files for participant "
                     f"{participant_id} session {session_id}: {exception}"
@@ -182,6 +190,34 @@ class DicomReorgWorkflow(BaseWorkflow):
 
         Specifically:
         - Write updated doughnut file
+        - Log a summary message
         """
         self.save_tabular_file(self.doughnut, self.layout.fpath_doughnut)
+
+        if self.n_total == 0:
+            self.logger.warning(
+                "No participant-session pairs to reorganize. Make sure there are no "
+                "mistakes in the dataset's manifest or config file, and/or check the "
+                f"doughnut file at {self.layout.fpath_doughnut}"
+            )
+        else:
+            # change the message depending on how successful the run was
+            prefix = "Reorganized"
+            suffix = ""
+            if self.n_success == 0:
+                color = "red"
+            elif self.n_success == self.n_total:
+                color = "green"
+                prefix = f"Successfully {prefix.lower()}"
+                suffix = "!"
+            else:
+                color = "yellow"
+
+            self.logger.info(
+                (
+                    f"[{color}]{prefix} files for {self.n_success} out of "
+                    f"{self.n_total} participant-session pairs{suffix}[/]"
+                )
+            )
+
         return super().run_cleanup()
