@@ -39,6 +39,7 @@ class DoughnutWorkflow(BaseWorkflow):
         dpath_downloaded = self.layout.dpath_raw_imaging
         dpath_organized = self.layout.dpath_sourcedata
         dpath_bidsified = self.layout.dpath_bids
+        dpath_mincified = self.layout.dpath_minc
         empty = self.empty
         logger = self.logger
 
@@ -52,6 +53,7 @@ class DoughnutWorkflow(BaseWorkflow):
                 dpath_downloaded=dpath_downloaded,
                 dpath_organized=dpath_organized,
                 dpath_bidsified=dpath_bidsified,
+                dpath_mincified=dpath_mincified,
                 empty=empty,
                 logger=logger,
             )
@@ -67,6 +69,7 @@ class DoughnutWorkflow(BaseWorkflow):
                 dpath_downloaded=dpath_downloaded,
                 dpath_organized=dpath_organized,
                 dpath_bidsified=dpath_bidsified,
+                dpath_mincified=dpath_mincified,
                 empty=empty,
                 logger=logger,
             )

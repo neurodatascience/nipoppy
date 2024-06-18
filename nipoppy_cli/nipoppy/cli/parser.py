@@ -12,6 +12,7 @@ COMMAND_INIT = "init"
 COMMAND_DOUGHNUT = "doughnut"
 COMMAND_DICOM_REORG = "reorg"
 COMMAND_BIDS_CONVERSION = "bidsify"
+COMMAND_MINC_CONVERSION = "mincify"
 COMMAND_PIPELINE_RUN = "run"
 COMMAND_PIPELINE_TRACK = "track"
 
@@ -252,6 +253,33 @@ def add_subparser_bids_conversion(
     return parser
 
 
+def add_subparser_minc_conversion(
+    subparsers: _SubParsersAction, formatter_class: type[HelpFormatter] = HelpFormatter
+) -> ArgumentParser:
+    """Add subparser for run command."""
+    description = "Convert to MINC."
+    parser = subparsers.add_parser(
+        COMMAND_MINC_CONVERSION,
+        description=description,
+        help=description,
+        formatter_class=formatter_class,
+        add_help=False,
+    )
+    parser = add_arg_dataset_root(parser)
+    parser = add_args_pipeline(parser)
+    parser = add_args_participant_and_session(parser)
+    parser = add_arg_simulate(parser)
+    parser.add_argument(
+        "--data-types",
+        type=str,
+        required=True,
+        help="BIDS data types to convert",
+        nargs='+',
+        choices=['anat', 'dwi', 'fmap', 'func']
+    )
+    return parser
+
+
 def add_subparser_pipeline_run(
     subparsers: _SubParsersAction, formatter_class: type[HelpFormatter] = HelpFormatter
 ) -> ArgumentParser:
@@ -316,6 +344,7 @@ def get_global_parser(
     add_subparser_doughnut(subparsers, formatter_class=formatter_class)
     add_subparser_dicom_reorg(subparsers, formatter_class=formatter_class)
     add_subparser_bids_conversion(subparsers, formatter_class=formatter_class)
+    add_subparser_minc_conversion(subparsers, formatter_class=formatter_class)
     add_subparser_pipeline_run(subparsers, formatter_class=formatter_class)
     add_subparser_pipeline_track(subparsers, formatter_class=formatter_class)
 

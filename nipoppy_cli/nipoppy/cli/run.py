@@ -8,6 +8,7 @@ from rich_argparse import RichHelpFormatter
 
 from nipoppy.cli.parser import (
     COMMAND_BIDS_CONVERSION,
+    COMMAND_MINC_CONVERSION,
     COMMAND_DICOM_REORG,
     COMMAND_DOUGHNUT,
     COMMAND_INIT,
@@ -17,6 +18,7 @@ from nipoppy.cli.parser import (
 )
 from nipoppy.logger import add_logfile, capture_warnings, get_logger
 from nipoppy.workflows.bids_conversion import BidsConversionRunner
+from nipoppy.workflows.minc_conversion import MincConversionRunner
 from nipoppy.workflows.dataset_init import InitWorkflow
 from nipoppy.workflows.dicom_reorg import DicomReorgWorkflow
 from nipoppy.workflows.doughnut import DoughnutWorkflow
@@ -70,6 +72,17 @@ def cli(argv: Sequence[str] = None) -> None:
                 participant_id=args.participant_id,
                 session_id=args.session_id,
                 simulate=args.simulate,
+                **workflow_kwargs,
+            )
+        elif command == COMMAND_MINC_CONVERSION:
+            workflow = MincConversionRunner(
+                dpath_root=dpath_root,
+                pipeline_name=args.pipeline,
+                pipeline_version=args.pipeline_version,
+                participant=args.participant,
+                session=args.session,
+                simulate=args.simulate,
+                data_types=args.data_types,
                 **workflow_kwargs,
             )
         elif command == COMMAND_PIPELINE_RUN:

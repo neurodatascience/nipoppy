@@ -1,0 +1,135 @@
+{
+    "name": "nii2mnc",
+    "description": "Convert a nifti file to a minc file",
+    "tool-version": "1.9.18",
+    "schema-version": "0.5",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] nii2mnc [BYTE] [SHORT] [INT] [FLOAT] [DOUBLE] [SIGNED] [UNSIGNED] [NOSCANRANGE] [CLOBBER] [QUIET] [HELP] [VERSION] [IN_FILE] [OUT_FILE]",
+    "inputs": [
+        {
+            "id": "byte",
+            "name": "byte",
+            "description": "Write voxel data in 8-bit integer format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[BYTE]",
+            "command-line-flag": "-byte"
+        },
+        {
+            "id": "short",
+            "name": "short",
+            "description": "Write voxel data in 16-bit integer format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[SHORT]",
+            "command-line-flag": "-short"
+        },
+        {
+            "id": "int",
+            "name": "int",
+            "description": "Write voxel data in 32-bit integer format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[INT]",
+            "command-line-flag": "-int"
+        },
+        {
+            "id": "float",
+            "name": "float",
+            "description": "Write voxel data in 32-bit floating point format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[FLOAT]",
+            "command-line-flag": "-float"
+        },
+        {
+            "id": "double",
+            "name": "double",
+            "description": "Write voxel data in 64-bit floating point format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[DOUBLE]",
+            "command-line-flag": "-double"
+        },
+        {
+            "id": "signed",
+            "name": "signed",
+            "description": "Write integer voxel data in signed format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[SIGNED]",
+            "command-line-flag": "-signed"
+        },
+        {
+            "id": "unsigned",
+            "name": "unsigned",
+            "description": "Write integer voxel data in unsigned format",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[UNSIGNED]",
+            "command-line-flag": "-unsigned"
+        },
+        {
+            "id": "noscanrange",
+            "name": "noscanrange",
+            "description": "Do not scan data range",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[NOSCANRANGE]",
+            "command-line-flag": "-noscanrange"
+        },
+        {
+            "id": "clobber",
+            "name": "clobber",
+            "description": "Overwrite existing output file",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[CLOBBER]",
+            "command-line-flag": "-clobber"
+        },
+        {
+            "id": "quiet",
+            "name": "quiet",
+            "description": "Quiet operation",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[QUIET]",
+            "command-line-flag": "-quiet"
+        },
+        {
+            "id": "help",
+            "name": "help",
+            "description": "Print summary of command-line options and abort",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[HELP]",
+            "command-line-flag": "-help"
+        },
+        {
+            "id": "version",
+            "name": "version",
+            "description": "Print version number of program and exit",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[VERSION]",
+            "command-line-flag": "-version"
+        },
+        {
+            "id": "in_file",
+            "name": "in_file",
+            "description": ".nii file to convert",
+            "optional": false,
+            "type": "String",
+            "value-key": "[IN_FILE]"
+        },
+        {
+            "id": "out_file",
+            "name": "out_file",
+            "description": "output .mnc file name",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUT_FILE]"
+        }
+    ],
+    "tags": {
+    }
+}

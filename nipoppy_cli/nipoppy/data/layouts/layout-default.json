@@ -3,6 +3,10 @@
         "path": "bids",
         "description": "This directory contains the raw dataset converted to the BIDS standard."
     },
+    "dpath_minc": {
+        "path": "minc",
+        "description": "This directory contains the raw dataset converted to MINC format."
+    },
     "dpath_derivatives": {
         "path": "derivatives",
         "description": "This directory contains the outputs of image processing pipelines. Outputs of different pipelines are stored in `<pipeline_name>/<pipeline_version>` subdirectories. Each subdirectory has two additional subdirectories: one for the actual output (under `output`) and one for temporary files created during processing (under `work`)."

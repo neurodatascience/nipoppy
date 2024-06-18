@@ -69,7 +69,10 @@ class Config(SchemaWithContainerConfig):
     BIDS_PIPELINES: list[PipelineConfig] = Field(
         default=[], description="Configurations for BIDS conversion, if applicable"
     )
-    PROC_PIPELINES: list[PipelineConfig] = Field(
+    MINC: dict[str, dict[str, PipelineConfig]] = Field(
+        default={}, description="Configurations for MINC converters, if any"
+    )
+    PROC_PIPELINES: dict[str, dict[str, PipelineConfig]] = Field(
         description="Configurations for processing pipelines"
     )
     CUSTOM: dict = Field(
@@ -191,6 +194,17 @@ class Config(SchemaWithContainerConfig):
             f"NAME={pipeline_name}, "
             f"VERSION={pipeline_version}"
         )
+    
+    def get_minc_pipeline_config(
+        self,
+        pipeline_name: str,
+        pipeline_version: str,
+    ) -> PipelineConfig:
+        """Get the config for a MINC conversion pipeline."""
+        try:
+            return self.MINC[pipeline_name][pipeline_version]
+        except KeyError:
+            raise ValueError(f"No config found for {pipeline_name} {pipeline_version}")
 
     def save(self, fpath: StrOrPathLike, **kwargs):
         """Save the config to a JSON file.
