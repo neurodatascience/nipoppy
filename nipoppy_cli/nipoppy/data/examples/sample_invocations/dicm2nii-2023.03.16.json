@@ -1,0 +1,6 @@
+{
+    "dicm2nii_folder": "[[DICM2NII_DIRECTORY]]",
+    "dcmsource": "[[NIPOPPY_DPATH_SOURCEDATA]]/dicm2nii",
+    "niifolder": "[[NIPOPPY_DPATH_SOURCEDATA]]/bidscoin",
+    "outfmt": ".nii.gz 3D"
+}

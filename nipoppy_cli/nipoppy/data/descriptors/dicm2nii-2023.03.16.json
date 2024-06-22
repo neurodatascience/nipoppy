@@ -1,0 +1,58 @@
+{
+    "name": "dicm2nii",
+    "description": "tool description",
+    "tool-version": "2024.06.06",
+    "schema-version": "0.5",
+    "command-line": "matlab -batch \"addpath('[DICM2NII_FOLDER]'); dicm2nii('[DCMSOURCE]', '[NIIFOLDER]', '[OUTFMT]')\"",
+    "inputs": [
+        {
+            "name": "dicm2nii_folder",
+            "id": "dicm2nii_folder",
+            "description": "Path to folder containing dicm2nii.m file.",
+            "type": "File",
+            "value-key": "[DICM2NII_FOLDER]",
+            "optional": false
+        },
+        {
+            "name": "dcmsource",
+            "id": "dcmsource",
+            "description": "Source file or folder: can be a zip or tgz file, a folder containing dicom files, or other convertible files. It can also contain wildcards like 'run1_*' for all files start with 'run1_'.",
+            "type": "File",
+            "value-key": "[DCMSOURCE]",
+            "optional": true
+        },
+        {
+            "name": "niifolder",
+            "id": "niifolder",
+            "description": "Folder to save result files.",
+            "type": "String",
+            "value-key": "[NIIFOLDER]",
+            "optional": true
+        },
+        {
+            "name": "outfmt",
+            "id": "outfmt",
+            "description": "Output file format: '.nii' for single nii uncompressed, '.nii.gz' for single nii compressed (default), '.hdr' for hdr/img pair uncompressed, '.hdr.gz' for hdr/img pair compressed, '.nii 3D' for 3D nii uncompressed (SPM12), '.nii.gz 3D' for 3D nii compressed, '.hdr 3D' for 3D hdr/img pair uncompressed (SPM8), '.hdr.gz 3D' for 3D hdr/img pair compressed, 'bids' for bids data structure (http://bids.neuroimaging.io/).",
+            "type": "String",
+            "value-key": "[OUTFMT]",
+            "value-choices": [
+                ".nii",
+                ".nii.gz",
+                ".hdr",
+                ".hdr.gz",
+                ".nii 3D",
+                ".nii.gz 3D",
+                ".hdr 3D",
+                ".hdr.gz 3D",
+                "bids"
+            ],
+            "default-value": ".nii.gz",
+            "optional": true
+        }
+    ],
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    }
+}
