@@ -1,0 +1,15 @@
+{
+    "bids_dir": "[[NIPOPPY_DPATH_BIDS]]",
+    "output_dir": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]",
+    "analysis_level": "participant",
+    "participant_label": [
+        "[[NIPOPPY_PARTICIPANT_ID]]"
+    ],
+    "bids_database_dir": "[[NIPOPPY_DPATH_PIPELINE_BIDS_DB]]",
+    "output_resolution": 1.2,
+    "work_dir": "[[NIPOPPY_DPATH_PIPELINE_WORK]]",
+    "skip_bids_validation": true,
+    "fs_license_file": "[[FREESURFER_LICENSE_FILE]]",
+    "omp_nthreads": 4,
+    "verbose_count": "-v"
+}

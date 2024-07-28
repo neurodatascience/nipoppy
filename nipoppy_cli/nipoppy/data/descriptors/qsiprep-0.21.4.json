@@ -1,0 +1,734 @@
+{
+    "name": "qsiprep",
+    "description": "qsiprep",
+    "tool-version": "0.21.4",
+    "schema-version": "0.5",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] qsiprep [BIDS_DIR] [OUTPUT_DIR] [ANALYSIS_LEVEL] [VERSION] [SKIP_BIDS_VALIDATION] [PARTICIPANT_LABEL] [BIDS_DATABASE_DIR] [BIDS_FILTERS] [INTERACTIVE_REPORTS_ONLY] [RECON_ONLY] [RECON_SPEC] [RECON_INPUT] [RECON_INPUT_PIPELINE] [FREESURFER_INPUT] [SKIP_ODF_REPORTS] [NTHREADS] [OMP_NTHREADS] [MEM_MB] [LOW_MEM] [USE_PLUGIN] [ANAT_ONLY] [DWI_ONLY] [INFANT] [BOILERPLATE] [VERBOSE_COUNT] [ANAT_MODALITY] [IGNORE] [LONGITUDINAL] [B0_THRESHOLD] [DWI_DENOISE_WINDOW] [DENOISE_METHOD] [UNRINGING_METHOD] [DWI_NO_BIASCORR] [B1_BIASCORRECT_STAGE] [NO_B0_HARMONIZATION] [DENOISE_AFTER_COMBINING] [SEPARATE_ALL_DWIS] [DISTORTION_GROUP_MERGE] [WRITE_LOCAL_BVECS] [ANATOMICAL_TEMPLATE] [OUTPUT_RESOLUTION] [B0_TO_T1W_TRANSFORM] [INTRAMODAL_TEMPLATE_ITERS] [INTRAMODAL_TEMPLATE_TRANSFORM] [B0_MOTION_CORR_TO] [HMC_TRANSFORM] [HMC_MODEL] [EDDY_CONFIG] [SHORELINE_ITERS] [IMPUTE_SLICE_THRESHOLD] [SKULL_STRIP_TEMPLATE] [SKULL_STRIP_FIXED_SEED] [SKIP_ANAT_BASED_SPATIAL_NORMALIZATION] [FS_LICENSE_FILE] [DO_RECONALL] [PEPOLAR_METHOD] [DENOISED_IMAGE_SDC] [PREFER_DEDICATED_FMAPS] [FMAP_BSPLINE] [FMAP_NO_DEMEAN] [USE_SYN_SDC] [FORCE_SYN] [WORK_DIR] [RESOURCE_MONITOR] [REPORTS_ONLY] [RUN_UUID] [WRITE_GRAPH] [STOP_ON_FIRST_CRASH] [NOTRACK] [SLOPPY]",
+    "inputs": [
+        {
+            "name": "bids_dir",
+            "id": "bids_dir",
+            "description": "the root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder).",
+            "type": "String",
+            "optional": false,
+            "value-key": "[BIDS_DIR]"
+        },
+        {
+            "name": "output_dir",
+            "id": "output_dir",
+            "description": "the output path for the outcomes of preprocessing and visual reports",
+            "type": "String",
+            "optional": false,
+            "value-key": "[OUTPUT_DIR]"
+        },
+        {
+            "name": "analysis_level",
+            "id": "analysis_level",
+            "description": "processing stage to be run, only \"participant\" in the case of qsiprep (see BIDS-Apps specification).",
+            "type": "String",
+            "optional": false,
+            "value-key": "[ANALYSIS_LEVEL]",
+            "value-choices": [
+                "participant"
+            ]
+        },
+        {
+            "name": "version",
+            "id": "version",
+            "description": "show program's version number and exit",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--version",
+            "value-key": "[VERSION]"
+        },
+        {
+            "name": "skip_bids_validation",
+            "id": "skip_bids_validation",
+            "description": "assume the input dataset is BIDS compliant and skip the validation",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip_bids_validation",
+            "value-key": "[SKIP_BIDS_VALIDATION]"
+        },
+        {
+            "name": "participant_label",
+            "id": "participant_label",
+            "description": "a space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed)",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--participant_label",
+            "value-key": "[PARTICIPANT_LABEL]"
+        },
+        {
+            "name": "bids_database_dir",
+            "id": "bids_database_dir",
+            "description": "path to a saved BIDS database directory",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--bids-database-dir",
+            "value-key": "[BIDS_DATABASE_DIR]"
+        },
+        {
+            "name": "bids_filters",
+            "id": "bids_filters",
+            "description": "a JSON file describing custom BIDS input filters using PyBIDS. For further details, please check out https://fmriprep.readthedocs.io/en/latest/faq.html#how-do-I-select-only-certain-files-to-be-input-to-fMRIPrep",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--bids-filter-file",
+            "value-key": "[BIDS_FILTERS]"
+        },
+        {
+            "name": "interactive_reports_only",
+            "id": "interactive_reports_only",
+            "description": "create interactive report json files on already preprocessed data.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--interactive-reports-only",
+            "value-key": "[INTERACTIVE_REPORTS_ONLY]"
+        },
+        {
+            "name": "recon_only",
+            "id": "recon_only",
+            "description": "run only reconstruction, assumes preprocessing has already completed.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--recon-only",
+            "value-key": "[RECON_ONLY]"
+        },
+        {
+            "name": "recon_spec",
+            "id": "recon_spec",
+            "description": "json file specifying a reconstruction pipeline to be run after preprocessing",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--recon-spec",
+            "value-key": "[RECON_SPEC]"
+        },
+        {
+            "name": "recon_input",
+            "id": "recon_input",
+            "description": "use this directory as inputs to qsirecon. This option skips qsiprep.",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--recon-input",
+            "value-key": "[RECON_INPUT]"
+        },
+        {
+            "name": "recon_input_pipeline",
+            "id": "recon_input_pipeline",
+            "description": "specify which pipeline was used to create the data specified as the --recon-input. Not necessary to specify if the data was processed by qsiprep. Other options include \"ukb\" for data processed with the UK BioBank minimal preprocessing pipeline and \"hcpya\" for the HCP young adult minimal preprocessing pipeline.",
+            "type": "String",
+            "optional": true,
+            "default-value": "qsiprep",
+            "command-line-flag": "--recon-input-pipeline",
+            "value-key": "[RECON_INPUT_PIPELINE]",
+            "value-choices": [
+                "qsiprep",
+                "ukb",
+                "hcpya"
+            ]
+        },
+        {
+            "name": "freesurfer_input",
+            "id": "freesurfer_input",
+            "description": "Directory containing freesurfer outputs to be integrated into recon.",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--freesurfer-input",
+            "value-key": "[FREESURFER_INPUT]"
+        },
+        {
+            "name": "skip_odf_reports",
+            "id": "skip_odf_reports",
+            "description": "run only reconstruction, assumes preprocessing has already completed.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip-odf-reports",
+            "value-key": "[SKIP_ODF_REPORTS]"
+        },
+        {
+            "name": "nthreads",
+            "id": "nthreads",
+            "description": "maximum number of threads across all processes",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--nthreads",
+            "value-key": "[NTHREADS]"
+        },
+        {
+            "name": "omp_nthreads",
+            "id": "omp_nthreads",
+            "description": "maximum number of threads per-process",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--omp-nthreads",
+            "value-key": "[OMP_NTHREADS]"
+        },
+        {
+            "name": "mem_mb",
+            "id": "mem_mb",
+            "description": "upper bound memory limit for qsiprep processes",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--mem_mb",
+            "value-key": "[MEM_MB]"
+        },
+        {
+            "name": "low_mem",
+            "id": "low_mem",
+            "description": "attempt to reduce memory usage (will increase disk usage in working directory)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--low-mem",
+            "value-key": "[LOW_MEM]"
+        },
+        {
+            "name": "use_plugin",
+            "id": "use_plugin",
+            "description": "nipype plugin configuration file",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--use-plugin",
+            "value-key": "[USE_PLUGIN]"
+        },
+        {
+            "name": "anat_only",
+            "id": "anat_only",
+            "description": "run anatomical workflows only",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--anat-only",
+            "value-key": "[ANAT_ONLY]"
+        },
+        {
+            "name": "dwi_only",
+            "id": "dwi_only",
+            "description": "ignore anatomical (T1w/T2w) data and process DWIs only",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--dwi-only",
+            "value-key": "[DWI_ONLY]"
+        },
+        {
+            "name": "infant",
+            "id": "infant",
+            "description": "configure pipelines to process infant brains",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--infant",
+            "value-key": "[INFANT]"
+        },
+        {
+            "name": "boilerplate",
+            "id": "boilerplate",
+            "description": "generate boilerplate only",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--boilerplate",
+            "value-key": "[BOILERPLATE]"
+        },
+        {
+            "name": "verbose_count",
+            "id": "verbose_count",
+            "description": "increases log verbosity for each occurrence, debug level is -vvv",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-v",
+            "value-key": "[VERBOSE_COUNT]"
+        },
+        {
+            "name": "anat_modality",
+            "id": "anat_modality",
+            "description": "Modality to use as the anatomical reference. Images of this contrast will be skull stripped and segmented for use in the visual reports and reconstruction. If --infant, T2w is forced.",
+            "type": "String",
+            "optional": true,
+            "default-value": "T1w",
+            "command-line-flag": "--anat-modality",
+            "value-key": "[ANAT_MODALITY]",
+            "value-choices": [
+                "T1w",
+                "T2w",
+                "none"
+            ]
+        },
+        {
+            "name": "ignore",
+            "id": "ignore",
+            "description": "ignore selected aspects of the input dataset to disable corresponding parts of the workflow (a space delimited list). Ignoring \"phase\" will disable complex-valued denoising, when phase DWI data are available.",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--ignore",
+            "value-key": "[IGNORE]",
+            "value-choices": [
+                "fieldmaps",
+                "phase"
+            ]
+        },
+        {
+            "name": "longitudinal",
+            "id": "longitudinal",
+            "description": "treat dataset as longitudinal - may increase runtime",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--longitudinal",
+            "value-key": "[LONGITUDINAL]"
+        },
+        {
+            "name": "b0_threshold",
+            "id": "b0_threshold",
+            "description": "any value in the .bval file less than this will be considered a b=0 image. Current default threshold = 100; this threshold can be lowered or increased. Note, setting this too high can result in inaccurate results.",
+            "type": "Number",
+            "optional": true,
+            "default-value": 100,
+            "command-line-flag": "--b0-threshold",
+            "value-key": "[B0_THRESHOLD]"
+        },
+        {
+            "name": "dwi_denoise_window",
+            "id": "dwi_denoise_window",
+            "description": "window size in voxels for image-based denoising, integer or \"auto\".If \"auto\", 5 will be used for dwidenoise and auto-configured for patch2self based on the number of b>0 images.",
+            "type": "String",
+            "optional": true,
+            "default-value": "auto",
+            "command-line-flag": "--dwi_denoise_window",
+            "value-key": "[DWI_DENOISE_WINDOW]"
+        },
+        {
+            "name": "denoise_method",
+            "id": "denoise_method",
+            "description": "Image-based denoising method. Either \"dwidenoise\" (MRtrix), \"patch2self\" (DIPY) or none. (default: dwidenoise)",
+            "type": "String",
+            "optional": true,
+            "default-value": "dwidenoise",
+            "command-line-flag": "--denoise-method",
+            "value-key": "[DENOISE_METHOD]",
+            "value-choices": [
+                "dwidenoise",
+                "patch2self",
+                "none"
+            ]
+        },
+        {
+            "name": "unringing_method",
+            "id": "unringing_method",
+            "description": "Method for Gibbs-ringing removal.\n - none: no action\n - mrdegibbs: use mrdegibbs from mrtrix3\n - rpg: Gibbs from TORTOISE, suggested for partial Fourier acquisitions (default: none).",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--unringing-method",
+            "value-key": "[UNRINGING_METHOD]",
+            "value-choices": [
+                "none",
+                "mrdegibbs",
+                "rpg"
+            ]
+        },
+        {
+            "name": "dwi_no_biascorr",
+            "id": "dwi_no_biascorr",
+            "description": "DEPRECATED: see --b1-biascorr-stage",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--dwi-no-biascorr",
+            "value-key": "[DWI_NO_BIASCORR]"
+        },
+        {
+            "name": "b1_biascorrect_stage",
+            "id": "b1_biascorrect_stage",
+            "description": "Which stage to apply B1 bias correction. The default 'final' will apply it after all the data has been resampled to its final space. 'none' will skip B1 bias correction and 'legacy' will behave consistent with qsiprep < 0.17.",
+            "type": "String",
+            "optional": true,
+            "default-value": "final",
+            "command-line-flag": "--b1-biascorrect-stage",
+            "value-key": "[B1_BIASCORRECT_STAGE]",
+            "value-choices": [
+                "final",
+                "none",
+                "legacy"
+            ]
+        },
+        {
+            "name": "no_b0_harmonization",
+            "id": "no_b0_harmonization",
+            "description": "skip re-scaling dwi scans to have matching b=0 intensities",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--no-b0-harmonization",
+            "value-key": "[NO_B0_HARMONIZATION]"
+        },
+        {
+            "name": "denoise_after_combining",
+            "id": "denoise_after_combining",
+            "description": "run ``dwidenoise`` after combining dwis, but before motion correction. Requires ``--combine-all-dwis``",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--denoise-after-combining",
+            "value-key": "[DENOISE_AFTER_COMBINING]"
+        },
+        {
+            "name": "separate_all_dwis",
+            "id": "separate_all_dwis",
+            "description": "don't attempt to combine dwis from multiple runs. Each will be processed separately.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--separate_all_dwis",
+            "value-key": "[SEPARATE_ALL_DWIS]"
+        },
+        {
+            "name": "distortion_group_merge",
+            "id": "distortion_group_merge",
+            "description": "How to combine images across distorted groups.\n - concatenate: append images in the 4th dimension\n  - average: if a whole sequence was duplicated in both PE\n            directions, average the corrected images of the same\n            q-space coordinate\n - none: Default. Keep distorted groups separate",
+            "type": "String",
+            "optional": true,
+            "default-value": "none",
+            "command-line-flag": "--distortion-group-merge",
+            "value-key": "[DISTORTION_GROUP_MERGE]",
+            "value-choices": [
+                "concat",
+                "average",
+                "none"
+            ]
+        },
+        {
+            "name": "write_local_bvecs",
+            "id": "write_local_bvecs",
+            "description": "write a series of voxelwise bvecs, relevant if writing preprocessed dwis to template space",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--write-local-bvecs",
+            "value-key": "[WRITE_LOCAL_BVECS]"
+        },
+        {
+            "name": "anatomical_template",
+            "id": "anatomical_template",
+            "description": "volume template space (default: MNI152NLin2009cAsym)",
+            "type": "String",
+            "optional": true,
+            "default-value": "MNI152NLin2009cAsym",
+            "command-line-flag": "--anatomical-template",
+            "value-key": "[ANATOMICAL_TEMPLATE]",
+            "value-choices": [
+                "MNI152NLin2009cAsym"
+            ]
+        },
+        {
+            "name": "output_resolution",
+            "id": "output_resolution",
+            "description": "the isotropic voxel size in mm the data will be resampled to after preprocessing. If set to a lower value than the original voxel size, your data will be upsampled using BSpline interpolation.",
+            "type": "Number",
+            "optional": false,
+            "command-line-flag": "--output-resolution",
+            "value-key": "[OUTPUT_RESOLUTION]"
+        },
+        {
+            "name": "b0_to_t1w_transform",
+            "id": "b0_to_t1w_transform",
+            "description": "Degrees of freedom when registering b0 to anatomical images. 6 degrees (rotation and translation) are used by default.",
+            "type": "String",
+            "optional": true,
+            "default-value": "Rigid",
+            "command-line-flag": "--b0-to-t1w-transform",
+            "value-key": "[B0_TO_T1W_TRANSFORM]",
+            "value-choices": [
+                "Rigid",
+                "Affine"
+            ]
+        },
+        {
+            "name": "intramodal_template_iters",
+            "id": "intramodal_template_iters",
+            "description": "Number of iterations for finding the midpoint image from the b0 templates from all groups. Has no effect if there is only one group. If 0, all b0 templates are directly registered to the t1w image.",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--intramodal-template-iters",
+            "value-key": "[INTRAMODAL_TEMPLATE_ITERS]"
+        },
+        {
+            "name": "intramodal_template_transform",
+            "id": "intramodal_template_transform",
+            "description": "Transformation used for building the intramodal template.",
+            "type": "String",
+            "optional": true,
+            "default-value": "BSplineSyN",
+            "command-line-flag": "--intramodal-template-transform",
+            "value-key": "[INTRAMODAL_TEMPLATE_TRANSFORM]",
+            "value-choices": [
+                "Rigid",
+                "Affine",
+                "BSplineSyN",
+                "SyN"
+            ]
+        },
+        {
+            "name": "b0_motion_corr_to",
+            "id": "b0_motion_corr_to",
+            "description": "align to the \"first\" b0 volume or do an \"iterative\" registration of all b0 images to their midpoint image (default: iterative)",
+            "type": "String",
+            "optional": true,
+            "default-value": "iterative",
+            "command-line-flag": "--b0-motion-corr-to",
+            "value-key": "[B0_MOTION_CORR_TO]",
+            "value-choices": [
+                "iterative",
+                "first"
+            ]
+        },
+        {
+            "name": "hmc_transform",
+            "id": "hmc_transform",
+            "description": "transformation to be optimized during head motion correction (default: affine)",
+            "type": "String",
+            "optional": true,
+            "default-value": "Affine",
+            "command-line-flag": "--hmc-transform",
+            "value-key": "[HMC_TRANSFORM]",
+            "value-choices": [
+                "Affine",
+                "Rigid"
+            ]
+        },
+        {
+            "name": "hmc_model",
+            "id": "hmc_model",
+            "description": "model used to generate target images for hmc. If \"none\" the non-b0 images will be warped using the same transform as their nearest b0 image. If \"3dSHORE\", SHORELine will be used. if \"tensor\", SHORELine iterations with a tensor model will be used",
+            "type": "String",
+            "optional": true,
+            "default-value": "eddy",
+            "command-line-flag": "--hmc_model",
+            "value-key": "[HMC_MODEL]",
+            "value-choices": [
+                "none",
+                "3dSHORE",
+                "eddy",
+                "tensor"
+            ]
+        },
+        {
+            "name": "eddy_config",
+            "id": "eddy_config",
+            "description": "path to a json file with settings for the call to eddy. If no json is specified, a default one will be used. The current default json can be found here: https://github.com/PennBBL/qsiprep/blob/master/qsiprep/data/eddy_params.json",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--eddy-config",
+            "value-key": "[EDDY_CONFIG]"
+        },
+        {
+            "name": "shoreline_iters",
+            "id": "shoreline_iters",
+            "description": "number of SHORELine iterations. (default: 2)",
+            "type": "Number",
+            "optional": true,
+            "default-value": 2,
+            "command-line-flag": "--shoreline_iters",
+            "value-key": "[SHORELINE_ITERS]"
+        },
+        {
+            "name": "impute_slice_threshold",
+            "id": "impute_slice_threshold",
+            "description": "impute data in slices that are this many SDs from expected. If 0 (default), no slices will be imputed",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--impute-slice-threshold",
+            "value-key": "[IMPUTE_SLICE_THRESHOLD]"
+        },
+        {
+            "name": "skull_strip_template",
+            "id": "skull_strip_template",
+            "description": "select ANTs skull-stripping template (default: OASIS). (IGNORED)",
+            "type": "String",
+            "optional": true,
+            "default-value": "OASIS",
+            "command-line-flag": "--skull-strip-template",
+            "value-key": "[SKULL_STRIP_TEMPLATE]",
+            "value-choices": [
+                "OASIS",
+                "NKI"
+            ]
+        },
+        {
+            "name": "skull_strip_fixed_seed",
+            "id": "skull_strip_fixed_seed",
+            "description": "do not use a random seed for skull-stripping - will ensure run-to-run replicability when used with --omp-nthreads 1. (IGNORED)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skull-strip-fixed-seed",
+            "value-key": "[SKULL_STRIP_FIXED_SEED]"
+        },
+        {
+            "name": "skip_anat_based_spatial_normalization",
+            "id": "skip_anat_based_spatial_normalization",
+            "description": "skip running the t1w-based normalization to template space. Default is to run the normalization.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip-anat-based-spatial-normalization",
+            "value-key": "[SKIP_ANAT_BASED_SPATIAL_NORMALIZATION]"
+        },
+        {
+            "name": "fs_license_file",
+            "id": "fs_license_file",
+            "description": "Path to FreeSurfer license key file. Get it (for free) by registering at https://surfer.nmr.mgh.harvard.edu/registration.html",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--fs-license-file",
+            "value-key": "[FS_LICENSE_FILE]"
+        },
+        {
+            "name": "do_reconall",
+            "id": "do_reconall",
+            "description": "Run the FreeSurfer recon-all pipeline (IGNORED)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--do-reconall",
+            "value-key": "[DO_RECONALL]"
+        },
+        {
+            "name": "pepolar_method",
+            "id": "pepolar_method",
+            "description": "select which SDC method to use for PEPOLAR fieldmaps (default: TOPUP)",
+            "type": "String",
+            "optional": true,
+            "default-value": "TOPUP",
+            "command-line-flag": "--pepolar-method",
+            "value-key": "[PEPOLAR_METHOD]",
+            "value-choices": [
+                "TOPUP",
+                "DRBUDDI",
+                "TOPUP+DRBUDDI"
+            ]
+        },
+        {
+            "name": "denoised_image_sdc",
+            "id": "denoised_image_sdc",
+            "description": "use denoised b=0 images if available instead of raw (from BIDS) images in SDC",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--denoised_image_sdc",
+            "value-key": "[DENOISED_IMAGE_SDC]"
+        },
+        {
+            "name": "prefer_dedicated_fmaps",
+            "id": "prefer_dedicated_fmaps",
+            "description": "forces unwarping to use files from the fmap directory instead of using an RPEdir scan from the same session. (IGNORED)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--prefer_dedicated_fmaps",
+            "value-key": "[PREFER_DEDICATED_FMAPS]"
+        },
+        {
+            "name": "fmap_bspline",
+            "id": "fmap_bspline",
+            "description": "fit a B-Spline field using least-squares (experimental)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--fmap-bspline",
+            "value-key": "[FMAP_BSPLINE]"
+        },
+        {
+            "name": "fmap_no_demean",
+            "id": "fmap_no_demean",
+            "description": "do not remove median (within mask) from fieldmap (default: True)",
+            "type": "Flag",
+            "optional": true,
+            "default-value": true,
+            "command-line-flag": "--fmap-no-demean",
+            "value-key": "[FMAP_NO_DEMEAN]"
+        },
+        {
+            "name": "use_syn_sdc",
+            "id": "use_syn_sdc",
+            "description": "EXPERIMENTAL: Use fieldmap-free distortion correction. To use this option, \"template\" must be passed to --output-space. (IGNORED)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--use-syn-sdc",
+            "value-key": "[USE_SYN_SDC]"
+        },
+        {
+            "name": "force_syn",
+            "id": "force_syn",
+            "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--force-syn",
+            "value-key": "[FORCE_SYN]"
+        },
+        {
+            "name": "work_dir",
+            "id": "work_dir",
+            "description": "path where intermediate results should be stored",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-w",
+            "value-key": "[WORK_DIR]"
+        },
+        {
+            "name": "resource_monitor",
+            "id": "resource_monitor",
+            "description": "enable Nipype's resource monitoring to keep track of memory and CPU usage",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--resource-monitor",
+            "value-key": "[RESOURCE_MONITOR]"
+        },
+        {
+            "name": "reports_only",
+            "id": "reports_only",
+            "description": "only generate reports, don't run workflows. This will only rerun report aggregation, not reportlet generation for specific nodes.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--reports-only",
+            "value-key": "[REPORTS_ONLY]"
+        },
+        {
+            "name": "run_uuid",
+            "id": "run_uuid",
+            "description": "Specify UUID of previous run, to include error logs in report. No effect without --reports-only.",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--run-uuid",
+            "value-key": "[RUN_UUID]"
+        },
+        {
+            "name": "write_graph",
+            "id": "write_graph",
+            "description": "Write workflow graph.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--write-graph",
+            "value-key": "[WRITE_GRAPH]"
+        },
+        {
+            "name": "stop_on_first_crash",
+            "id": "stop_on_first_crash",
+            "description": "Force stopping on first crash, even if a work directory was specified.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--stop-on-first-crash",
+            "value-key": "[STOP_ON_FIRST_CRASH]"
+        },
+        {
+            "name": "notrack",
+            "id": "notrack",
+            "description": "Opt-out of sending tracking information of this run to the qsiprep developers. This information helps to improve qsiprep and provides an indicator of real world usage crucial for obtaining funding.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--notrack",
+            "value-key": "[NOTRACK]"
+        },
+        {
+            "name": "sloppy",
+            "id": "sloppy",
+            "description": "Use low-quality tools for speed - TESTING ONLY",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--sloppy",
+            "value-key": "[SLOPPY]"
+        }
+    ],
+    "tags": {},
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    }
+}
