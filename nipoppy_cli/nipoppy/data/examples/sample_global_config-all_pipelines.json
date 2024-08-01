@@ -12,6 +12,7 @@
         "[[NIPOPPY_DPATH_CONTAINERS]]": "<PATH_TO_CONTAINER_STORE_DIRECTORY>",
         "[[HEUDICONV_HEURISTIC_FILE]]": "<PATH_TO_HEURISTIC_FILE>",
         "[[DCM2BIDS_CONFIG_FILE]]": "<PATH_TO_CONFIG_FILE>",
+        "[[DICM2NII_DIRECTORY]]": "<PATH_TO_MATLAB_FILES>",
         "[[FREESURFER_LICENSE_FILE]]": "<PATH_TO_FREESURFER_LICENSE_FILE>",
         "[[TEMPLATEFLOW_HOME]]": "<PATH_TO_TEMPLATEFLOW_DIRECTORY>"
     },
@@ -95,6 +96,16 @@
                     "NAME": "convert",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
                     "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidscoiner-[[NIPOPPY_PIPELINE_VERSION]].json"
+                }
+            ]
+        },
+        {
+            "NAME": "dicm2nii",
+            "VERSION": "2023.03.16",
+            "STEPS": [
+                {
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
                 }
             ]
         }
