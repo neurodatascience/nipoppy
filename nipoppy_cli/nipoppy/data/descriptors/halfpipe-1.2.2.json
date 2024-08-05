@@ -1,0 +1,631 @@
+{
+    "name": "halfpipe",
+    "description": "halfpipe",
+    "tool-version": "1.2.2.post1.dev750+gdac5d3ed",
+    "schema-version": "0.5",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] halfpipe [WORKDIR] [FS_ROOT] [VERBOSE] [EXISTING_SPEC_FILE] [ONLY_SPEC_UI] [SKIP_SPEC_UI] [ONLY_WORKFLOW] [SKIP_WORKFLOW] [ONLY_RUN] [SKIP_RUN] [NIPYPE_OMP_NTHREADS] [FS_LICENSE_FILE] [USE_CLUSTER] [GRAPHS_FILE] [UUID] [SUBJECT_INCLUDE] [SUBJECT_EXCLUDE] [SUBJECT_LIST] [N_CHUNKS] [MAX_CHUNK_SIZE] [SUBJECT_CHUNKS] [ONLY_CHUNK_INDEX] [ONLY_MODEL_CHUNK] [NIPYPE_MEMORY_GB] [NIPYPE_N_PROCS] [NIPYPE_RUN_PLUGIN] [NIPYPE_RESOURCE_MONITOR] [KEEP] [VERSION] [DEBUG] [PROFILE] [WATCHDOG] [COMMAND] [INPUT_DIRECTORY] [OUTPUT_DIRECTORY] [INCLUDE] [INCLUDE_LIST] [EXCLUDE] [EXCLUDE_LIST] [FD_MEAN_CUTOFF] [FD_PERC_CUTOFF] [MISSING_VALUE_STRATEGY] [RENAME] [AGGREGATE] [FROM_SPEC] [MODEL_NAME] [QC_EXCLUDE_FILES] [SPREADSHEET] [ID_COLUMN] [CATEGORICAL_VARIABLE] [LEVELS] [CONTINUOUS_VARIABLE] [IMAGING_VARIABLE] [DERIVED_VARIABLE] [DERIVED_IMAGE] [DROP_VARIABLE] [ALGORITHM] [EXPORT_VARIABLE] [EXPORT_MODES] [EXPORT_ATLAS] [MINIMUM_ATLAS_COVERAGE]",
+    "inputs": [
+        {
+            "name": "workdir",
+            "id": "workdir",
+            "description": "directory where output and intermediate files are stored",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--workdir",
+            "value-key": "[WORKDIR]"
+        },
+        {
+            "name": "fs_root",
+            "id": "fs_root",
+            "description": "path to the file system root",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--fs-root",
+            "value-key": "[FS_ROOT]"
+        },
+        {
+            "name": "verbose",
+            "id": "verbose",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--verbose",
+            "value-key": "[VERBOSE]"
+        },
+        {
+            "name": "existing_spec_file",
+            "id": "existing_spec_file",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--existing-spec-file",
+            "value-key": "[EXISTING_SPEC_FILE]"
+        },
+        {
+            "name": "only_spec_ui",
+            "id": "only_spec_ui",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--only-spec-ui",
+            "value-key": "[ONLY_SPEC_UI]"
+        },
+        {
+            "name": "skip_spec_ui",
+            "id": "skip_spec_ui",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip-spec-ui",
+            "value-key": "[SKIP_SPEC_UI]"
+        },
+        {
+            "name": "only_workflow",
+            "id": "only_workflow",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--only-workflow",
+            "value-key": "[ONLY_WORKFLOW]"
+        },
+        {
+            "name": "skip_workflow",
+            "id": "skip_workflow",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip-workflow",
+            "value-key": "[SKIP_WORKFLOW]"
+        },
+        {
+            "name": "only_run",
+            "id": "only_run",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--only-run",
+            "value-key": "[ONLY_RUN]"
+        },
+        {
+            "name": "skip_run",
+            "id": "skip_run",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--skip-run",
+            "value-key": "[SKIP_RUN]"
+        },
+        {
+            "name": "nipype_omp_nthreads",
+            "id": "nipype_omp_nthreads",
+            "description": "No description provided.",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--nipype-omp-nthreads",
+            "value-key": "[NIPYPE_OMP_NTHREADS]"
+        },
+        {
+            "name": "fs_license_file",
+            "id": "fs_license_file",
+            "description": "No description provided.",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--fs-license-file",
+            "value-key": "[FS_LICENSE_FILE]"
+        },
+        {
+            "name": "use_cluster",
+            "id": "use_cluster",
+            "description": "generate workflow suitable for running on a cluster",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--use-cluster",
+            "value-key": "[USE_CLUSTER]"
+        },
+        {
+            "name": "graphs_file",
+            "id": "graphs_file",
+            "description": "manually select graphs file",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--graphs-file",
+            "value-key": "[GRAPHS_FILE]"
+        },
+        {
+            "name": "uuid",
+            "id": "uuid",
+            "description": "load graphs based on this uuid",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--uuid",
+            "value-key": "[UUID]"
+        },
+        {
+            "name": "subject_include",
+            "id": "subject_include",
+            "description": "include only subjects that match",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--subject-include",
+            "value-key": "[SUBJECT_INCLUDE]"
+        },
+        {
+            "name": "subject_exclude",
+            "id": "subject_exclude",
+            "description": "exclude subjects that match",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--subject-exclude",
+            "value-key": "[SUBJECT_EXCLUDE]"
+        },
+        {
+            "name": "subject_list",
+            "id": "subject_list",
+            "description": "select subjects that match",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--subject-list",
+            "value-key": "[SUBJECT_LIST]"
+        },
+        {
+            "name": "n_chunks",
+            "id": "n_chunks",
+            "description": "merge subject workflows to n chunks",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--n-chunks",
+            "value-key": "[N_CHUNKS]"
+        },
+        {
+            "name": "max_chunk_size",
+            "id": "max_chunk_size",
+            "description": "maximum number of subjects per chunk",
+            "type": "Number",
+            "optional": true,
+            "default-value": 64,
+            "command-line-flag": "--max-chunk-size",
+            "value-key": "[MAX_CHUNK_SIZE]"
+        },
+        {
+            "name": "subject_chunks",
+            "id": "subject_chunks",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--subject-chunks",
+            "value-key": "[SUBJECT_CHUNKS]"
+        },
+        {
+            "name": "only_chunk_index",
+            "id": "only_chunk_index",
+            "description": "select which chunk to run",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--only-chunk-index",
+            "value-key": "[ONLY_CHUNK_INDEX]"
+        },
+        {
+            "name": "only_model_chunk",
+            "id": "only_model_chunk",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--only-model-chunk",
+            "value-key": "[ONLY_MODEL_CHUNK]"
+        },
+        {
+            "name": "nipype_memory_gb",
+            "id": "nipype_memory_gb",
+            "description": "No description provided.",
+            "type": "Number",
+            "optional": true,
+            "command-line-flag": "--nipype-memory-gb",
+            "value-key": "[NIPYPE_MEMORY_GB]"
+        },
+        {
+            "name": "nipype_n_procs",
+            "id": "nipype_n_procs",
+            "description": "No description provided.",
+            "type": "Number",
+            "optional": true,
+            "default-value": 64,
+            "command-line-flag": "--nipype-n-procs",
+            "value-key": "[NIPYPE_N_PROCS]"
+        },
+        {
+            "name": "nipype_run_plugin",
+            "id": "nipype_run_plugin",
+            "description": "No description provided.",
+            "type": "String",
+            "optional": true,
+            "default-value": "MultiProc",
+            "command-line-flag": "--nipype-run-plugin",
+            "value-key": "[NIPYPE_RUN_PLUGIN]"
+        },
+        {
+            "name": "nipype_resource_monitor",
+            "id": "nipype_resource_monitor",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--nipype-resource-monitor",
+            "value-key": "[NIPYPE_RESOURCE_MONITOR]"
+        },
+        {
+            "name": "keep",
+            "id": "keep",
+            "description": "choose which intermediate files to keep",
+            "type": "String",
+            "optional": true,
+            "default-value": "some",
+            "command-line-flag": "--keep",
+            "value-key": "[KEEP]",
+            "value-choices": [
+                "all",
+                "some",
+                "none"
+            ]
+        },
+        {
+            "name": "version",
+            "id": "version",
+            "description": "print the version number and exit",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "-v",
+            "value-key": "[VERSION]"
+        },
+        {
+            "name": "debug",
+            "id": "debug",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--debug",
+            "value-key": "[DEBUG]"
+        },
+        {
+            "name": "profile",
+            "id": "profile",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--profile",
+            "value-key": "[PROFILE]"
+        },
+        {
+            "name": "watchdog",
+            "id": "watchdog",
+            "description": "No description provided.",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--watchdog",
+            "value-key": "[WATCHDOG]"
+        },
+        {
+            "name": "input_directory",
+            "id": "input_directory",
+            "description": "one or more input directories containing HALFpipe derivatives",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--input-directory",
+            "value-key": "[INPUT_DIRECTORY]"
+        },
+        {
+            "name": "output_directory",
+            "id": "output_directory",
+            "description": "the directory to write the results to",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--output-directory",
+            "value-key": "[OUTPUT_DIRECTORY]"
+        },
+        {
+            "name": "include",
+            "id": "include",
+            "description": "include only images with this tag and value. if multiple are specified, images must match one of them",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--include",
+            "value-key": "[INCLUDE]"
+        },
+        {
+            "name": "include_list",
+            "id": "include_list",
+            "description": "include only images with this tag and any of the values in the file",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--include-list",
+            "value-key": "[INCLUDE_LIST]"
+        },
+        {
+            "name": "exclude",
+            "id": "exclude",
+            "description": "exclude images with this tag and value",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--exclude",
+            "value-key": "[EXCLUDE]"
+        },
+        {
+            "name": "exclude_list",
+            "id": "exclude_list",
+            "description": "exclude images with this tag and any of the values in the file",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--exclude-list",
+            "value-key": "[EXCLUDE_LIST]"
+        },
+        {
+            "name": "fd_mean_cutoff",
+            "id": "fd_mean_cutoff",
+            "description": "exclude subjects with a mean framewise displacement above this cutoff",
+            "type": "Number",
+            "optional": true,
+            "default-value": 0.5,
+            "command-line-flag": "--fd-mean-cutoff",
+            "value-key": "[FD_MEAN_CUTOFF]"
+        },
+        {
+            "name": "fd_perc_cutoff",
+            "id": "fd_perc_cutoff",
+            "description": "exclude subjects with a percentage of high framewise displacement volumes above this cutoff",
+            "type": "Number",
+            "optional": true,
+            "default-value": 10,
+            "command-line-flag": "--fd-perc-cutoff",
+            "value-key": "[FD_PERC_CUTOFF]"
+        },
+        {
+            "name": "missing_value_strategy",
+            "id": "missing_value_strategy",
+            "description": "the strategy to use for handling missing values in the covariates",
+            "type": "String",
+            "optional": true,
+            "default-value": "listwise-deletion",
+            "command-line-flag": "--missing-value-strategy",
+            "value-key": "[MISSING_VALUE_STRATEGY]",
+            "value-choices": [
+                "listwise-deletion"
+            ]
+        },
+        {
+            "name": "rename",
+            "id": "rename",
+            "description": "change all values of tag from the value `FROM` to the value `TO`",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--rename",
+            "value-key": "[RENAME]"
+        },
+        {
+            "name": "aggregate",
+            "id": "aggregate",
+            "description": "aggregate the images across the given tags with a fixed effects model",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--aggregate",
+            "value-key": "[AGGREGATE]"
+        },
+        {
+            "name": "from_spec",
+            "id": "from_spec",
+            "description": "load the model and filter from the working directory's `spec.json` file",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--from-spec",
+            "value-key": "[FROM_SPEC]"
+        },
+        {
+            "name": "model_name",
+            "id": "model_name",
+            "description": "the name of the model to use if running from a spec file",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--model-name",
+            "value-key": "[MODEL_NAME]"
+        },
+        {
+            "name": "qc_exclude_files",
+            "id": "qc_exclude_files",
+            "description": "one or more exclude files generated by the quality check web interface",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--qc-exclude-files",
+            "value-key": "[QC_EXCLUDE_FILES]"
+        },
+        {
+            "name": "spreadsheet",
+            "id": "spreadsheet",
+            "description": "the path to the spreadsheet containing model covariates",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--spreadsheet",
+            "value-key": "[SPREADSHEET]"
+        },
+        {
+            "name": "id_column",
+            "id": "id_column",
+            "description": "the name of the column containing the subject IDs",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--id-column",
+            "value-key": "[ID_COLUMN]"
+        },
+        {
+            "name": "categorical_variable",
+            "id": "categorical_variable",
+            "description": "add this variable to the model as a categorical variable. Requires specifying `--levels`",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--categorical-variable",
+            "value-key": "[CATEGORICAL_VARIABLE]"
+        },
+        {
+            "name": "levels",
+            "id": "levels",
+            "description": "the levels of the categorical variable",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--levels",
+            "value-key": "[LEVELS]"
+        },
+        {
+            "name": "continuous_variable",
+            "id": "continuous_variable",
+            "description": "add this variable to the model as a continuous variable",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "--continuous-variable",
+            "value-key": "[CONTINUOUS_VARIABLE]"
+        },
+        {
+            "name": "imaging_variable",
+            "id": "imaging_variable",
+            "description": "add this variable to the model as a continuous variable",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--imaging-variable",
+            "value-key": "[IMAGING_VARIABLE]",
+            "value-choices": [
+                "fd_mean",
+                "fd_perc",
+                "mean_gm_tsnr",
+                "aroma_noise_frac",
+                "total_intracranial_volume",
+                "jacobian_mean",
+                "jacobian_variance"
+            ]
+        },
+        {
+            "name": "derived_variable",
+            "id": "derived_variable",
+            "description": "add this variable to the model as a variable derived from existing variables via the specified formula",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--derived-variable",
+            "value-key": "[DERIVED_VARIABLE]"
+        },
+        {
+            "name": "derived_image",
+            "id": "derived_image",
+            "description": "calculate this image from the data and add it to the model",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--derived-image",
+            "value-key": "[DERIVED_IMAGE]",
+            "value-choices": [
+                "jacobian"
+            ]
+        },
+        {
+            "name": "drop_variable",
+            "id": "drop_variable",
+            "description": "remove the variable from the covariates",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--drop-variable",
+            "value-key": "[DROP_VARIABLE]"
+        },
+        {
+            "name": "algorithm",
+            "id": "algorithm",
+            "description": "the algorithms to run for the analysis",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "default-value": [
+                "descriptive",
+                "flame1",
+                "heterogeneity",
+                "mcartest"
+            ],
+            "command-line-flag": "--algorithm",
+            "value-key": "[ALGORITHM]",
+            "value-choices": [
+                "descriptive",
+                "flame1",
+                "heterogeneity",
+                "mcartest"
+            ]
+        },
+        {
+            "name": "export_variable",
+            "id": "export_variable",
+            "description": "export the variable with this name as a phenotype",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--export-variable",
+            "value-key": "[EXPORT_VARIABLE]"
+        },
+        {
+            "name": "export_modes",
+            "id": "export_modes",
+            "description": "for all images, export the modes defined by the image/label files",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--export-modes",
+            "value-key": "[EXPORT_MODES]"
+        },
+        {
+            "name": "export_atlas",
+            "id": "export_atlas",
+            "description": "for all images, export region signals based on the atlas defined by the image/label files",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "--export-atlas",
+            "value-key": "[EXPORT_ATLAS]"
+        },
+        {
+            "name": "minimum_atlas_coverage",
+            "id": "minimum_atlas_coverage",
+            "description": "the minimum proportion of voxels in each atlas region that must be covered by the subject-specific mask for region to be included in the analysis",
+            "type": "Number",
+            "optional": true,
+            "default-value": 0.5,
+            "command-line-flag": "--minimum-atlas-coverage",
+            "value-key": "[MINIMUM_ATLAS_COVERAGE]"
+        },
+        {
+            "name": "command",
+            "id": "command",
+            "description": "No description provided.",
+            "type": "String",
+            "optional": true,
+            "value-key": "[COMMAND]",
+            "value-choices": [
+                "group-level"
+            ],
+            "value-requires": {
+                "group-level": [
+                    "input_directory"
+                ]
+            },
+            "value-disables": {
+                "group-level": []
+            }
+        }
+    ],
+    "tags": {},
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    }
+}

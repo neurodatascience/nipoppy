@@ -1,0 +1,6 @@
+{
+    "workdir": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]",
+    "existing_spec_file": true,
+    "skip_spec_ui": true,
+    "skip_workflow": false
+}
