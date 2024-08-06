@@ -382,7 +382,7 @@
             "type": "String",
             "value-key": "[OUTPUT_DIR]",
             "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
-        } 
+        }
     ],
     "tags": {},
     "suggested-resources": {
