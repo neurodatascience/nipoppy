@@ -9,15 +9,11 @@ from typing import Optional
 from pydantic import Field
 from typing_extensions import Self
 
+from nipoppy.env import StrOrPathLike
 from nipoppy.logger import get_logger
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.manifest import Manifest, ManifestModel
-from nipoppy.utils import (
-    FIELD_DESCRIPTION_MAP,
-    StrOrPathLike,
-    participant_id_to_bids_id,
-    participant_id_to_dicom_id,
-)
+from nipoppy.utils import participant_id_to_bids_participant, session_id_to_bids_session
 
 
 class DoughnutModel(ManifestModel):
@@ -38,16 +34,11 @@ class DoughnutModel(ManifestModel):
             "relative to the raw data directory"
         ),
     )
-    dicom_id: str = Field(
-        title="DICOM ID",
-        description="Participant identifier used in DICOM file names/paths",
-    )
-    bids_id: str = Field(title="BIDS ID", description=FIELD_DESCRIPTION_MAP["bids_id"])
-    downloaded: bool = Field(description="Whether files are available on disk")
-    organized: bool = Field(
+    in_raw_imaging: bool = Field(description="Whether files are available on disk")
+    in_sourcedata: bool = Field(
         description="Whether files have been organized in the sourcedata directory"
     )
-    bidsified: bool = Field(
+    in_bids: bool = Field(
         title="BIDSified", description="Whether files have been converted to BIDS"
     )
 
@@ -57,26 +48,22 @@ class Doughnut(Manifest):
 
     # column names
     col_participant_dicom_dir = "participant_dicom_dir"
-    col_dicom_id = "dicom_id"
-    col_bids_id = "bids_id"
-    col_downloaded = "downloaded"
-    col_organized = "organized"
-    col_bidsified = "bidsified"
+    col_in_raw_imaging = "in_raw_imaging"
+    col_in_sourcedata = "in_sourcedata"
+    col_in_bids = "in_bids"
 
-    status_cols = [col_downloaded, col_organized, col_bidsified]
+    status_cols = [col_in_raw_imaging, col_in_sourcedata, col_in_bids]
 
     # set the model
     model = DoughnutModel
 
-    index_cols = [Manifest.col_participant_id, Manifest.col_session]
+    index_cols = [Manifest.col_participant_id, Manifest.col_session_id]
 
     _metadata = Manifest._metadata + [
         "col_participant_dicom_dir",
-        "col_dicom_id",
-        "col_bids_id",
-        "col_downloaded",
-        "col_organized",
-        "col_bidsified",
+        "col_in_raw_imaging",
+        "col_in_sourcedata",
+        "col_in_bids",
     ]
 
     @classmethod
@@ -93,61 +80,63 @@ class Doughnut(Manifest):
             raise ValueError(f"Invalid status value: {value}. Must be a boolean")
         return value
 
-    def get_status(self, participant: str, session: str, col: str) -> bool:
+    def get_status(self, participant_id: str, session_id: str, col: str) -> bool:
         """Get one of the statuses for an existing record."""
         col = self._check_status_col(col)
-        return self.set_index(self.index_cols).loc[(participant, session), col]
+        return self.set_index(self.index_cols).loc[(participant_id, session_id), col]
 
     def set_status(
-        self, participant: str, session: str, col: str, status: bool
+        self, participant_id: str, session_id: str, col: str, status: bool
     ) -> Self:
         """Set one of the statuses for an existing record."""
         col = self._check_status_col(col)
         status = self._check_status_value(status)
         self.set_index(self.index_cols, inplace=True)
-        self.loc[(participant, session), col] = status
+        self.loc[(participant_id, session_id), col] = status
         return self.reset_index(inplace=True)
 
     def _get_participant_sessions_helper(
         self,
         status_col: str,
-        participant: Optional[str] = None,
-        session: Optional[str] = None,
+        participant_id: Optional[str] = None,
+        session_id: Optional[str] = None,
     ):
         """Get subset of participants/sessions based on a status column."""
         doughnut_subset: Doughnut = self.loc[self[status_col]]
         return doughnut_subset.get_participants_sessions(
-            participant=participant, session=session
+            participant_id=participant_id, session_id=session_id
         )
 
     def get_downloaded_participants_sessions(
         self,
-        participant: Optional[str] = None,
-        session: Optional[str] = None,
+        participant_id: Optional[str] = None,
+        session_id: Optional[str] = None,
     ):
         """Get participants and sessions with downloaded data."""
         return self._get_participant_sessions_helper(
-            self.col_downloaded, participant=participant, session=session
+            self.col_in_raw_imaging,
+            participant_id=participant_id,
+            session_id=session_id,
         )
 
     def get_organized_participants_sessions(
         self,
-        participant: Optional[str] = None,
-        session: Optional[str] = None,
+        participant_id: Optional[str] = None,
+        session_id: Optional[str] = None,
     ):
         """Get participants and sessions with organized data."""
         return self._get_participant_sessions_helper(
-            self.col_organized, participant=participant, session=session
+            self.col_in_sourcedata, participant_id=participant_id, session_id=session_id
         )
 
     def get_bidsified_participants_sessions(
         self,
-        participant: Optional[str] = None,
-        session: Optional[str] = None,
+        participant_id: Optional[str] = None,
+        session_id: Optional[str] = None,
     ):
         """Get participants and sessions with BIDS data."""
         return self._get_participant_sessions_helper(
-            self.col_bidsified, participant=participant, session=session
+            self.col_in_bids, participant_id=participant_id, session_id=session_id
         )
 
 
@@ -171,7 +160,7 @@ def generate_doughnut(
             status = False
         else:
             dpath = Path(dpath)
-            dpath_participant = dpath / dname_subdirectory
+            dpath_participant: Path = dpath / dname_subdirectory
             if dpath_participant.exists():
                 status = next(dpath_participant.iterdir(), None) is not None
             else:
@@ -189,17 +178,17 @@ def generate_doughnut(
 
     doughnut_records = []
     for _, manifest_record in manifest_imaging_only.iterrows():
-        participant = manifest_record[manifest.col_participant_id]
-        session = manifest_record[manifest.col_session]
+        participant_id = manifest_record[manifest.col_participant_id]
+        session_id = manifest_record[manifest.col_session_id]
 
         # get DICOM dir
         participant_dicom_dir = dicom_dir_map.get_dicom_dir(
-            participant=participant, session=session
+            participant_id=participant_id, session_id=session_id
         )
 
-        # get DICOM and BIDS IDs
-        dicom_id = participant_id_to_dicom_id(participant)
-        bids_id = participant_id_to_bids_id(participant)
+        # get BIDS IDs
+        bids_participant = participant_id_to_bids_participant(participant_id)
+        bids_session = session_id_to_bids_session(session_id)
 
         if empty:
             status_downloaded = False
@@ -211,24 +200,24 @@ def generate_doughnut(
                 dname_subdirectory=participant_dicom_dir,
             )
             status_organized = check_status(
-                dpath=dpath_organized, dname_subdirectory=Path(dicom_id, session)
+                dpath=dpath_organized,
+                dname_subdirectory=Path(bids_participant, bids_session),
             )
             status_bidsified = check_status(
-                dpath=dpath_bidsified, dname_subdirectory=Path(bids_id, session)
+                dpath=dpath_bidsified,
+                dname_subdirectory=Path(bids_participant, bids_session),
             )
 
         doughnut_records.append(
             {
-                Doughnut.col_participant_id: participant,
-                Doughnut.col_visit: manifest_record[Manifest.col_visit],
-                Doughnut.col_session: session,
+                Doughnut.col_participant_id: participant_id,
+                Doughnut.col_visit_id: manifest_record[Manifest.col_visit_id],
+                Doughnut.col_session_id: session_id,
                 Doughnut.col_datatype: manifest_record[Manifest.col_datatype],
                 Doughnut.col_participant_dicom_dir: participant_dicom_dir,
-                Doughnut.col_dicom_id: dicom_id,
-                Doughnut.col_bids_id: bids_id,
-                Doughnut.col_downloaded: status_downloaded,
-                Doughnut.col_organized: status_organized,
-                Doughnut.col_bidsified: status_bidsified,
+                Doughnut.col_in_raw_imaging: status_downloaded,
+                Doughnut.col_in_sourcedata: status_organized,
+                Doughnut.col_in_bids: status_bidsified,
             }
         )
 

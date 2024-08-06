@@ -25,7 +25,7 @@ Below is the schema used for the global configuration :term:`JSON` file.
 Tracker configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The tracker configuration file specified in the `PipelineConfig`_ should be a :term:`JSON` file that contains **a list** of tracker configurations.
+The tracker configuration file specified in the `ProcPipelineConfig`_ should be a :term:`JSON` file that contains **a list** of tracker configurations.
 The schema for each individual tracker configuration is shown below.
 
 .. jsonschema:: tracker.json
@@ -39,10 +39,12 @@ Manifest file
 .. include:: schema_howto.md
     :parser: myst_parser.sphinx_
 
-Here is the schema used for each row in the manifest file:
+Here is the schema for the manifest file:
 
 .. jsonschema:: manifest.json
     :lift_title: False
+
+.. _doughnut-schema:
 
 Doughnut file
 -------------
@@ -50,7 +52,7 @@ Doughnut file
 .. include:: schema_howto.md
     :parser: myst_parser.sphinx_
 
-Here is the schema used for each row in the doughnut file:
+Here is the schema for the doughnut file:
 
 .. jsonschema:: doughnut.json
     :lift_title: False
@@ -61,11 +63,25 @@ Bagel file
 .. include:: schema_howto.md
     :parser: myst_parser.sphinx_
 
-Here is the schema used for each row in the bagel file:
+Here is the schema for the bagel file:
 
 .. jsonschema:: bagel.json
     :lift_title: False
 
+.. _dicom-dir-map-schema:
+
+DICOM directory mapping file
+----------------------------
+
+.. include:: schema_howto.md
+    :parser: myst_parser.sphinx_
+
+Here is the schema for the DICOM directory mapping file:
+
+.. jsonschema:: dicom_dir_map.json
+    :lift_title: False
+
+.. _layout-schema:
 
 Layout configuration
 --------------------

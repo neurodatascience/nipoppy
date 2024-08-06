@@ -1,3 +1,9 @@
 {
+    "dicom_dir_template": "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT_ID]]/[[NIPOPPY_BIDS_SESSION]]/*",
+    "subjs": "[[NIPOPPY_PARTICIPANT_ID]]",
+    "converter": "none",
+    "outdir": "[[NIPOPPY_DPATH_BIDS]]",
+    "heuristic": "convertall",
+    "session": "[[NIPOPPY_BIDS_SESSION]]",
     "overwrite": true
 }

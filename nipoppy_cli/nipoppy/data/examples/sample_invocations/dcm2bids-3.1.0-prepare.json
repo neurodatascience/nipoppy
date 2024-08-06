@@ -1,1 +1,6 @@
-{}
+{
+    "dicom_dir": [
+        "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT_ID]]/[[NIPOPPY_BIDS_SESSION]]"
+    ],
+    "output_dir": "[[NIPOPPY_DPATH_SCRATCH]]/dcm2bids_helper"
+}

@@ -8,14 +8,13 @@ exclude =
 	venv,
 per-file-ignores =
     # - docstrings rules that should not be applied to tests
-	**/test_*: D100, D101, D103, D104
-    __init__.py:F401
+	**/test_*.py: D100, D101, D103
+    __init__.py: D104, F401
     # allow "weird indentation"
-	tests/test_workflow_*.py: D100, D103, D104, E131, E127, E501
+	tests/test_workflow_*.py: D100, D103, E127, E131, E501
+    **/docs/source/conf.py: E501
 docstring-convention = numpy
 max_complexity = 12
 max_function_length = 150
-# for compatibility with black
-# https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8
 max-line-length = 88
 extend-ignore = D105, E203, E704

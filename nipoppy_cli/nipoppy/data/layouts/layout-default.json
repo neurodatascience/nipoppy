@@ -55,9 +55,9 @@
         "path": "scratch",
         "description": "This directory is for scratch data."
     },
-    "dpath_raw_dicom": {
-        "path": "scratch/raw_dicom",
-        "description": "This directory is for raw, unorganized DICOM dumps."
+    "dpath_raw_imaging": {
+        "path": "scratch/raw_imaging",
+        "description": "This directory is for raw, unorganized imaging file dumps."
     },
     "dpath_logs": {
         "path": "scratch/logs",
@@ -80,7 +80,7 @@
         "description": "The configuration file for a dataset is where all data processing is configured."
     },
     "fpath_doughnut": {
-        "path": "scratch/raw_dicom/doughnut.csv",
+        "path": "scratch/raw_imaging/doughnut.csv",
         "description": "The doughnut file is generated/updated internally and is used to keep track of the raw data organization and BIDS conversion process."
     },
     "fpath_manifest": {

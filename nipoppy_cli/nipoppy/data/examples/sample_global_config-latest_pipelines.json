@@ -1,12 +1,12 @@
 {
     "DATASET_NAME": "<DATASET_NAME>",
-    "VISITS": [
+    "VISIT_IDS": [
         "<VISIT_LABEL>",
         "<OTHER_VISIT_LABEL>"
     ],
-    "SESSIONS": [
-        "ses-<SESSION_LABEL>",
-        "ses-<OTHER_SESSION_LABEL>"
+    "SESSION_IDS": [
+        "<SESSION_LABEL>",
+        "<OTHER_SESSION_LABEL>"
     ],
     "SUBSTITUTIONS": {
         "[[NIPOPPY_DPATH_CONTAINERS]]": "<PATH_TO_CONTAINER_STORE_DIRECTORY>",
@@ -15,6 +15,7 @@
         "[[FREESURFER_LICENSE_FILE]]": "<PATH_TO_FREESURFER_LICENSE_FILE>",
         "[[TEMPLATEFLOW_HOME]]": "<PATH_TO_TEMPLATEFLOW_DIRECTORY>"
     },
+    "DICOM_DIR_PARTICIPANT_FIRST": true,
     "CONTAINER_CONFIG": {
         "COMMAND": "apptainer",
         "ARGS": [
@@ -33,18 +34,19 @@
                 {
                     "NAME": "prepare",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json"
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
                 },
                 {
                     "NAME": "convert",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json",
                     "CONTAINER_CONFIG": {
                         "ARGS": [
                             "--bind",
                             "[[HEUDICONV_HEURISTIC_FILE]]"
                         ]
-                    }
+                    },
+                    "UPDATE_DOUGHNUT": true
                 }
             ]
         },
@@ -59,18 +61,40 @@
                 {
                     "NAME": "prepare",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json"
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/dcm2bids_helper-[[NIPOPPY_PIPELINE_VERSION]].json"
                 },
                 {
                     "NAME": "convert",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/dcm2bids-[[NIPOPPY_PIPELINE_VERSION]].json",
                     "CONTAINER_CONFIG": {
                         "ARGS": [
                             "--bind",
                             "[[DCM2BIDS_CONFIG_FILE]]"
                         ]
-                    }
+                    },
+                    "UPDATE_DOUGHNUT": true
+                }
+            ]
+        },
+        {
+            "NAME": "bidscoin",
+            "VERSION": "4.3.2",
+            "STEPS": [
+                {
+                    "NAME": "prepare",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-prepare.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidsmapper-[[NIPOPPY_PIPELINE_VERSION]].json"
+                },
+                {
+                    "NAME": "edit",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-edit.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidseditor-[[NIPOPPY_PIPELINE_VERSION]].json"
+                },
+                {
+                    "NAME": "convert",
+                    "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidscoiner-[[NIPOPPY_PIPELINE_VERSION]].json"
                 }
             ]
         }
@@ -99,7 +123,14 @@
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json",
                     "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
                 }
-            ]
+            ],
+            "TRACKER_CONFIG_FILE": "[[NIPOPPY_DPATH_TRACKER_CONFIGS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
+        },
+        {
+            "NAME": "freesurfer",
+            "VERSION": "7.3.2",
+            "DESCRIPTION": "Freesurfer version associated with fMRIPrep 23.1.3",
+            "TRACKER_CONFIG_FILE": "[[NIPOPPY_DPATH_TRACKER_CONFIGS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]].json"
         },
         {
             "NAME": "mriqc",

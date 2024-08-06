@@ -10,8 +10,8 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from nipoppy.env import StrOrPathLike
 from nipoppy.logger import get_logger
-from nipoppy.utils import StrOrPathLike
 
 # Apptainer
 APPTAINER_BIND_FLAG = "--bind"
@@ -141,10 +141,10 @@ def add_bind_path_to_args(
     ----------
     args : list[str]
         Existing arguments
-    path_local : nipoppy.utils.StrOrPathLike
+    path_local : nipoppy.env.StrOrPathLike
         Path on disk. If this is a relative path or contains symlinks,
         it will be resolved
-    path_inside_container : Optional[nipoppy.utils.StrOrPathLike], optional
+    path_inside_container : Optional[nipoppy.env.StrOrPathLike], optional
         Path inside the container (if None, will be the same as the local path),
         by default None
     mode : str, optional

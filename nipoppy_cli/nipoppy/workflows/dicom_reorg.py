@@ -7,7 +7,9 @@ from typing import Optional
 
 import pydicom
 
-from nipoppy.utils import StrOrPathLike
+from nipoppy.env import StrOrPathLike
+from nipoppy.tabular.doughnut import update_doughnut
+from nipoppy.utils import participant_id_to_bids_participant, session_id_to_bids_session
 from nipoppy.workflows.base import BaseWorkflow
 
 
@@ -47,20 +49,22 @@ class DicomReorgWorkflow(BaseWorkflow):
 
     def get_fpaths_to_reorg(
         self,
-        participant: str,
-        session: str,
+        participant_id: str,
+        session_id: str,
     ) -> list[Path]:
         """Get file paths to reorganize for a single participant and session."""
         dpath_downloaded = (
-            self.layout.dpath_raw_dicom
-            / self.dicom_dir_map.get_dicom_dir(participant=participant, session=session)
+            self.layout.dpath_raw_imaging
+            / self.dicom_dir_map.get_dicom_dir(
+                participant_id=participant_id, session_id=session_id
+            )
         )
 
         # make sure directory exists
         if not dpath_downloaded.exists():
             raise FileNotFoundError(
-                f"Raw DICOM directory not found for participant {participant}"
-                f" session {session}: {dpath_downloaded}"
+                f"Raw DICOM directory not found for participant {participant_id}"
+                f" session {session_id}: {dpath_downloaded}"
             )
 
         # crawl through directory tree and get all file paths
@@ -70,7 +74,7 @@ class DicomReorgWorkflow(BaseWorkflow):
         return fpaths
 
     def apply_fname_mapping(
-        self, fname_source: str, participant: str, session: str
+        self, fname_source: str, participant_id: str, session_id: str
     ) -> str:
         """
         Apply a mapping to the file name.
@@ -81,14 +85,19 @@ class DicomReorgWorkflow(BaseWorkflow):
         """
         return fname_source
 
-    def run_single(self, participant: str, session: str):
+    def run_single(self, participant_id: str, session_id: str):
         """Reorganize downloaded DICOM files for a single participant and session."""
         # get paths to reorganize
-        fpaths_to_reorg = self.get_fpaths_to_reorg(participant, session)
+        fpaths_to_reorg = self.get_fpaths_to_reorg(participant_id, session_id)
+
+        dpath_reorganized: Path = (
+            self.layout.dpath_sourcedata
+            / participant_id_to_bids_participant(participant_id)
+            / session_id_to_bids_session(session_id)
+        )
+        self.mkdir(dpath_reorganized)
 
         # do reorg
-        dpath_reorganized: Path = self.layout.dpath_sourcedata / participant / session
-        self.mkdir(dpath_reorganized)
         for fpath_source in fpaths_to_reorg:
             # check file (though only error out if DICOM cannot be read)
             if self.check_dicoms:
@@ -103,7 +112,7 @@ class DicomReorgWorkflow(BaseWorkflow):
                     )
 
             fpath_dest = dpath_reorganized / self.apply_fname_mapping(
-                fpath_source.name, participant=participant, session=session
+                fpath_source.name, participant_id=participant_id, session_id=session_id
             )
 
             # do not overwrite existing files
@@ -123,22 +132,53 @@ class DicomReorgWorkflow(BaseWorkflow):
 
         # update doughnut entry
         self.doughnut.set_status(
-            participant=participant,
-            session=session,
-            col=self.doughnut.col_organized,
+            participant_id=participant_id,
+            session_id=session_id,
+            col=self.doughnut.col_in_sourcedata,
             status=True,
+        )
+
+    def get_participants_sessions_to_run(self):
+        """Return participant-session pairs to reorganize."""
+        participants_sessions_organized = set(
+            self.doughnut.get_organized_participants_sessions()
+        )
+        for participant_session in self.doughnut.get_downloaded_participants_sessions():
+            if participant_session not in participants_sessions_organized:
+                yield participant_session
+
+    def run_setup(self):
+        """Update the doughnut in case it is not up-to-date."""
+        self.doughnut = update_doughnut(
+            doughnut=self.doughnut,
+            manifest=self.manifest,
+            dicom_dir_map=self.dicom_dir_map,
+            dpath_downloaded=self.layout.dpath_raw_imaging,
+            dpath_organized=self.layout.dpath_sourcedata,
+            dpath_bidsified=self.layout.dpath_bids,
+            logger=self.logger,
         )
 
     def run_main(self):
         """Reorganize all downloaded DICOM files."""
         for (
-            participant,
-            session,
-        ) in self.doughnut.get_downloaded_participants_sessions():
+            participant_id,
+            session_id,
+        ) in self.get_participants_sessions_to_run():
             try:
-                self.run_single(participant, session)
+                self.run_single(participant_id, session_id)
             except Exception as exception:
                 self.logger.error(
-                    "Error reorganizing DICOM files"
-                    f" for participant {participant} session {session}: {exception}"
+                    "Error reorganizing DICOM files for participant "
+                    f"{participant_id} session {session_id}: {exception}"
                 )
+
+    def run_cleanup(self):
+        """
+        Clean up after main DICOM reorg part is run.
+
+        Specifically:
+        - Write updated doughnut file
+        """
+        self.save_tabular_file(self.doughnut, self.layout.fpath_doughnut)
+        return super().run_cleanup()

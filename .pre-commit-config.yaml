@@ -2,9 +2,18 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
+exclude: |
+    (?x)^(
+    nipoppy/.*
+    )$
+
+# To use to configure behavior of pre-commit ci
+# ci:
+#     skip: [hadolint-docker]
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
     -   id: check-ast
     -   id: check-case-conflict
@@ -19,18 +28,18 @@ repos:
     hooks:
     -   id: isort
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.12.1
+    rev: 24.4.2
     hooks:
     -   id: black
         args: [--config=pyproject.toml]
 -   repo: https://github.com/pyCQA/flake8
-    rev: 7.0.0
+    rev: 7.1.1
     hooks:
     -   id: flake8
         args: [--verbose, --config, .flake8]
         additional_dependencies: [flake8-docstrings]
 -   repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
     -   id: codespell
         args: [--toml=pyproject.toml]

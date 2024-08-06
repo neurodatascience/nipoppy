@@ -21,8 +21,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-d",
-            "value-key": "[DICOM_DIR_TEMPLATE]",
-            "default-value": "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]/*"
+            "value-key": "[DICOM_DIR_TEMPLATE]"
         },
         {
             "name": "files",
@@ -40,8 +39,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-s",
-            "value-key": "[SUBJS]",
-            "default-value": "[[NIPOPPY_PARTICIPANT]]"
+            "value-key": "[SUBJS]"
         },
         {
             "name": "converter",
@@ -49,13 +47,13 @@
             "description": "Tool to use for DICOM conversion. Setting to \"none\" disables the actual conversion step -- useful for testing heuristics.",
             "type": "String",
             "optional": true,
+            "default-value": "dcm2niix",
             "command-line-flag": "-c",
             "value-key": "[CONVERTER]",
             "value-choices": [
                 "dcm2niix",
                 "none"
-            ],
-            "default-value": "none"
+            ]
         },
         {
             "name": "outdir",
@@ -64,8 +62,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-o",
-            "value-key": "[OUTDIR]",
-            "default-value": "[[NIPOPPY_DPATH_BIDS]]"
+            "value-key": "[OUTDIR]"
         },
         {
             "name": "locator",
@@ -101,8 +98,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-f",
-            "value-key": "[HEURISTIC]",
-            "default-value": "convertall"
+            "value-key": "[HEURISTIC]"
         },
         {
             "name": "with_prov",
@@ -120,8 +116,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-ss",
-            "value-key": "[SESSION]",
-            "default-value": "[[NIPOPPY_SESSION]]"
+            "value-key": "[SESSION]"
         },
         {
             "name": "bids_options",

@@ -58,9 +58,9 @@ def test_add_arg_pipeline_step():
     "args",
     [
         [],
-        ["--participant", "1000"],
-        ["--session", "1"],
-        ["--participant", "sub-123", "--session", "ses-1"],
+        ["--participant-id", "1000"],
+        ["--session-id", "1"],
+        ["--participant-id", "sub-123", "--session-id", "ses-1"],
     ],
 )
 def test_add_args_participant_and_session(args):
@@ -179,7 +179,7 @@ def test_add_subparser_bids_conversion(args):
             "my_dataset",
             "--pipeline",
             "pipeline2",
-            "--participant",
+            "--participant-id",
             "1000",
         ],
         [
@@ -187,9 +187,9 @@ def test_add_subparser_bids_conversion(args):
             "my_dataset",
             "--pipeline",
             "pipeline2",
-            "--participant",
+            "--participant-id",
             "1000",
-            "--session",
+            "--session-id",
             "BL",
         ],
     ],

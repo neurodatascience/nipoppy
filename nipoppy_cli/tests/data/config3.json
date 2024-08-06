@@ -1,6 +1,6 @@
 {
     "DATASET_NAME": "my_dataset",
-    "VISITS": [
+    "VISIT_IDS": [
         "V01",
         "V02"
     ],

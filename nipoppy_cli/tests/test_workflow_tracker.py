@@ -8,6 +8,7 @@ import pytest
 
 from nipoppy.config.main import Config
 from nipoppy.tabular.bagel import Bagel
+from nipoppy.tabular.doughnut import Doughnut
 from nipoppy.tabular.manifest import Manifest
 from nipoppy.workflows.tracker import PipelineTracker
 
@@ -20,8 +21,8 @@ def tracker(tmp_path: Path):
     pipeline_name = "test_pipeline"
     pipeline_version = "0.1.0"
     participants_and_sessions = {
-        "01": ["ses-1", "ses-2"],
-        "02": ["ses-1", "ses-2"],
+        "01": ["1", "2"],
+        "02": ["1", "2"],
     }
 
     tracker = PipelineTracker(
@@ -43,7 +44,7 @@ def tracker(tmp_path: Path):
         {
             "NAME": "pipeline_complete",
             "PATHS": [
-                "[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]/results.txt",
+                "[[NIPOPPY_PARTICIPANT_ID]]/[[NIPOPPY_BIDS_SESSION]]/results.txt",
                 "file.txt",
             ],
         },
@@ -51,7 +52,7 @@ def tracker(tmp_path: Path):
     fpath_tracker_config.write_text(json.dumps(tracker_config))
 
     config: Config = get_config(
-        visits=["1", "2"],
+        visit_ids=["1", "2"],
         proc_pipelines=[
             {
                 "NAME": pipeline_name,
@@ -74,7 +75,7 @@ def test_run_setup_existing_bagel(tracker: PipelineTracker):
     bagel = Bagel(
         data={
             Bagel.col_participant_id: ["01"],
-            Bagel.col_session: ["ses-1"],
+            Bagel.col_session_id: ["1"],
             Bagel.col_pipeline_name: ["some_pipeline"],
             Bagel.col_pipeline_version: ["some_version"],
             Bagel.col_pipeline_complete: [Bagel.status_success],
@@ -104,10 +105,69 @@ def test_check_status(tracker: PipelineTracker, relative_paths, expected_status)
 
 
 @pytest.mark.parametrize(
-    "participant,session,expected_status",
-    [("01", "ses-1", Bagel.status_success), ("02", "ses-2", Bagel.status_fail)],
+    "doughnut_data,participant_id,session_id,expected",
+    [
+        (
+            [
+                ["S01", "1", False],
+                ["S01", "2", True],
+                ["S02", "3", False],
+            ],
+            None,
+            None,
+            [("S01", "2")],
+        ),
+        (
+            [
+                ["P01", "A", False],
+                ["P01", "B", True],
+                ["P02", "B", True],
+            ],
+            "P01",
+            "B",
+            [("P01", "B")],
+        ),
+    ],
 )
-def test_run_single(participant, session, expected_status, tracker: PipelineTracker):
+def test_get_participants_sessions_to_run(
+    doughnut_data, participant_id, session_id, expected, tmp_path: Path
+):
+    tracker = PipelineTracker(
+        dpath_root=tmp_path,
+        pipeline_name="",
+        pipeline_version="",
+    )
+    tracker.doughnut = Doughnut().add_or_update_records(
+        records=[
+            {
+                Doughnut.col_participant_id: data[0],
+                Doughnut.col_session_id: data[1],
+                Doughnut.col_visit_id: data[1],
+                Doughnut.col_in_bids: data[2],
+                Doughnut.col_datatype: None,
+                Doughnut.col_participant_dicom_dir: "",
+                Doughnut.col_in_raw_imaging: False,
+                Doughnut.col_in_sourcedata: False,
+            }
+            for data in doughnut_data
+        ]
+    )
+
+    assert [
+        tuple(x)
+        for x in tracker.get_participants_sessions_to_run(
+            participant_id=participant_id, session_id=session_id
+        )
+    ] == expected
+
+
+@pytest.mark.parametrize(
+    "participant_id,session_id,expected_status",
+    [("01", "1", Bagel.status_success), ("02", "2", Bagel.status_fail)],
+)
+def test_run_single(
+    participant_id, session_id, expected_status, tracker: PipelineTracker
+):
     for relative_path_to_write in [
         "01/ses-1/results.txt",
         "file.txt",
@@ -117,10 +177,10 @@ def test_run_single(participant, session, expected_status, tracker: PipelineTrac
         fpath.mkdir(parents=True, exist_ok=True)
         fpath.touch()
 
-    assert tracker.run_single(participant, session) == expected_status
+    assert tracker.run_single(participant_id, session_id) == expected_status
 
     assert (
-        tracker.bagel.set_index([Bagel.col_participant_id, Bagel.col_session])
+        tracker.bagel.set_index([Bagel.col_participant_id, Bagel.col_session_id])
         .loc[:, Bagel.col_pipeline_complete]
         .item()
     ) == expected_status
@@ -134,7 +194,7 @@ def test_run_single_multiple_configs(
         {"NAME": "tracker2", "PATHS": ["path2"]},
     ]
     tracker.pipeline_config.TRACKER_CONFIG_FILE.write_text(json.dumps(tracker_configs))
-    tracker.run_single("01", "ses-1")
+    tracker.run_single("01", "1")
 
     assert any(
         [
@@ -148,7 +208,7 @@ def test_run_single_multiple_configs(
 def test_run_single_no_config(tracker: PipelineTracker):
     tracker.pipeline_config.TRACKER_CONFIG_FILE = None
     with pytest.raises(ValueError, match="No tracker config file specified for"):
-        tracker.run_single("01", "ses-1")
+        tracker.run_single("01", "1")
 
 
 @pytest.mark.parametrize(
@@ -158,7 +218,7 @@ def test_run_single_no_config(tracker: PipelineTracker):
         Bagel(
             data={
                 Bagel.col_participant_id: ["01"],
-                Bagel.col_session: ["ses-1"],
+                Bagel.col_session_id: ["1"],
                 Bagel.col_pipeline_name: ["some_pipeline"],
                 Bagel.col_pipeline_version: ["some_version"],
                 Bagel.col_pipeline_complete: [Bagel.status_success],
@@ -172,3 +232,14 @@ def test_run_cleanup(tracker: PipelineTracker, bagel: Bagel):
 
     assert tracker.layout.fpath_imaging_bagel.exists()
     assert Bagel.load(tracker.layout.fpath_imaging_bagel).equals(bagel)
+
+
+def test_run_no_create_work_directory(tracker: PipelineTracker):
+    tracker.run()
+    assert not tracker.dpath_pipeline_work.exists()
+
+
+def test_run_no_rm_work_directory(tracker: PipelineTracker):
+    tracker.dpath_pipeline_work.mkdir(parents=True)
+    tracker.run()
+    assert tracker.dpath_pipeline_work.exists()

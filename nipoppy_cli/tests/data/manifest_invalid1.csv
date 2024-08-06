@@ -1,5 +1,5 @@
-participant_id,visit,session,datatype
-01,MRI1,ses-MRI1,anat
+participant_id,visit_id,session_id,datatype
+01,MRI1,MRI1,anat
 01,MOCA1,,
-02,MRI1,ses-MRI1,
+02,MRI1,MRI1,
 02,MOCA1,,

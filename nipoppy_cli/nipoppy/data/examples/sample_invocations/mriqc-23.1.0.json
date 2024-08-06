@@ -1,8 +1,17 @@
 {
+    "bids_dir": "[[NIPOPPY_DPATH_BIDS]]",
+    "output_dir": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]",
+    "analysis_level": "participant",
+    "participant_label": [
+        "[[NIPOPPY_PARTICIPANT_ID]]"
+    ],
+    "session_id": "[[NIPOPPY_SESSION_ID]]",
     "modalities": [
         "T1w",
         "T2w"
     ],
-    "no_sub": true,
-    "nprocs": "4"
+    "bids_database_dir": "[[NIPOPPY_DPATH_PIPELINE_BIDS_DB]]",
+    "nprocs": "4",
+    "work_dir": "[[NIPOPPY_DPATH_PIPELINE_WORK]]",
+    "no_sub": true
 }

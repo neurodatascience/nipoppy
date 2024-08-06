@@ -1,5 +1,5 @@
-participant_id,visit,session,datatype,extra_col
-01,MRI1,ses-1,["anat"],x
+participant_id,visit_id,session_id,datatype,extra_col
+01,MRI1,1,["anat"],x
 01,MOCA1,,,
-02,MRI1,ses-1,["anat"],y
+02,MRI1,1,["anat"],y
 02,MOCA1,,[],

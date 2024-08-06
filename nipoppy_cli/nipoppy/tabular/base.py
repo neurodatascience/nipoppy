@@ -11,7 +11,8 @@ import pandas as pd
 from pydantic import BaseModel, ValidationError, model_validator
 from typing_extensions import Self
 
-from nipoppy.utils import StrOrPathLike, save_df_with_backup
+from nipoppy.env import StrOrPathLike
+from nipoppy.utils import save_df_with_backup
 
 
 class BaseTabularModel(BaseModel):

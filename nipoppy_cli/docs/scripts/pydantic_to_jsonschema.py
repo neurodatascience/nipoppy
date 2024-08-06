@@ -9,6 +9,7 @@ from nipoppy.config.main import Config
 from nipoppy.config.tracker import TrackerConfig
 from nipoppy.layout import LayoutConfig
 from nipoppy.tabular.bagel import BagelModel
+from nipoppy.tabular.dicom_dir_map import DicomDirMapModel
 from nipoppy.tabular.doughnut import DoughnutModel
 from nipoppy.tabular.manifest import ManifestModel
 
@@ -20,6 +21,7 @@ MODEL_FILENAME_MAP = {
     LayoutConfig: "layout.json",
     TrackerConfig: "tracker.json",
     BagelModel: "bagel.json",
+    DicomDirMapModel: "dicom_dir_map.json",
     DoughnutModel: "doughnut.json",
     ManifestModel: "manifest.json",
 }

@@ -1,13 +1,13 @@
-"""Tests for the manifest."""
+"""Tests for the doughnut."""
 
 from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
 
+from nipoppy.env import StrOrPathLike
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.doughnut import Doughnut, generate_doughnut, update_doughnut
-from nipoppy.utils import StrOrPathLike
 
 from .conftest import DPATH_TEST_DATA, check_doughnut, prepare_dataset
 
@@ -16,15 +16,13 @@ from .conftest import DPATH_TEST_DATA, check_doughnut, prepare_dataset
 def data():
     return {
         Doughnut.col_participant_id: ["01", "01", "02", "02"],
-        Doughnut.col_visit: ["BL", "M12", "BL", "M12"],
-        Doughnut.col_session: ["ses-BL", "ses-M12", "ses-BL", "ses-M12"],
+        Doughnut.col_visit_id: ["BL", "M12", "BL", "M12"],
+        Doughnut.col_session_id: ["BL", "M12", "BL", "M12"],
         Doughnut.col_datatype: ["anat", "anat", "anat", "anat"],
         Doughnut.col_participant_dicom_dir: ["01", "01", "02", "02"],
-        Doughnut.col_dicom_id: ["01", "01", "02", "02"],
-        Doughnut.col_bids_id: ["01", "01", "02", "02"],
-        Doughnut.col_downloaded: [True, True, True, False],
-        Doughnut.col_organized: [True, False, True, False],
-        Doughnut.col_bidsified: [True, False, False, False],
+        Doughnut.col_in_raw_imaging: [True, True, True, False],
+        Doughnut.col_in_sourcedata: [True, False, True, False],
+        Doughnut.col_in_bids: [True, False, False, False],
     }
 
 
@@ -56,7 +54,8 @@ def test_validate(fpath, is_valid):
 
 
 @pytest.mark.parametrize(
-    "col", [Doughnut.col_downloaded, Doughnut.col_organized, Doughnut.col_bidsified]
+    "col",
+    [Doughnut.col_in_raw_imaging, Doughnut.col_in_sourcedata, Doughnut.col_in_bids],
 )
 def test_check_status_col(col):
     assert Doughnut._check_status_col(col) == col
@@ -78,55 +77,62 @@ def test_check_status_value_invalid():
 
 
 @pytest.mark.parametrize(
-    "participant,session,col,expected_status",
+    "participant_id,session_id,col,expected_status",
     [
-        ("01", "ses-BL", Doughnut.col_downloaded, True),
-        ("01", "ses-BL", Doughnut.col_organized, True),
-        ("01", "ses-BL", Doughnut.col_bidsified, True),
-        ("02", "ses-M12", Doughnut.col_downloaded, False),
-        ("02", "ses-M12", Doughnut.col_organized, False),
-        ("02", "ses-M12", Doughnut.col_bidsified, False),
+        ("01", "BL", Doughnut.col_in_raw_imaging, True),
+        ("01", "BL", Doughnut.col_in_sourcedata, True),
+        ("01", "BL", Doughnut.col_in_bids, True),
+        ("02", "M12", Doughnut.col_in_raw_imaging, False),
+        ("02", "M12", Doughnut.col_in_sourcedata, False),
+        ("02", "M12", Doughnut.col_in_bids, False),
     ],
 )
-def test_get_status(data, participant, session, col, expected_status):
-    assert Doughnut(data).get_status(participant, session, col) == expected_status
+def test_get_status(data, participant_id, session_id, col, expected_status):
+    assert Doughnut(data).get_status(participant_id, session_id, col) == expected_status
 
 
 @pytest.mark.parametrize(
-    "participant,session,col,status",
+    "participant_id,session_id,col,status",
     [
-        ("01", "ses-BL", Doughnut.col_downloaded, False),
-        ("01", "ses-BL", Doughnut.col_organized, False),
-        ("01", "ses-BL", Doughnut.col_bidsified, False),
-        ("02", "ses-M12", Doughnut.col_downloaded, True),
-        ("02", "ses-M12", Doughnut.col_organized, True),
-        ("02", "ses-M12", Doughnut.col_bidsified, True),
+        ("01", "BL", Doughnut.col_in_raw_imaging, False),
+        ("01", "BL", Doughnut.col_in_sourcedata, False),
+        ("01", "BL", Doughnut.col_in_bids, False),
+        ("02", "M12", Doughnut.col_in_raw_imaging, True),
+        ("02", "M12", Doughnut.col_in_sourcedata, True),
+        ("02", "M12", Doughnut.col_in_bids, True),
     ],
 )
-def test_set_status(data, participant, session, col, status):
+def test_set_status(data, participant_id, session_id, col, status):
     doughnut = Doughnut(data)
-    doughnut.set_status(participant, session, col, status)
-    assert doughnut.get_status(participant, session, col) == status
+    doughnut.set_status(
+        participant_id=participant_id, session_id=session_id, col=col, status=status
+    )
+    assert (
+        doughnut.get_status(
+            participant_id=participant_id, session_id=session_id, col=col
+        )
+        == status
+    )
 
 
 @pytest.mark.parametrize(
-    "status_col,participant,session,expected_count",
+    "status_col,participant_id,session_id,expected_count",
     [
-        ("downloaded", None, None, 3),
-        ("organized", None, None, 2),
-        ("bidsified", None, None, 1),
-        ("downloaded", "01", None, 2),
-        ("organized", None, "ses-M12", 0),
-        ("bidsified", "01", "ses-BL", 1),
+        (Doughnut.col_in_raw_imaging, None, None, 3),
+        (Doughnut.col_in_sourcedata, None, None, 2),
+        (Doughnut.col_in_bids, None, None, 1),
+        (Doughnut.col_in_raw_imaging, "01", None, 2),
+        (Doughnut.col_in_sourcedata, None, "M12", 0),
+        (Doughnut.col_in_bids, "01", "BL", 1),
     ],
 )
 def test_get_participant_sessions_helper(
-    data, status_col, participant, session, expected_count
+    data, status_col, participant_id, session_id, expected_count
 ):
     doughnut = Doughnut(data)
     count = 0
     for _ in doughnut._get_participant_sessions_helper(
-        status_col=status_col, participant=participant, session=session
+        status_col=status_col, participant_id=participant_id, session_id=session_id
     ):
         count += 1
     assert count == expected_count
@@ -145,25 +151,25 @@ def test_get_participant_sessions_helper(
     ),
     [
         (
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL", "ses-M12"]},
+            {"01": ["BL", "M12"], "02": ["BL", "M12"]},
             {
-                "01": ["ses-BL", "ses-M12"],
-                "02": ["ses-BL", "ses-M12"],
-                "03": ["ses-BL", "ses-M12"],
+                "01": ["BL", "M12"],
+                "02": ["BL", "M12"],
+                "03": ["BL", "M12"],
             },
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL"]},
-            {"01": ["ses-BL"], "02": ["ses-BL"], "03": ["ses-BL"]},
-            {"01": ["ses-BL", "ses-M12"], "03": ["ses-M12"]},
+            {"01": ["BL", "M12"], "02": ["BL"]},
+            {"01": ["BL"], "02": ["BL"], "03": ["BL"]},
+            {"01": ["BL", "M12"], "03": ["M12"]},
             "downloaded",
             "organized",
             "bidsified",
         ),
         (
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL"]},
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL"]},
+            {"PD01": ["BL"], "PD02": ["BL"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL"]},
             Path("scratch", "raw_dicom"),
             Path("dicom"),
             Path("bids"),
@@ -256,8 +262,8 @@ def test_generate_and_update(
 
 def test_generate_missing_paths(tmp_path: Path):
     participants_and_sessions = {
-        "01": ["ses-BL", "ses-M12"],
-        "02": ["ses-BL", "ses-M12"],
+        "01": ["BL", "M12"],
+        "02": ["BL", "M12"],
     }
 
     dpath_root = tmp_path / "my_dataset"
@@ -286,6 +292,6 @@ def test_generate_missing_paths(tmp_path: Path):
         empty=False,
     )
 
-    assert doughnut[Doughnut.col_downloaded].all()
-    assert (~doughnut[Doughnut.col_organized]).all()
-    assert doughnut[Doughnut.col_bidsified].all()
+    assert doughnut[Doughnut.col_in_raw_imaging].all()
+    assert (~doughnut[Doughnut.col_in_sourcedata]).all()
+    assert doughnut[Doughnut.col_in_bids].all()

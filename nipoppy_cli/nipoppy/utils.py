@@ -8,16 +8,12 @@ import os
 import re
 import warnings
 from pathlib import Path
-from typing import List, Optional, Sequence, TypeVar
+from typing import List, Optional, Sequence
 
 import bids
 import pandas as pd
 
-StrOrPathLike = TypeVar("StrOrPathLike", str, os.PathLike)
-
-# BIDS
-BIDS_SUBJECT_PREFIX = "sub-"
-BIDS_SESSION_PREFIX = "ses-"
+from nipoppy.env import BIDS_SESSION_PREFIX, BIDS_SUBJECT_PREFIX, StrOrPathLike
 
 # user configs (pipeline configs, invocations, descriptors)
 TEMPLATE_REPLACE_PATTERN = re.compile("\\[\\[NIPOPPY\\_(.*?)\\]\\]")
@@ -30,93 +26,103 @@ FPATH_SAMPLE_CONFIG_FULL = DPATH_EXAMPLES / "sample_global_config-all_pipelines.
 FPATH_SAMPLE_MANIFEST = DPATH_EXAMPLES / "sample_manifest.csv"
 DPATH_INVOCATIONS = DPATH_EXAMPLES / "sample_invocations"
 DPATH_TRACKER_CONFIGS = DPATH_EXAMPLES / "sample_tracker_configs"
+FPATH_SAMPLE_DICOM_DIR_MAP = DPATH_EXAMPLES / "sample_dicom_dir_map.csv"
 DPATH_DESCRIPTORS = DPATH_DATA / "descriptors"
 DPATH_LAYOUTS = DPATH_DATA / "layouts"
 FPATH_DEFAULT_LAYOUT = DPATH_LAYOUTS / "layout-default.json"
 
 # descriptions for common fields in the Pydantic models
 FIELD_DESCRIPTION_MAP = {
-    "bids_id": "BIDS-compliant participant identifier (e.g., sub-01)",
-    "participant_id": "Participant identifier",
-    "session": "BIDS-compliant identifier imaging session (e.g., ses-1)",
-    "visit": "Visit identifier",
+    "participant_id": "Participant identifier, without the BIDS prefix",
+    "session_id": "Imaging session identifier, without the BIDS prefix",
+    "bids_participant": "Participant identifier with BIDS prefix (e.g., sub-01)",
+    "bids_session": "Imaging session identifier with BIDS prefix (e.g., ses-01)",
+    "visit_id": "Visit identifier",
 }
 
 
-def participant_id_to_dicom_id(participant_id: str):
-    """Convert a participant ID to a BIDS-compatible DICOM ID."""
-    # keep only alphanumeric characters
-    participant_id = str(participant_id)
-    dicom_id = "".join(filter(str.isalnum, participant_id))
-    return dicom_id
+def participant_id_to_bids_participant(participant_id: str) -> str:
+    """Add the BIDS prefix to a participant ID."""
+    return f"{BIDS_SUBJECT_PREFIX}{participant_id}"
 
 
-def dicom_id_to_bids_id(dicom_id: str):
-    """Add the BIDS prefix to a DICOM ID."""
-    return f"{BIDS_SUBJECT_PREFIX}{dicom_id}"
-
-
-def participant_id_to_bids_id(participant_id: str):
-    """Convert a participant ID to a BIDS-compatible participant ID."""
-    bids_id = dicom_id_to_bids_id(participant_id_to_dicom_id(participant_id))
-    return bids_id
-
-
-def check_participant(participant: Optional[str]):
-    """Check/process a participant string."""
-    if participant is None:
-        return participant
-
-    # remove the BIDS prefix if it exists
-    return str(participant).removeprefix(BIDS_SUBJECT_PREFIX)
-
-
-def check_participant_id_strict(participant_id: str):
+def session_id_to_bids_session(session_id: Optional[str]) -> str:
     """
-    Make sure participant_id does not have the BIDS prefix.
+    Add the BIDS prefix to a session ID.
 
-    To use when validating user-provided files (e.g. the manifest).
+    If session_id is None, returns None.
     """
+    if session_id is None:
+        return session_id
+
+    return f"{BIDS_SESSION_PREFIX}{session_id}"
+
+
+def check_participant_id(participant_id: Optional[str], raise_error=False):
+    """Make sure a participant ID does not have the BIDS prefix.
+
+    Parameters
+    ----------
+    participant_id : Optional[str]
+        The participant ID to check. If None, returns None.
+    strict : bool, optional
+        Whether to raise an error if the participant ID has the prefix, by default False
+
+    Returns
+    -------
+    str
+        The participant ID without the BIDS prefix
+
+    Raises
+    ------
+    ValueError
+    """
+    if participant_id is None:
+        return participant_id
+
     if participant_id.startswith(BIDS_SUBJECT_PREFIX):
-        raise ValueError(
-            f'Participant ID should not start with "{BIDS_SUBJECT_PREFIX}"'
-            f", got {participant_id}"
-        )
+        if raise_error:
+            raise ValueError(
+                f'Participant ID should not start with "{BIDS_SUBJECT_PREFIX}"'
+                f", got {participant_id}"
+            )
+        else:
+            return participant_id.removeprefix(BIDS_SUBJECT_PREFIX)
+
     return participant_id
 
 
-def check_session(session: Optional[str]):
-    """Check/process a session string."""
-    if session is None:
-        return session
+def check_session_id(session_id: Optional[str], raise_error=False):
+    """Make sure a session ID does not have the BIDS prefix.
 
-    # add BIDS prefix if it doesn't already exist
-    session = str(session)
-    if session.startswith(BIDS_SESSION_PREFIX):
-        return session
-    else:
-        return f"{BIDS_SESSION_PREFIX}{session}"
+    Parameters
+    ----------
+    session_id : Optional[str]
+        The session ID to check. If None, returns None.
+    strict : bool, optional
+        Whether to raise an error if the session ID has the prefix, by default False
 
+    Returns
+    -------
+    str
+        The session ID without the BIDS prefix
 
-def check_session_strict(session: Optional[str]):
+    Raises
+    ------
+    ValueError
     """
-    Make sure session has the BIDS prefix.
+    if session_id is None:
+        return session_id
 
-    To use when validating user-provided files (e.g. the manifest).
-    """
-    if session is not None and not session.startswith(BIDS_SESSION_PREFIX):
-        raise ValueError(
-            f'Session should start with "{BIDS_SESSION_PREFIX}"' f", got {session}"
-        )
-    return session
-
-
-def strip_session(session: Optional[str]):
-    """Strip the BIDS prefix from a session string."""
-    if session is None:
-        return session
-    session = str(session)
-    return session.removeprefix(BIDS_SESSION_PREFIX)
+    if session_id.startswith(BIDS_SESSION_PREFIX):
+        if raise_error:
+            raise ValueError(
+                f'Session ID should not start with "{BIDS_SESSION_PREFIX}"'
+                f", got {session_id}"
+            )
+        else:
+            return session_id.removeprefix(BIDS_SESSION_PREFIX)
+    return session_id
 
 
 def create_bids_db(
@@ -167,18 +173,18 @@ def get_pipeline_tag(
     pipeline_name: str,
     pipeline_version: str,
     pipeline_step: Optional[str] = None,
-    participant: Optional[str] = None,
-    session: Optional[str] = None,
+    participant_id: Optional[str] = None,
+    session_id: Optional[str] = None,
     sep="-",
 ):
     """Generate a tag for a pipeline."""
     components = [pipeline_name, pipeline_version]
     if pipeline_step is not None:
         components.append(pipeline_step)
-    if participant is not None:
-        components.append(participant)
-    if session is not None:
-        components.append(strip_session(session))
+    if participant_id is not None:
+        components.append(participant_id)
+    if session_id is not None:
+        components.append(session_id)
     return sep.join(components)
 
 
@@ -187,7 +193,7 @@ def load_json(fpath: StrOrPathLike, **kwargs) -> dict:
 
     Parameters
     ----------
-    fpath : nipoppy.utils.StrOrPathLike
+    fpath : nipoppy.env.StrOrPathLike
         Path to the JSON file
     **kwargs :
         Keyword arguments to pass to json.load
@@ -213,7 +219,7 @@ def save_json(obj: dict, fpath: StrOrPathLike, **kwargs):
     ----------
     obj : dict
         The JSON object
-    fpath : nipoppy.utils.StrOrPathLike
+    fpath : nipoppy.env.StrOrPathLike
         Path to the JSON file to write
     indent : int, optional
         Indentation level, by default 4
@@ -256,7 +262,7 @@ def save_df_with_backup(
     ----------
     df : pd.DataFrame
         The dataframe to save
-    fpath_symlink : nipoppy.utils.StrOrPathLike
+    fpath_symlink : nipoppy.env.StrOrPathLike
         The path to the symlink
     dname_backups : Optional[str], optional
         The directory where the timestamped backup file should be written

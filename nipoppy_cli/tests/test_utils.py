@@ -16,19 +16,15 @@ from nipoppy.utils import (
     add_path_timestamp,
     add_pybids_ignore_patterns,
     apply_substitutions_to_json,
-    check_participant,
-    check_participant_id_strict,
-    check_session,
-    check_session_strict,
-    dicom_id_to_bids_id,
+    check_participant_id,
+    check_session_id,
     get_pipeline_tag,
     load_json,
-    participant_id_to_bids_id,
-    participant_id_to_dicom_id,
+    participant_id_to_bids_participant,
     process_template_str,
     save_df_with_backup,
     save_json,
-    strip_session,
+    session_id_to_bids_session,
 )
 
 from .conftest import datetime_fixture  # noqa F401
@@ -36,70 +32,58 @@ from .conftest import DPATH_TEST_DATA
 
 
 @pytest.mark.parametrize(
-    "participant_id,expected",
-    [("123", "123"), ("P_123", "P123"), ("sub!@#-", "sub")],
+    "participant_id,expected", [("123", "sub-123"), ("sub01", "sub-sub01")]
 )
-def test_participant_id_to_dicom_id(participant_id, expected):
-    assert participant_id_to_dicom_id(participant_id) == expected
+def test_participant_id_to_bids_participant(participant_id, expected):
+    assert participant_id_to_bids_participant(participant_id) == expected
 
 
 @pytest.mark.parametrize(
-    "dicom_id,expected",
-    [("123", "sub-123"), ("P123", "sub-P123"), ("sub", "sub-sub")],
+    "session,expected",
+    [("BL", "ses-BL"), ("M12", "ses-M12"), (None, None)],
 )
-def test_dicom_id_to_bids_id(dicom_id, expected):
-    assert dicom_id_to_bids_id(dicom_id) == expected
+def test_session_id_to_bids_session(session, expected):
+    assert session_id_to_bids_session(session) == expected
 
 
 @pytest.mark.parametrize(
-    "participant_id,expected",
-    [("123", "sub-123"), ("P_123", "sub-P123"), ("sub!@#-", "sub-sub")],
+    "participant_id,raise_error,is_valid,expected",
+    [
+        ("sub-01", False, True, "01"),
+        ("01", False, True, "01"),
+        (None, False, True, None),
+        ("sub-01", True, False, None),
+        ("01", True, True, "01"),
+        (None, True, True, None),
+    ],
 )
-def test_participant_id_to_bids_id(participant_id, expected):
-    assert participant_id_to_bids_id(participant_id) == expected
-
-
-@pytest.mark.parametrize(
-    "participant,expected",
-    [("sub-01", "01"), ("01", "01"), (None, None)],
-)
-def test_check_participant(participant, expected):
-    assert check_participant(participant) == expected
-
-
-@pytest.mark.parametrize("participant_id,is_valid", [("01", True), ("sub-01", False)])
-def test_check_participant_id_strict(participant_id, is_valid):
+def test_check_participant_id(participant_id, raise_error, is_valid, expected):
     with (
         pytest.raises(ValueError, match="Participant ID should not start with")
         if not is_valid
         else nullcontext()
     ):
-        assert check_participant_id_strict(participant_id) == participant_id
+        assert check_participant_id(participant_id, raise_error=raise_error) == expected
 
 
 @pytest.mark.parametrize(
-    "session,expected",
-    [("ses-BL", "ses-BL"), ("BL", "ses-BL"), ("M12", "ses-M12"), (None, None)],
+    "session_id,raise_error,is_valid,expected",
+    [
+        ("ses-BL", False, True, "BL"),
+        ("M12", False, True, "M12"),
+        (None, False, True, None),
+        ("ses-1", True, False, None),
+        ("1", True, True, "1"),
+        (None, True, True, None),
+    ],
 )
-def test_check_session(session, expected):
-    assert check_session(session) == expected
-
-
-@pytest.mark.parametrize("session,is_valid", [("ses-1", True), ("1", False)])
-def test_check_session_strict(session, is_valid):
+def test_check_session_id(session_id, raise_error, is_valid, expected):
     with (
-        pytest.raises(ValueError, match="Session should start with")
+        pytest.raises(ValueError, match="Session ID should not start with")
         if not is_valid
         else nullcontext()
     ):
-        assert check_session_strict(session) == session
-
-
-@pytest.mark.parametrize(
-    "session,expected", [("ses-BL", "BL"), ("BL", "BL"), ("ses-01", "01"), (None, None)]
-)
-def test_strip_session(session, expected):
-    assert strip_session(session) == expected
+        assert check_session_id(session_id, raise_error=raise_error) == expected
 
 
 @pytest.mark.parametrize(
@@ -165,22 +149,22 @@ def test_add_pybids_ignore_patterns(orig_patterns, new_patterns, expected):
 
 
 @pytest.mark.parametrize(
-    "name,version,step,participant,session,expected",
+    "name,version,step,participant_id,session_id,expected",
     [
         ("my_pipeline", "1.0", None, None, None, "my_pipeline-1.0"),
         ("pipeline", "2.0", None, "3000", None, "pipeline-2.0-3000"),
-        ("pipeline", "2.0", None, None, "ses-BL", "pipeline-2.0-BL"),
+        ("pipeline", "2.0", None, None, "BL", "pipeline-2.0-BL"),
         ("pipeline", "2.0", "step1", "3000", "BL", "pipeline-2.0-step1-3000-BL"),
     ],
 )
-def test_get_pipeline_tag(name, version, participant, step, session, expected):
+def test_get_pipeline_tag(name, version, participant_id, step, session_id, expected):
     assert (
         get_pipeline_tag(
             pipeline_name=name,
             pipeline_version=version,
             pipeline_step=step,
-            participant=participant,
-            session=session,
+            participant_id=participant_id,
+            session_id=session_id,
         )
         == expected
     )

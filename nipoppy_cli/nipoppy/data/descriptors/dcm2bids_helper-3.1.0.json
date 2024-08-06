@@ -13,10 +13,7 @@
             "list": true,
             "optional": false,
             "command-line-flag": "-d",
-            "value-key": "[DICOM_DIR]",
-            "default-value": [
-                "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT]]/[[NIPOPPY_SESSION]]"
-            ]
+            "value-key": "[DICOM_DIR]"
         },
         {
             "name": "output_dir",
@@ -25,8 +22,7 @@
             "type": "String",
             "optional": true,
             "command-line-flag": "-o",
-            "value-key": "[OUTPUT_DIR]",
-            "default-value": "[[NIPOPPY_DPATH_SCRATCH]]/dcm2bids_helper"
+            "value-key": "[OUTPUT_DIR]"
         },
         {
             "name": "nest",

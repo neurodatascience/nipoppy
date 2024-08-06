@@ -23,7 +23,7 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     # only trigger on upstream repo
-    if: github.repository_owner == 'neurodatascience' && github.event.repository.name == 'nipoppy'
+    if: github.repository_owner == 'nipoppy' && github.event.repository.name == 'nipoppy'
 
     steps:
 

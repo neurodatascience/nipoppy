@@ -4,16 +4,21 @@ import pytest
 
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.manifest import Manifest
+from nipoppy.utils import FPATH_SAMPLE_DICOM_DIR_MAP
 
 from .conftest import DPATH_TEST_DATA
 
 
 @pytest.mark.parametrize(
-    "fname",
-    ["dicom_dir_map1.csv", "dicom_dir_map2.csv"],
+    "fpath",
+    [
+        FPATH_SAMPLE_DICOM_DIR_MAP,
+        DPATH_TEST_DATA / "dicom_dir_map1.csv",
+        DPATH_TEST_DATA / "dicom_dir_map2.csv",
+    ],
 )
-def test_load(fname):
-    assert isinstance(DicomDirMap.load(DPATH_TEST_DATA / fname), DicomDirMap)
+def test_load(fpath):
+    assert isinstance(DicomDirMap.load(fpath), DicomDirMap)
 
 
 @pytest.mark.parametrize(
@@ -49,8 +54,8 @@ def test_load_or_generate_load(fpath_dicom_dir_map):
 @pytest.mark.parametrize(
     "participant_ids,sessions,participant_first,expected",
     [
-        (["01", "02"], ["ses-1", "ses-2"], True, ["01/ses-1", "02/ses-2"]),
-        (["P01", "P02"], ["ses-BL", "ses-BL"], False, ["ses-BL/P01", "ses-BL/P02"]),
+        (["01", "02"], ["1", "2"], True, ["01/1", "02/2"]),
+        (["P01", "P02"], ["BL", "BL"], False, ["BL/P01", "BL/P02"]),
     ],
 )
 def test_load_or_generate_generate(
@@ -59,8 +64,8 @@ def test_load_or_generate_generate(
     manifest = Manifest(
         data={
             Manifest.col_participant_id: participant_ids,
-            Manifest.col_visit: sessions,
-            Manifest.col_session: sessions,
+            Manifest.col_visit_id: sessions,
+            Manifest.col_session_id: sessions,
             Manifest.col_datatype: [[] for _ in participant_ids],
         }
     )

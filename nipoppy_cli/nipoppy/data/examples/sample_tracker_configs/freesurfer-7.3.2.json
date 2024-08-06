@@ -1,0 +1,27 @@
+[
+    {
+        "NAME": "pipeline_complete",
+        "PATHS": [
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/mri/aparc+aseg.mgz",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/mri/aparc.a2009s+aseg.mgz",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/label/lh.aparc.annot",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/label/rh.aparc.annot",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/label/lh.aparc.a2009s.annot",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/label/rh.aparc.a2009s.annot",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/lh.curv",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/lh.area",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/lh.thickness",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/lh.sulc",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/lh.midthickness",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/rh.curv",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/rh.area",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/rh.thickness",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/rh.sulc",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/surf/rh.midthickness",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/stats/lh.aparc.stats",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/stats/rh.aparc.stats",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/stats/lh.aparc.a2009s.stats",
+            "[[NIPOPPY_BIDS_SESSION]]/[[NIPOPPY_BIDS_PARTICIPANT]]/stats/rh.aparc.a2009s.stats"
+        ]
+    }
+]

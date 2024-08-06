@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+from abc import ABC
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import ConfigDict, Field, model_validator
 
 from nipoppy.config.container import ContainerInfo, SchemaWithContainerConfig
-from nipoppy.config.pipeline_step import PipelineStepConfig
+from nipoppy.config.pipeline_step import (
+    BasePipelineStepConfig,
+    BidsPipelineStepConfig,
+    ProcPipelineStepConfig,
+)
 
 
-class PipelineConfig(SchemaWithContainerConfig):
-    """Schema for processing pipeline configuration."""
+class BasePipelineConfig(SchemaWithContainerConfig, ABC):
+    """Base schema for processing/BIDS pipeline configuration."""
 
     NAME: str = Field(description="Name of the pipeline")
     VERSION: str = Field(description="Version of the pipeline")
@@ -23,21 +28,10 @@ class PipelineConfig(SchemaWithContainerConfig):
         default=ContainerInfo(),
         description="Information about the container image file",
     )
-    STEPS: list[PipelineStepConfig] = Field(
+    STEPS: list[Union[ProcPipelineStepConfig, BidsPipelineStepConfig]] = Field(
         default=[],
         description="List of pipeline step configurations",
     )
-    TRACKER_CONFIG_FILE: Optional[Path] = Field(
-        default=None,
-        description=(
-            "Path to the tracker configuration file associated with the pipeline"
-            ". This file must contain a list of tracker configurations"
-            ", each of which must be a dictionary with a NAME field (string)"
-            " and a PATHS field (non-empty list of strings)"
-        ),
-    )
-
-    model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="after")
     def validate_after(self):
@@ -71,7 +65,9 @@ class PipelineConfig(SchemaWithContainerConfig):
         """Return the path to the pipeline's container."""
         return self.CONTAINER_INFO.FILE
 
-    def get_step_config(self, step_name: Optional[str] = None) -> PipelineStepConfig:
+    def get_step_config(
+        self, step_name: Optional[str] = None
+    ) -> BasePipelineStepConfig:
         """
         Return the configuration for the given step.
 
@@ -105,6 +101,36 @@ class PipelineConfig(SchemaWithContainerConfig):
         If step is None, return the descriptor file for the first step.
         """
         return self.get_step_config(step_name).DESCRIPTOR_FILE
+
+
+class BidsPipelineConfig(BasePipelineConfig):
+    """Schema for BIDS pipeline configuration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    def get_update_doughnut(self, step_name: Optional[str] = None) -> Path | None:
+        """
+        Return the update doughnut flag for the given step.
+
+        If step is None, return the flag for the first step.
+        """
+        return self.get_step_config(step_name).UPDATE_DOUGHNUT
+
+
+class ProcPipelineConfig(BasePipelineConfig):
+    """Schema for processing pipeline configuration."""
+
+    TRACKER_CONFIG_FILE: Optional[Path] = Field(
+        default=None,
+        description=(
+            "Path to the tracker configuration file associated with the pipeline"
+            ". This file must contain a list of tracker configurations"
+            ", each of which must be a dictionary with a NAME field (string)"
+            " and a PATHS field (non-empty list of strings)"
+        ),
+    )
+
+    model_config = ConfigDict(extra="forbid")
 
     def get_pybids_ignore_file(self, step_name: Optional[str] = None) -> Path | None:
         """

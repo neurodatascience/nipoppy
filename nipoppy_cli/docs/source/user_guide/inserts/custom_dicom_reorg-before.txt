@@ -1,0 +1,8 @@
+└── scratch
+    └── raw_dicom
+        ├── 01            # participant subdirectory
+        │   ├── 1.tar.gz  # archive for session 1
+        │   └── 2.tar.gz  # archive for session 2
+        └── 02
+            ├── 1.tar.gz
+            └── 2.tar.gz

@@ -1,0 +1,13 @@
+└── derivatives
+    └── mriqc
+        └── 23.1.0
+            └── output
+                ├── sub-001
+                │   ├── figures
+                │   │   ├── sub-001_ses-1_run-01_desc-background_T1w.svg
+                │   │   └── sub-001_ses-1_run-01_desc-zoomed_T1w.svg
+                │   └── ses-1
+                │       └── anat
+                │           ├── sub-001_ses-1_run-01_T1w.json
+                │           └── sub-001_ses-1_run-02_T1w.json
+                └── sub-001_ses-1_run-01_T1w.html

@@ -33,9 +33,7 @@ def test_run(caplog, tmp_path, output_dir, modalities, logger):
         output_dir = tmp_path
         expected_output_dir = output_dir
     if output_dir is None:
-        expected_output_dir = (
-            Path(global_configs["DATASET_ROOT"]) / "derivatives"
-        )
+        expected_output_dir = Path(global_configs["DATASET_ROOT"]) / "derivatives"
 
     cmd = run(
         participant_id=participant_id,

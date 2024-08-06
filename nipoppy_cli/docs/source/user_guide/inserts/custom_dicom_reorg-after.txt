@@ -1,0 +1,11 @@
+└── sourcedata
+    ├── sub-01
+    │   ├── ses-1
+    │   │   └── 01-1.tar.gz
+    │   └── ses-2
+    │       └── 01-2.tar.gz
+    └── sub-02
+        ├── ses-1
+        │   └── 02-1.tar.gz
+        └── ses-2
+            └── 03-2.tar.gz

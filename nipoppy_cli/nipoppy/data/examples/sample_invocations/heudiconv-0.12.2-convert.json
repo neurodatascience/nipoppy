@@ -1,5 +1,10 @@
 {
+    "dicom_dir_template": "[[NIPOPPY_DPATH_SOURCEDATA]]/[[NIPOPPY_PARTICIPANT_ID]]/[[NIPOPPY_BIDS_SESSION]]/*",
+    "subjs": "[[NIPOPPY_PARTICIPANT_ID]]",
+    "converter": "dcm2niix",
+    "outdir": "[[NIPOPPY_DPATH_BIDS]]",
     "heuristic": "[[HEUDICONV_HEURISTIC_FILE]]",
+    "session": "[[NIPOPPY_BIDS_SESSION]]",
     "overwrite": true,
     "minmeta": true
 }

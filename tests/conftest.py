@@ -1,3 +1,5 @@
+"""Config for pytest."""
+
 from __future__ import annotations
 
 import json
@@ -21,9 +23,7 @@ def global_config_for_testing(pth: Path) -> dict:
     return global_configs
 
 
-def create_dummy_bids_filter(
-    pth: Path, filename: str = "bids_filter.json"
-) -> None:
+def create_dummy_bids_filter(pth: Path, filename: str = "bids_filter.json") -> None:
     """Use a modified content from the tractoflow sample."""
     bids_filter = {
         "t1w": {

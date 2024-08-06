@@ -4,13 +4,7 @@ import logging
 from argparse import ArgumentParser, HelpFormatter, _ActionsContainer, _SubParsersAction
 from pathlib import Path
 
-from nipoppy.layout import DEFAULT_LAYOUT_INFO
-from nipoppy.utils import (
-    BIDS_SESSION_PREFIX,
-    BIDS_SUBJECT_PREFIX,
-    check_participant,
-    check_session,
-)
+from nipoppy.env import BIDS_SESSION_PREFIX, BIDS_SUBJECT_PREFIX
 
 PROGRAM_NAME = "nipoppy"
 COMMAND_INIT = "init"
@@ -51,16 +45,14 @@ def add_arg_simulate(parser: _ActionsContainer) -> _ActionsContainer:
 
 
 def add_args_participant_and_session(parser: _ActionsContainer) -> _ActionsContainer:
-    """Add --participant and --session arguments to the parser."""
+    """Add --participant-id and --session-id arguments to the parser."""
     parser.add_argument(
-        "--participant",
-        type=check_participant,
+        "--participant-id",
         required=False,
         help=f"Participant ID (with or without the {BIDS_SUBJECT_PREFIX} prefix).",
     )
     parser.add_argument(
-        "--session",
-        type=check_session,
+        "--session-id",
         required=False,
         help=f"Session ID (with or without the {BIDS_SESSION_PREFIX} prefix).",
     )
@@ -209,9 +201,11 @@ def add_subparser_dicom_reorg(
     formatter_class: type[HelpFormatter] = HelpFormatter,
 ) -> ArgumentParser:
     """Add subparser for reorg command."""
+    from nipoppy.layout import DEFAULT_LAYOUT_INFO
+
     description = (
         "(Re)organize raw (DICOM) files, from the raw DICOM directory "
-        f"({DEFAULT_LAYOUT_INFO.dpath_raw_dicom}) to the organized "
+        f"({DEFAULT_LAYOUT_INFO.dpath_raw_imaging}) to the organized "
         f"sourcedata directory ({DEFAULT_LAYOUT_INFO.dpath_sourcedata})."
     )
     parser = subparsers.add_parser(

@@ -42,8 +42,8 @@
     "dpath_scratch": {
         "path": "scratch"
     },
-    "dpath_raw_dicom": {
-        "path": "scratch/raw_dicom"
+    "dpath_raw_imaging": {
+        "path": "scratch/raw_imaging"
     },
     "dpath_logs": {
         "path": "scratch/logs"

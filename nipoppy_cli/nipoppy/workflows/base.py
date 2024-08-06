@@ -15,13 +15,14 @@ from typing import Optional, Sequence
 
 from nipoppy.base import Base
 from nipoppy.config.main import Config
+from nipoppy.env import StrOrPathLike
 from nipoppy.layout import DatasetLayout
 from nipoppy.logger import get_logger
 from nipoppy.tabular.base import BaseTabular
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
 from nipoppy.tabular.doughnut import Doughnut, generate_doughnut
 from nipoppy.tabular.manifest import Manifest
-from nipoppy.utils import StrOrPathLike, add_path_timestamp, process_template_str
+from nipoppy.utils import add_path_timestamp, process_template_str
 
 LOG_SUFFIX = ".log"
 
@@ -51,7 +52,7 @@ class BaseWorkflow(Base, ABC):
 
         Parameters
         ----------
-        dpath_root : nipoppy.utils.StrOrPathLike
+        dpath_root : nipoppy.env.StrOrPathLike
             Path the the root directory of the dataset.
         name : str
             Name of the workflow, used for logging.
@@ -292,13 +293,13 @@ class BaseWorkflow(Base, ABC):
     def manifest(self) -> Manifest:
         """Load the manifest."""
         fpath_manifest = Path(self.layout.fpath_manifest)
-        expected_sessions = self.config.SESSIONS
-        expected_visits = self.config.VISITS
+        expected_session_ids = self.config.SESSION_IDS
+        expected_visit_ids = self.config.VISIT_IDS
         try:
             return Manifest.load(
                 fpath_manifest,
-                sessions=expected_sessions,
-                visits=expected_visits,
+                session_ids=expected_session_ids,
+                visit_ids=expected_visit_ids,
             )
         except FileNotFoundError:
             raise FileNotFoundError(f"Manifest file not found: {fpath_manifest}")
@@ -318,7 +319,7 @@ class BaseWorkflow(Base, ABC):
             doughnut = generate_doughnut(
                 manifest=self.manifest,
                 dicom_dir_map=self.dicom_dir_map,
-                dpath_downloaded=self.layout.dpath_raw_dicom,
+                dpath_downloaded=self.layout.dpath_raw_imaging,
                 dpath_organized=self.layout.dpath_sourcedata,
                 dpath_bidsified=self.layout.dpath_bids,
                 empty=False,

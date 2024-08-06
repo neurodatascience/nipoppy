@@ -1,5 +1,5 @@
-participant_id,visit,session,datatype,participant_dicom_dir,dicom_id,bids_id
-01,BL,ses-BL,"['anat']",01,01,sub-01
-01,M12,ses-M12,"['anat']",01,01,sub-01
-02,BL,ses-BL,"['anat']",01,01,sub-02
-02,M12,ses-M12,"['anat']",01,01,sub-02
+participant_id,visit_id,session_id,datatype,participant_dicom_dir,dicom_id,bids_id
+01,BL,BL,"['anat']",01,01,sub-01
+01,M12,M12,"['anat']",01,01,sub-01
+02,BL,BL,"['anat']",01,01,sub-02
+02,M12,M12,"['anat']",01,01,sub-02

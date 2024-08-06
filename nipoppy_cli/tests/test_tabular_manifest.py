@@ -49,19 +49,19 @@ def test_validate(fpath, is_valid):
 
 
 @pytest.mark.parametrize(
-    "sessions,visits,is_valid",
+    "session_ids,visit_ids,is_valid",
     [
         (None, None, True),
-        (["ses-BL", "ses-M12"], ["BL", "M12"], True),
-        (["ses-BL"], ["BL", "M12"], False),
-        (["ses-BL", "ses-M12"], ["M12"], False),
+        (["BL", "M12"], ["BL", "M12"], True),
+        (["BL"], ["BL", "M12"], False),
+        (["BL", "M12"], ["M12"], False),
     ],
 )
-def test_validate_sessions_visits(sessions, visits, is_valid):
+def test_validate_sessions_visits(session_ids, visit_ids, is_valid):
     manifest = Manifest.load(
         DPATH_TEST_DATA / "manifest1.csv",
-        sessions=sessions,
-        visits=visits,
+        session_ids=session_ids,
+        visit_ids=visit_ids,
         validate=False,
     )
     with pytest.raises(ValueError) if not is_valid else nullcontext():
@@ -69,59 +69,56 @@ def test_validate_sessions_visits(sessions, visits, is_valid):
 
 
 @pytest.mark.parametrize(
-    "data,session,expected_count",
+    "data,session_id,expected_count",
     [
         (
-            {
-                "participant_id": ["01"],
-                "visit": ["BL"],
-                "session": [None],
-                "datatype": [[]],
-            },
-            "ses-BL",
+            (["01"], ["BL"], None, [[]]),
+            "BL",
             0,
         ),
         (
-            {
-                "participant_id": ["01"],
-                "visit": ["BL"],
-                "session": ["ses-BL"],
-                "datatype": [["anat"]],
-            },
-            "ses-BL",
+            (["01"], ["BL"], "BL", [["anat"]]),
+            "BL",
             1,
         ),
         (
-            {
-                "participant_id": ["01", "02"],
-                "visit": ["BL", "M12"],
-                "session": ["ses-BL", "ses-M12"],
-                "datatype": [["anat"], ["anat", "dwi"]],
-            },
-            "ses-BL",
+            (
+                ["01", "02"],
+                ["BL", "M12"],
+                ["BL", "M12"],
+                [["anat"], ["anat", "dwi"]],
+            ),
+            "BL",
             1,
         ),
         (
-            {
-                "participant_id": ["01", "02"],
-                "visit": ["BL", "M12"],
-                "session": ["ses-BL", "ses-M12"],
-                "datatype": [["anat"], ["anat", "dwi"]],
-            },
+            (
+                ["01", "02"],
+                ["BL", "M12"],
+                ["BL", "M12"],
+                [["anat"], ["anat", "dwi"]],
+            ),
             None,
             2,
         ),
     ],
 )
-def test_get_imaging_subset(data, session, expected_count):
-    manifest = Manifest(data)
-    manifest_with_imaging_only = manifest.get_imaging_subset(session=session)
+def test_get_imaging_subset(data, session_id, expected_count):
+    manifest = Manifest(
+        {
+            Manifest.col_participant_id: data[0],
+            Manifest.col_visit_id: data[1],
+            Manifest.col_session_id: data[2],
+            Manifest.col_datatype: data[3],
+        }
+    )
+    manifest_with_imaging_only = manifest.get_imaging_subset(session_id=session_id)
     assert isinstance(manifest_with_imaging_only, Manifest)
     assert len(manifest_with_imaging_only) == expected_count
 
 
 @pytest.mark.parametrize(
-    "participant,session,expected_count",
+    "participant_id,session_id,expected_count",
     [
         (None, None, 6),
         ("01", None, 3),
@@ -135,12 +132,12 @@ def test_get_imaging_subset(data, session, expected_count):
         ("03", "ses-BL", 1),
     ],
 )
-def get_participants_sessions(participant, session, expected_count):
+def get_participants_sessions(participant_id, session_id, expected_count):
     data = (
         {
             "participant_id": ["01", "01", "01", "02", "02", "03", "04"],
             "visit": ["BL", "M12", "M24", "BL", "M12", "BL", "SC"],
-            "session": [
+            "session_id": [
                 "ses-BL",
                 "ses-M12",
                 "ses-M24",
@@ -163,7 +160,7 @@ def get_participants_sessions(participant, session, expected_count):
     manifest = Manifest(data)
     count = 0
     for _ in manifest.get_participants_sessions(
-        participant=participant, session=session
+        participant_id=participant_id, session_id=session_id
     ):
         count += 1
     assert count == expected_count

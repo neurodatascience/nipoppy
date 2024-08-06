@@ -33,15 +33,15 @@ The [`nipoppy init`](#cli_reference/init) command copies examples of these files
 ```
 
 (customizing-config)=
-### Customizing the configuration file
+### Customizing the global configuration file
 
-The configuration file at {{fpath_config}} contains general information about a dataset (e.g. name, visit and session names) and configurations for running processing pipelines (e.g., pipeline version and runtime parameters).
+The global configuration file at {{fpath_config}} contains the high-level description of a dataset (e.g. name, visit and session names) and configurations for running the available pipelines (e.g., pipeline version and runtime parameters).
 
-The example config file contains configurations for all BIDS conversion and image processing software that are supported out-of-the-box by Nipoppy. You should replace the placeholder strings/substrings (e.g. `<DATASET_NAME>`) by more appropriate values for your dataset. See dropdown below (lines that should be changed are highlighted).
+The example global config file contains configurations for all BIDS conversion and image processing software that are supported out-of-the-box by Nipoppy. You should replace the placeholder strings/substrings (e.g. `<DATASET_NAME>`) by more appropriate values for your dataset. See dropdown below (lines that should be changed are highlighted).
 
 You can also delete (or not) any configuration for a software/version that you do not plan to use.
 
-````{admonition} The example config file
+````{admonition} The example global config file
 ---
 class: dropdown
 ---
@@ -55,10 +55,8 @@ language: json
 ```
 ````
 
-% TODO point to config pages for detailed guide once those are written
-
 ```{tip}
-See the {ref}`schema reference <config-schema>` for more information about each config field.
+See the <project:./user_guide/global_config.md> for more information about each config field.
 ```
 
 ### Generating the manifest file
@@ -98,10 +96,11 @@ See the {ref}`schema reference <manifest-schema>` for more information about eac
 
 ## Next steps
 
-The rest of this documentation is still work in progress. At a starting point, refer to the [commands](cli_reference/index) associated with the data organization or processing step(s) you wish to perform.
+```{note}
+
+The rest of this documentation is still work in progress. If the information you are looking for is not available in the user guide, refer to the [commands](cli_reference/index) associated with the data organization or processing step(s) you wish to perform.
 
 ![Nipoppy protocol](_static/img/nipoppy_protocol.jpg)
+```
 
-% TODO point to tutorials once they are created (running BIDS conversion, running a pipeline)
-
-% TODO mention that all other commands create log files in scratch/logs (?)
+Once the Nipoppy directory tree for a study is created, the next steps are typically to [populate it with raw data](user_guide/populating.md), [move and organize raw imaging data (typically DICOMs) into a regular structure](user_guide/organizing_imaging.md), then [convert the data to BIDS](user_guide/bids_conversion.md). However, depending on the type of raw data you have, your workflow might be a little different. See [here](user_guide/index.md) for all the available documentation in the User guide.

@@ -1,5 +1,6 @@
 """Test that all supported pipelines can run successfully in simulate mode."""
 
+import warnings
 from pathlib import Path
 
 import pytest
@@ -8,8 +9,14 @@ from boutiques import bosh
 
 from nipoppy.config.main import Config
 from nipoppy.layout import DatasetLayout
-from nipoppy.utils import DPATH_DESCRIPTORS, DPATH_INVOCATIONS, FPATH_SAMPLE_CONFIG_FULL
-from nipoppy.workflows import BidsConversionRunner, PipelineRunner
+from nipoppy.utils import (
+    DPATH_DESCRIPTORS,
+    DPATH_INVOCATIONS,
+    DPATH_TRACKER_CONFIGS,
+    FPATH_SAMPLE_CONFIG_FULL,
+    TEMPLATE_REPLACE_PATTERN,
+)
+from nipoppy.workflows import BidsConversionRunner, PipelineRunner, PipelineTracker
 
 from .conftest import create_empty_dataset, prepare_dataset
 
@@ -19,10 +26,11 @@ def single_subject_dataset(
     tmp_path: Path, mocker: pytest_mock.MockerFixture
 ) -> DatasetLayout:
     dataset_root = tmp_path / "my_dataset"
-    participant = "01"
-    session = "ses-01"
+    participant_id = "01"
+    session_id = "01"
     container_command = "apptainer"
     substitutions = {
+        "[[NIPOPPY_DPATH_TRACKER_CONFIGS]]": str(DPATH_TRACKER_CONFIGS),
         "[[NIPOPPY_DPATH_DESCRIPTORS]]": str(DPATH_DESCRIPTORS),
         "[[NIPOPPY_DPATH_INVOCATIONS]]": str(DPATH_INVOCATIONS),
         "[[NIPOPPY_DPATH_CONTAINERS]]": "[[NIPOPPY_DPATH_CONTAINERS]]",
@@ -32,7 +40,7 @@ def single_subject_dataset(
         "[[TEMPLATEFLOW_HOME]]": str(tmp_path / "templateflow"),
     }
 
-    participants_and_sessions = {participant: [session]}
+    participants_and_sessions = {participant_id: [session_id]}
 
     layout = DatasetLayout(dataset_root)
     create_empty_dataset(dataset_root)
@@ -57,7 +65,7 @@ def single_subject_dataset(
         return_value=container_command,
     )
 
-    return layout, participant, session
+    return layout, participant_id, session_id
 
 
 def get_fpaths_descriptors() -> list[str]:
@@ -77,8 +85,12 @@ def test_boutiques_descriptors(fpath_descriptor):
         ("mriqc", "23.1.0"),
     ],
 )
-def test_pipeline_runner(pipeline_name, pipeline_version, single_subject_dataset):
-    layout, participant, session = single_subject_dataset
+def test_pipeline_runner(
+    pipeline_name,
+    pipeline_version,
+    single_subject_dataset,
+):
+    layout, participant_id, session_id = single_subject_dataset
     layout: DatasetLayout
     runner = PipelineRunner(
         dpath_root=layout.dpath_root,
@@ -89,7 +101,12 @@ def test_pipeline_runner(pipeline_name, pipeline_version, single_subject_dataset
 
     runner.pipeline_config.get_fpath_container().touch()
 
-    runner.run_single(participant=participant, session=session)
+    invocation_str, descriptor_str = runner.run_single(
+        participant_id=participant_id, session_id=session_id
+    )
+
+    assert TEMPLATE_REPLACE_PATTERN.search(invocation_str) is None
+    assert TEMPLATE_REPLACE_PATTERN.search(descriptor_str) is None
 
 
 @pytest.mark.parametrize(
@@ -99,12 +116,15 @@ def test_pipeline_runner(pipeline_name, pipeline_version, single_subject_dataset
         ("heudiconv", "0.12.2", "convert"),
         ("dcm2bids", "3.1.0", "prepare"),
         ("dcm2bids", "3.1.0", "convert"),
+        ("bidscoin", "4.3.2", "prepare"),
+        ("bidscoin", "4.3.2", "edit"),
+        ("bidscoin", "4.3.2", "convert"),
     ],
 )
 def test_bids_conversion_runner(
     pipeline_name, pipeline_version, pipeline_step, single_subject_dataset
 ):
-    layout, participant, session = single_subject_dataset
+    layout, participant_id, session_id = single_subject_dataset
     layout: DatasetLayout
     runner = BidsConversionRunner(
         dpath_root=layout.dpath_root,
@@ -114,7 +134,38 @@ def test_bids_conversion_runner(
         simulate=True,
     )
 
-    runner.pipeline_config.get_fpath_container().touch()
+    fpath_container = runner.pipeline_config.get_fpath_container()
+    if fpath_container is not None:
+        runner.pipeline_config.get_fpath_container().touch()
 
-    print(runner.invocation)
-    runner.run_single(participant=participant, session=session)
+    invocation_str, descriptor_str = runner.run_single(
+        participant_id=participant_id, session_id=session_id
+    )
+
+    assert TEMPLATE_REPLACE_PATTERN.search(invocation_str) is None
+    assert TEMPLATE_REPLACE_PATTERN.search(descriptor_str) is None
+
+
+@pytest.mark.parametrize(
+    "pipeline_name,pipeline_version",
+    [
+        ("fmriprep", "20.2.7"),
+        ("fmriprep", "23.1.3"),
+        ("freesurfer", "6.0.1"),
+        ("freesurfer", "7.3.2"),
+        ("mriqc", "23.1.0"),
+    ],
+)
+def test_tracker(pipeline_name, pipeline_version, single_subject_dataset):
+    layout, participant_id, session_id = single_subject_dataset
+    layout: DatasetLayout
+    tracker = PipelineTracker(
+        dpath_root=layout.dpath_root,
+        pipeline_name=pipeline_name,
+        pipeline_version=pipeline_version,
+    )
+
+    # make sure all template strings are replaced
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        tracker.run_single(participant_id=participant_id, session_id=session_id)

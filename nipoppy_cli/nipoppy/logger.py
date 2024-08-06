@@ -8,7 +8,7 @@ from typing import Optional
 from rich.console import Console
 from rich.logging import RichHandler
 
-from nipoppy.utils import StrOrPathLike
+from nipoppy.env import StrOrPathLike
 
 DATE_FORMAT = "[%Y-%m-%d %X]"
 FORMAT_RICH = "%(message)s"

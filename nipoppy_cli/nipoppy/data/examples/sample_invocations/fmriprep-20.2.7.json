@@ -1,12 +1,24 @@
 {
-    "anat_only": true,
-    "fs_license_file": "[[FREESURFER_LICENSE_FILE]]",
+    "bids_dir": "[[NIPOPPY_DPATH_BIDS]]",
+    "output_dir": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]",
+    "analysis_level": "participant",
     "skip_bids_validation": true,
-    "regressors_all_comps": true,
-    "write_graph": true,
-    "notrack": true,
+    "participant_label": [
+        "[[NIPOPPY_PARTICIPANT_ID]]"
+    ],
+    "bids_database_dir": "[[NIPOPPY_DPATH_PIPELINE_BIDS_DB]]",
     "nprocs": "8",
     "omp_nthreads": "4",
     "memory_gb": "4G",
-    "verbose_count": "-v"
+    "anat_only": true,
+    "verbose_count": "-v",
+    "output_spaces": [
+        "MNI152NLin2009cAsym"
+    ],
+    "regressors_all_comps": true,
+    "fs_license_file": "[[FREESURFER_LICENSE_FILE]]",
+    "fs_subjects_dir": "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_BIDS_SESSION]]",
+    "work_dir": "[[NIPOPPY_DPATH_PIPELINE_WORK]]",
+    "write_graph": true,
+    "notrack": true
 }

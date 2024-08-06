@@ -4,13 +4,13 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from nipoppy.env import StrOrPathLike
 from nipoppy.utils import (
     DPATH_DESCRIPTORS,
     DPATH_INVOCATIONS,
     DPATH_TRACKER_CONFIGS,
     FPATH_SAMPLE_CONFIG,
     FPATH_SAMPLE_MANIFEST,
-    StrOrPathLike,
 )
 from nipoppy.workflows.base import BaseWorkflow
 

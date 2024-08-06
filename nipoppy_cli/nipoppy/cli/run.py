@@ -16,12 +16,6 @@ from nipoppy.cli.parser import (
     get_global_parser,
 )
 from nipoppy.logger import add_logfile, capture_warnings, get_logger
-from nipoppy.workflows.bids_conversion import BidsConversionRunner
-from nipoppy.workflows.dataset_init import InitWorkflow
-from nipoppy.workflows.dicom_reorg import DicomReorgWorkflow
-from nipoppy.workflows.doughnut import DoughnutWorkflow
-from nipoppy.workflows.runner import PipelineRunner
-from nipoppy.workflows.tracker import PipelineTracker
 
 
 def cli(argv: Sequence[str] = None) -> None:
@@ -44,11 +38,17 @@ def cli(argv: Sequence[str] = None) -> None:
         dpath_root = args.dataset_root
 
         if command == COMMAND_INIT:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.dataset_init import InitWorkflow
+
             workflow = InitWorkflow(
                 dpath_root=dpath_root,
                 **workflow_kwargs,
             )
         elif command == COMMAND_DOUGHNUT:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.doughnut import DoughnutWorkflow
+
             workflow = DoughnutWorkflow(
                 dpath_root=dpath_root,
                 empty=args.empty,
@@ -56,40 +56,53 @@ def cli(argv: Sequence[str] = None) -> None:
                 **workflow_kwargs,
             )
         elif command == COMMAND_DICOM_REORG:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.dicom_reorg import DicomReorgWorkflow
+
             workflow = DicomReorgWorkflow(
                 dpath_root=dpath_root,
                 copy_files=args.copy_files,
+                check_dicoms=args.check_dicoms,
                 **workflow_kwargs,
             )
         elif command == COMMAND_BIDS_CONVERSION:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.bids_conversion import BidsConversionRunner
+
             workflow = BidsConversionRunner(
                 dpath_root=dpath_root,
                 pipeline_name=args.pipeline,
                 pipeline_version=args.pipeline_version,
                 pipeline_step=args.pipeline_step,
-                participant=args.participant,
-                session=args.session,
+                participant_id=args.participant_id,
+                session_id=args.session_id,
                 simulate=args.simulate,
                 **workflow_kwargs,
             )
         elif command == COMMAND_PIPELINE_RUN:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.runner import PipelineRunner
+
             workflow = PipelineRunner(
                 dpath_root=dpath_root,
                 pipeline_name=args.pipeline,
                 pipeline_version=args.pipeline_version,
                 pipeline_step=args.pipeline_step,
-                participant=args.participant,
-                session=args.session,
+                participant_id=args.participant_id,
+                session_id=args.session_id,
                 simulate=args.simulate,
                 **workflow_kwargs,
             )
         elif command == COMMAND_PIPELINE_TRACK:
+            # Lazy import to improve performance of cli.
+            from nipoppy.workflows.tracker import PipelineTracker
+
             workflow = PipelineTracker(
                 dpath_root=dpath_root,
                 pipeline_name=args.pipeline,
                 pipeline_version=args.pipeline_version,
-                participant=args.participant,
-                session=args.session,
+                participant_id=args.participant_id,
+                session_id=args.session_id,
                 **workflow_kwargs,
             )
         else:

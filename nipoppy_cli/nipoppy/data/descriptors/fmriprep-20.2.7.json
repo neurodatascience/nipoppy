@@ -11,8 +11,7 @@
             "description": "the root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder).",
             "optional": false,
             "type": "String",
-            "value-key": "[BIDS_DIR]",
-            "default-value": "[[NIPOPPY_DPATH_BIDS]]"
+            "value-key": "[BIDS_DIR]"
         },
         {
             "id": "output_dir",
@@ -20,8 +19,7 @@
             "description": "the output path for the outcomes of preprocessing and visual reports",
             "optional": false,
             "type": "String",
-            "value-key": "[OUTPUT_DIR]",
-            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
+            "value-key": "[OUTPUT_DIR]"
         },
         {
             "id": "analysis_level",
@@ -32,8 +30,7 @@
             "value-key": "[ANALYSIS_LEVEL]",
             "value-choices": [
                 "participant"
-            ],
-            "default-value": "participant"
+            ]
         },
         {
             "id": "version",
@@ -61,10 +58,7 @@
             "type": "String",
             "value-key": "[PARTICIPANT_LABEL]",
             "list": true,
-            "command-line-flag": "--participant-label",
-            "default-value": [
-                "[[NIPOPPY_PARTICIPANT]]"
-            ]
+            "command-line-flag": "--participant-label"
         },
         {
             "id": "task_id",
@@ -109,8 +103,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[BIDS_DATABASE_DIR]",
-            "command-line-flag": "--bids-database-dir",
-            "default-value": "[[NIPOPPY_DPATH_PIPELINE_BIDS_DB]]"
+            "command-line-flag": "--bids-database-dir"
         },
         {
             "id": "nprocs",
@@ -450,8 +443,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[FS_SUBJECTS_DIR]",
-            "command-line-flag": "--fs-subjects-dir",
-            "default-value": "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_SESSION]]"
+            "command-line-flag": "--fs-subjects-dir"
         },
         {
             "id": "hires",
@@ -505,8 +497,7 @@
             "optional": true,
             "type": "String",
             "value-key": "[WORK_DIR]",
-            "command-line-flag": "-w",
-            "default-value": "[[NIPOPPY_DPATH_PIPELINE_WORK]]"
+            "command-line-flag": "-w"
         },
         {
             "id": "clean_workdir",
@@ -606,14 +597,14 @@
             "CONTAINER_CONFIG": {
                 "ARGS": [
                     "--bind",
-                    "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_SESSION]]"
+                    "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_BIDS_SESSION]]"
                 ]
             }
         },
         "nipoppy_old": {
             "paths_to_tar": [
-                "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]/fmriprep/sub-[[NIPOPPY_PARTICIPANT]]/ses-[[NIPOPPY_SESSION]]",
-                "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_SESSION]]/sub-[[NIPOPPY_PARTICIPANT]]"
+                "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]/fmriprep/sub-[[NIPOPPY_PARTICIPANT_ID]]/ses-[[NIPOPPY_BIDS_SESSION]]",
+                "[[NIPOPPY_DPATH_DERIVATIVES]]/freesurfer/6.0.1/output/[[NIPOPPY_BIDS_SESSION]]/sub-[[NIPOPPY_PARTICIPANT_ID]]"
             ]
         }
     }

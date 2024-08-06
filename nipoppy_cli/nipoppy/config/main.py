@@ -9,25 +9,29 @@ from pydantic import ConfigDict, Field, model_validator
 from typing_extensions import Self
 
 from nipoppy.config.container import SchemaWithContainerConfig
-from nipoppy.config.pipeline import PipelineConfig
+from nipoppy.config.pipeline import (
+    BasePipelineConfig,
+    BidsPipelineConfig,
+    ProcPipelineConfig,
+)
+from nipoppy.config.pipeline_step import BidsPipelineStepConfig, ProcPipelineStepConfig
+from nipoppy.env import BIDS_SESSION_PREFIX, StrOrPathLike
 from nipoppy.layout import DEFAULT_LAYOUT_INFO
 from nipoppy.tabular.dicom_dir_map import DicomDirMap
-from nipoppy.utils import (
-    BIDS_SESSION_PREFIX,
-    StrOrPathLike,
-    apply_substitutions_to_json,
-    check_session,
-    check_session_strict,
-    load_json,
-)
+from nipoppy.utils import apply_substitutions_to_json, load_json
 
 
 class Config(SchemaWithContainerConfig):
     """Schema for dataset configuration."""
 
     DATASET_NAME: str = Field(description="Name of the dataset")
-    VISITS: list[str] = Field(description="List of visits available in the study")
-    SESSIONS: Optional[list[str]] = Field(
+    VISIT_IDS: list[str] = Field(
+        description=(
+            "List of visits available in the study. A visit ID is an identifier "
+            "for a data collection event, not restricted to imaging data."
+        )
+    )
+    SESSION_IDS: Optional[list[str]] = Field(
         default=None,  # will be a list after validation
         description=(
             "List of BIDS-compliant sessions available in the study"
@@ -42,7 +46,7 @@ class Config(SchemaWithContainerConfig):
             ", to be used in the DICOM reorg step. Note: this field and "
             "DICOM_DIR_PARTICIPANT_FIRST cannot both be specified"
             f'. The CSV should have three columns: "{DicomDirMap.col_participant_id}"'
-            f' , "{DicomDirMap.col_session}"'
+            f' , "{DicomDirMap.col_session_id}"'
             f', and "{DicomDirMap.col_participant_dicom_dir}"'
         ),
     )
@@ -50,7 +54,7 @@ class Config(SchemaWithContainerConfig):
         default=None,
         description=(
             "Whether subdirectories under the raw dicom directory (default: "
-            f"{DEFAULT_LAYOUT_INFO.dpath_raw_dicom}) follow the pattern "
+            f"{DEFAULT_LAYOUT_INFO.dpath_raw_imaging}) follow the pattern "
             "<PARTICIPANT>/<SESSION> (default) or <SESSION>/<PARTICIPANT>. Note: "
             "this field and and DICOM_DIR_MAP_FILE cannot both be specified"
         ),
@@ -63,10 +67,10 @@ class Config(SchemaWithContainerConfig):
             "is loaded from a file with :func:`nipoppy.config.main.Config.load`"
         ),
     )
-    BIDS_PIPELINES: list[PipelineConfig] = Field(
+    BIDS_PIPELINES: list[BidsPipelineConfig] = Field(
         default=[], description="Configurations for BIDS conversion, if applicable"
     )
-    PROC_PIPELINES: list[PipelineConfig] = Field(
+    PROC_PIPELINES: list[ProcPipelineConfig] = Field(
         description="Configurations for processing pipelines"
     )
     CUSTOM: dict = Field(
@@ -75,12 +79,6 @@ class Config(SchemaWithContainerConfig):
     )
 
     model_config = ConfigDict(extra="forbid")
-
-    def _check_sessions_have_prefix(self) -> Self:
-        """Check that sessions have the BIDS prefix."""
-        for session in self.SESSIONS:
-            check_session_strict(session)
-        return self
 
     def _check_dicom_dir_options(self) -> Self:
         """Check that only one DICOM directory mapping option is given."""
@@ -114,7 +112,7 @@ class Config(SchemaWithContainerConfig):
     def propagate_container_config(self) -> Self:
         """Propagate the container config to all pipelines."""
 
-        def _propagate(pipeline_configs: list[PipelineConfig]):
+        def _propagate(pipeline_configs: list[BasePipelineConfig]):
             for pipeline_config in pipeline_configs:
                 pipeline_container_config = pipeline_config.get_container_config()
                 if pipeline_container_config.INHERIT:
@@ -136,24 +134,44 @@ class Config(SchemaWithContainerConfig):
     @model_validator(mode="before")
     @classmethod
     def check_input(cls, data: Any):
-        """Validate the raw input."""
-        key_sessions = "SESSIONS"
-        key_visits = "VISITS"
-        if isinstance(data, dict):
-            # if sessions are not given, infer from visits
-            if key_sessions not in data:
-                data[key_sessions] = [
-                    check_session(visit) for visit in data[key_visits]
-                ]
+        """
+        Validate the raw input.
 
+        Specifically:
+        - If session_ids is not given, set to be the same as visit_ids
+        """
+        key_session_ids = "SESSION_IDS"
+        key_visit_ids = "VISIT_IDS"
+        if isinstance(data, dict):
+            if key_session_ids not in data:
+                data[key_session_ids] = data[key_visit_ids]
         return data
 
     @model_validator(mode="after")
     def validate_and_process(self) -> Self:
         """Validate and process the configuration."""
-        self._check_sessions_have_prefix()
         self._check_dicom_dir_options()
         self._check_no_duplicate_pipeline()
+
+        # make sure BIDS/processing pipelines are the right type
+        for pipeline_configs, step_class in [
+            (self.BIDS_PIPELINES, BidsPipelineStepConfig),
+            (self.PROC_PIPELINES, ProcPipelineStepConfig),
+        ]:
+            for pipeline_config in pipeline_configs:
+                # type annotation to make IDE smarter
+                pipeline_config: BasePipelineConfig
+                steps = pipeline_config.STEPS
+                for i_step in range(len(steps)):
+                    # extract fields used to create (possibly incorrect) step object
+                    # and use them to create a new (correct) step object
+                    # (this is needed because BidsPipelineStepConfig and
+                    # ProcPipelineStepConfig share some fields, and the fields
+                    # that are different are optional, so the default Pydantic
+                    # parsing can create the wrong type of step object)
+                    steps[i_step] = step_class(
+                        **steps[i_step].model_dump(exclude_unset=True)
+                    )
         return self
 
     def get_pipeline_version(self, pipeline_name: str) -> str:
@@ -182,7 +200,7 @@ class Config(SchemaWithContainerConfig):
         self,
         pipeline_name: str,
         pipeline_version: str,
-    ) -> PipelineConfig:
+    ) -> ProcPipelineConfig:
         """Get the config for a BIDS or processing pipeline."""
         # pooling them together since there should not be any duplicates
         for pipeline_config in self.PROC_PIPELINES + self.BIDS_PIPELINES:
@@ -203,7 +221,7 @@ class Config(SchemaWithContainerConfig):
 
         Parameters
         ----------
-        fpath : nipoppy.utils.StrOrPathLike
+        fpath : nipoppy.env.StrOrPathLike
             Path to the JSON file to write
         """
         fpath: Path = Path(fpath)

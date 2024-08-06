@@ -4,7 +4,7 @@ title: "nipoppy"
 
 version: 0.1.0
 
-abstract: A workflow manager for curating MRI and tabular data and standardized processing. 
+abstract: A workflow manager for curating MRI and tabular data and standardized processing.
 
 message: "If you use this software, please cite it as below."
 
@@ -27,21 +27,21 @@ authors:
   - affiliation: "ORIGAMI lab, McGill University, Montréal, Canada"
     family-names: Wang
     given-names: Michelle
-    orcid: "https://orcid.org/0000-0002-3432-6899"    
+    orcid: "https://orcid.org/0000-0002-3432-6899"
 
   - affiliation: "ORIGAMI lab, McGill University, Montréal, Canada"
     family-names: McPherson
-    given-names: Brent 
-    orcid: "https://orcid.org/0000-0001-8378-8136"    
+    given-names: Brent
+    orcid: "https://orcid.org/0000-0001-8378-8136"
 
   - affiliation: "ORIGAMI lab, McGill University, Montréal, Canada"
     family-names: Gonzalez Pepe
-    given-names: Ines 
-    orcid: "https://orcid.org/0009-0002-4017-6599"      
+    given-names: Ines
+    orcid: "https://orcid.org/0009-0002-4017-6599"
 
   - affiliation: "ORIGAMI lab, McGill University, Montréal, Canada"
     family-names: Poline
     given-names: Jean-Baptiste
-    orcid: "https://orcid.org/0000-0002-9794-749X"    
+    orcid: "https://orcid.org/0000-0002-9794-749X"
 
 license: MIT

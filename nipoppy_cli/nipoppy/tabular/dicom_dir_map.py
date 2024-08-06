@@ -11,11 +11,7 @@ from typing_extensions import Self
 from nipoppy.layout import DEFAULT_LAYOUT_INFO
 from nipoppy.tabular.base import BaseTabular, BaseTabularModel
 from nipoppy.tabular.manifest import Manifest
-from nipoppy.utils import (
-    BIDS_SESSION_PREFIX,
-    BIDS_SUBJECT_PREFIX,
-    FIELD_DESCRIPTION_MAP,
-)
+from nipoppy.utils import FIELD_DESCRIPTION_MAP, check_participant_id, check_session_id
 
 
 class DicomDirMapModel(BaseTabularModel):
@@ -29,28 +25,20 @@ class DicomDirMapModel(BaseTabularModel):
     participant_id: str = Field(
         title="Participant ID", description=FIELD_DESCRIPTION_MAP["participant_id"]
     )
-    session: str = Field(description=FIELD_DESCRIPTION_MAP["session"])
+    session_id: str = Field(description=FIELD_DESCRIPTION_MAP["session_id"])
     participant_dicom_dir: str = Field(
         title="Participant's raw DICOM directory",
         description=(
             "Path to the participant's raw DICOM directory, relative to the dataset's"
-            f"raw DICOM directory (default: {DEFAULT_LAYOUT_INFO.dpath_raw_dicom})"
+            f" raw DICOM directory ({DEFAULT_LAYOUT_INFO.dpath_raw_imaging})"
         ),
     )
 
     @model_validator(mode="after")
     def validate_after(self) -> Self:
         """Validate participant_id and session fields."""
-        if self.participant_id.startswith(BIDS_SUBJECT_PREFIX):
-            raise ValueError(
-                f'Participant ID should not start with "{BIDS_SUBJECT_PREFIX}"'
-                f", got {self.participant_id}"
-            )
-        if not self.session.startswith(BIDS_SESSION_PREFIX):
-            raise ValueError(
-                f'Session should start with "{BIDS_SESSION_PREFIX}"'
-                f", got {self.session}"
-            )
+        check_participant_id(self.participant_id, raise_error=True)
+        check_session_id(self.session_id, raise_error=True)
         return self
 
 
@@ -63,17 +51,17 @@ class DicomDirMap(BaseTabular):
 
     # column names
     col_participant_id = "participant_id"
-    col_session = "session"
+    col_session_id = "session_id"
     col_participant_dicom_dir = "participant_dicom_dir"
 
-    index_cols = [col_participant_id, col_session]
+    index_cols = [col_participant_id, col_session_id]
 
     # set the model
     model = DicomDirMapModel
 
     _metadata = BaseTabular._metadata + [
         "col_participant_id",
-        "col_session",
+        "col_session_id",
         "col_participant_dicom_dir",
         "index_cols",
         "model",
@@ -116,15 +104,15 @@ class DicomDirMap(BaseTabular):
         # else depends on participant_first or no
         else:
             data_dicom_dir_map = []
-            for participant, session in manifest.get_participants_sessions():
+            for participant_id, session_id in manifest.get_participants_sessions():
                 if participant_first is not False:
-                    participant_dicom_dir = f"{participant}/{session}"
+                    participant_dicom_dir = f"{participant_id}/{session_id}"
                 else:
-                    participant_dicom_dir = f"{session}/{participant}"
+                    participant_dicom_dir = f"{session_id}/{participant_id}"
                 data_dicom_dir_map.append(
                     {
-                        cls.col_participant_id: participant,
-                        cls.col_session: session,
+                        cls.col_participant_id: participant_id,
+                        cls.col_session_id: session_id,
                         cls.col_participant_dicom_dir: participant_dicom_dir,
                     }
                 )
@@ -133,14 +121,14 @@ class DicomDirMap(BaseTabular):
                 dicom_dir_map.validate()
             return dicom_dir_map
 
-    def get_dicom_dir(self, participant: str, session: str) -> str:
+    def get_dicom_dir(self, participant_id: str, session_id: str) -> str:
         """Return the participant's raw DICOM directory for a given session.
 
         Parameters
         ----------
-        participant : str
+        participant_id : str
             Participant ID, without the BIDS prefix
-        session : str
+        session_id : str
             Session, with the BIDS prefix
         """
-        return self.set_index(self.index_cols).loc[participant, session].item()
+        return self.set_index(self.index_cols).loc[participant_id, session_id].item()

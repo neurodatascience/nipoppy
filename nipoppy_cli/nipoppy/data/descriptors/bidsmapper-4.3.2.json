@@ -1,0 +1,123 @@
+{
+    "name": "bidsmapper",
+    "description": "bidsmapper (part of BIDScoin) to create/edit a YAML configuration file (bidsmap). See https://bidscoin.readthedocs.io/en/latest/workflow.html#step-1a-running-the-bidsmapper",
+    "tool-version": "4.3.2+qt5",
+    "schema-version": "0.5",
+    "command-line": "bidsmapper [SOURCEFOLDER] [BIDSFOLDER] [BIDSMAP] [TEMPLATE] [PLUGINS] [SUBPREFIX] [SESPREFIX] [UNZIP] [STORE] [AUTOMATED] [FORCE] [NO_UPDATE]",
+    "inputs": [
+        {
+            "name": "sourcefolder",
+            "id": "sourcefolder",
+            "description": "The study root folder containing the raw source data folders",
+            "type": "String",
+            "optional": false,
+            "value-key": "[SOURCEFOLDER]"
+        },
+        {
+            "name": "bidsfolder",
+            "id": "bidsfolder",
+            "description": "The destination folder with the (future) bids data and the bidsfolder/code/bidscoin/bidsmap.yaml output file",
+            "type": "String",
+            "optional": false,
+            "value-key": "[BIDSFOLDER]"
+        },
+        {
+            "name": "bidsmap",
+            "id": "bidsmap",
+            "description": "The study bidsmap file with the mapping heuristics. If the bidsmap filename is just the basename (i.e. no '/' in the name) then it is assumed to be located in the current directory or in bidsfolder/code/bidscoin. Default: bidsmap.yaml",
+            "type": "String",
+            "optional": true,
+            "default-value": "bidsmap.yaml",
+            "command-line-flag": "-b",
+            "value-key": "[BIDSMAP]"
+        },
+        {
+            "name": "template",
+            "id": "template",
+            "description": "The bidsmap template file with the default heuristics (this could be provided by your institute). If the bidsmap filename is just the basename (i.e. no '/' in the name) then it is assumed to be located in the bidscoin config folder. Default: bidsmap_dccn",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-t",
+            "value-key": "[TEMPLATE]"
+        },
+        {
+            "name": "plugins",
+            "id": "plugins",
+            "description": "List of plugins to be used. Default: the plugin list of the study/template bidsmap)",
+            "type": "String",
+            "list": true,
+            "optional": true,
+            "command-line-flag": "-p",
+            "value-key": "[PLUGINS]"
+        },
+        {
+            "name": "subprefix",
+            "id": "subprefix",
+            "description": "The prefix common for all the source subject-folders (e.g. 'Pt' is the subprefix if subject folders are named 'Pt018', 'Pt019', ...). Use '*' when your subject folders do not have a prefix. Default: the value of the study/template bidsmap, e.g. 'sub-'",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-n",
+            "value-key": "[SUBPREFIX]"
+        },
+        {
+            "name": "sesprefix",
+            "id": "sesprefix",
+            "description": "The prefix common for all the source session-folders (e.g. 'M_' is the subprefix if session folders are named 'M_pre', 'M_post', ..). Use '*' when your session folders do not have a prefix. Default: the value of the study/template bidsmap, e.g. 'ses-'",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-m",
+            "value-key": "[SESPREFIX]"
+        },
+        {
+            "name": "unzip",
+            "id": "unzip",
+            "description": "Wildcard pattern to unpack tarball/zip-files in the sub/ses sourcefolder that need to be unzipped (in a tempdir) to make the data readable. Default: the value of the study/template bidsmap",
+            "type": "String",
+            "optional": true,
+            "command-line-flag": "-u",
+            "value-key": "[UNZIP]"
+        },
+        {
+            "name": "store",
+            "id": "store",
+            "description": "Store provenance data samples in the bidsfolder/code/provenance folder (useful for inspecting e.g. zipped or transferred datasets)",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "-s",
+            "value-key": "[STORE]"
+        },
+        {
+            "name": "automated",
+            "id": "automated",
+            "description": "Save the automatically generated bidsmap to disk and without interactively tweaking it with the bidseditor",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "-a",
+            "value-key": "[AUTOMATED]"
+        },
+        {
+            "name": "force",
+            "id": "force",
+            "description": "Discard the previously saved bidsmap and logfile",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "-f",
+            "value-key": "[FORCE]"
+        },
+        {
+            "name": "no_update",
+            "id": "no_update",
+            "description": "Do not update any sub/sesprefixes in or prepend the sourcefolder name to the <<filepath:regex>> expression that extracts the subject/session labels. This is normally done to make the extraction more robust, but could cause problems for certain use cases",
+            "type": "Flag",
+            "optional": true,
+            "command-line-flag": "--no-update",
+            "value-key": "[NO_UPDATE]"
+        }
+    ],
+    "tags": {},
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    }
+}

@@ -55,7 +55,7 @@
         "path": "scratch",
         "description": "This directory is for scratch data."
     },
-    "dpath_raw_dicom": {
+    "dpath_raw_imaging": {
         "path": "scratch/raw_dicom",
         "description": "This directory is for raw, unorganized DICOM dumps."
     },

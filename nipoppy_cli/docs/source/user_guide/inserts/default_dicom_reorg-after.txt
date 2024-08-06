@@ -1,0 +1,16 @@
+└── sourcedata
+    └── sub-01
+        ├── ses-1
+        │   ├── 100.dcm  # flat list of DICOM files
+        │   ├── 101.dcm
+        │   ├── 102.dcm
+        │   ├── 200.dcm
+        │   ├── 201.dcm
+        │   └── 202.dcm
+        └── ses-2
+            ├── 100.dcm
+            ├── 101.dcm
+            ├── 102.dcm
+            ├── 200.dcm
+            ├── 201.dcm
+            └── 202.dcm

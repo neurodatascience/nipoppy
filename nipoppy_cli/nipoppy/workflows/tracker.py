@@ -6,8 +6,9 @@ from typing import List, Optional
 from pydantic import TypeAdapter
 
 from nipoppy.config.tracker import TrackerConfig, check_tracker_configs
+from nipoppy.env import StrOrPathLike
 from nipoppy.tabular.bagel import Bagel
-from nipoppy.utils import StrOrPathLike, load_json
+from nipoppy.utils import load_json
 from nipoppy.workflows.pipeline import BasePipelineWorkflow
 
 
@@ -19,8 +20,8 @@ class PipelineTracker(BasePipelineWorkflow):
         dpath_root: StrOrPathLike,
         pipeline_name: str,
         pipeline_version: Optional[str] = None,
-        participant: str = None,
-        session: str = None,
+        participant_id: str = None,
+        session_id: str = None,
         fpath_layout: Optional[StrOrPathLike] = None,
         logger: Optional[logging.Logger] = None,
         dry_run: bool = False,
@@ -30,8 +31,8 @@ class PipelineTracker(BasePipelineWorkflow):
             name="track",
             pipeline_name=pipeline_name,
             pipeline_version=pipeline_version,
-            participant=participant,
-            session=session,
+            participant_id=participant_id,
+            session_id=session_id,
             fpath_layout=fpath_layout,
             logger=logger,
             dry_run=dry_run,
@@ -58,7 +59,6 @@ class PipelineTracker(BasePipelineWorkflow):
                 f"Checking path {self.dpath_pipeline_output / relative_path}"
             )
 
-            # TODO handle potentially zipped archives
             matches = list(self.dpath_pipeline_output.glob(str(relative_path)))
             self.logger.debug(f"Matches: {matches}")
             if not matches:
@@ -66,7 +66,15 @@ class PipelineTracker(BasePipelineWorkflow):
 
         return Bagel.status_success
 
-    def run_single(self, participant: str, session: str):
+    def get_participants_sessions_to_run(
+        self, participant_id: Optional[str], session_id: Optional[str]
+    ):
+        """Get participant-session pairs with BIDS data to run the tracker on."""
+        return self.doughnut.get_bidsified_participants_sessions(
+            participant_id=participant_id, session_id=session_id
+        )
+
+    def run_single(self, participant_id: str, session_id: str):
         """Run tracker on a single participant/session."""
         # load tracker configs from file
         fpath_tracker_config = self.pipeline_config.TRACKER_CONFIG_FILE
@@ -78,8 +86,8 @@ class PipelineTracker(BasePipelineWorkflow):
         # replace template strings
         tracker_configs = self.process_template_json(
             load_json(fpath_tracker_config),
-            participant=participant,
-            session=session,
+            participant_id=participant_id,
+            session_id=session_id,
         )
         # convert to list of TrackerConfig objects and validate
         tracker_configs = TypeAdapter(List[TrackerConfig]).validate_python(
@@ -99,8 +107,8 @@ class PipelineTracker(BasePipelineWorkflow):
         status = self.check_status(tracker_config.PATHS)
         self.bagel = self.bagel.add_or_update_records(
             {
-                Bagel.col_participant_id: participant,
-                Bagel.col_session: session,
+                Bagel.col_participant_id: participant_id,
+                Bagel.col_session_id: session_id,
                 Bagel.col_pipeline_name: self.pipeline_name,
                 Bagel.col_pipeline_version: self.pipeline_version,
                 Bagel.col_pipeline_complete: status,

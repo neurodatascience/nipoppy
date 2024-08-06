@@ -152,7 +152,7 @@ def test_manifest(workflow: BaseWorkflow):
     workflow.layout.fpath_manifest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(FPATH_SAMPLE_MANIFEST, workflow.layout.fpath_manifest)
     config = get_config(
-        visits=["BL", "M12"],
+        visit_ids=["BL", "M12"],
     )
     workflow.layout.fpath_config.parent.mkdir(parents=True, exist_ok=True)
     config.save(workflow.layout.fpath_config)

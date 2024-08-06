@@ -10,9 +10,9 @@ import pytest
 from fids import fids
 
 from nipoppy.config.boutiques import BoutiquesConfig
-from nipoppy.config.pipeline import PipelineConfig
-from nipoppy.config.pipeline_step import PipelineStepConfig
-from nipoppy.utils import StrOrPathLike, strip_session
+from nipoppy.config.pipeline import ProcPipelineConfig
+from nipoppy.config.pipeline_step import ProcPipelineStepConfig
+from nipoppy.env import StrOrPathLike
 from nipoppy.workflows.pipeline import BasePipelineWorkflow
 
 from .conftest import datetime_fixture  # noqa F401
@@ -26,8 +26,8 @@ class PipelineWorkflow(BasePipelineWorkflow):
         pipeline_name: str,
         pipeline_version: Optional[str] = None,
         pipeline_step: Optional[str] = None,
-        participant: str = None,
-        session: str = None,
+        participant_id: str = None,
+        session_id: str = None,
         fpath_layout: Optional[StrOrPathLike] = None,
         logger: Optional[logging.Logger] = None,
         dry_run: bool = False,
@@ -40,18 +40,26 @@ class PipelineWorkflow(BasePipelineWorkflow):
             pipeline_name=pipeline_name,
             pipeline_version=pipeline_version,
             pipeline_step=pipeline_step,
-            participant=participant,
-            session=session,
+            participant_id=participant_id,
+            session_id=session_id,
             fpath_layout=fpath_layout,
             logger=logger,
             dry_run=dry_run,
         )
 
-    def run_single(self, subject: str, session: str):
-        """Run on a single subject/session."""
+    def get_participants_sessions_to_run(
+        self, participant_id: Optional[str], session_id: Optional[str]
+    ):
+        """Only run on participant_id/sessions with BIDS data."""
+        return self.doughnut.get_bidsified_participants_sessions(
+            participant_id=participant_id, session_id=session_id
+        )
+
+    def run_single(self, participant: str, session_id: str):
+        """Run on a single participant_id/session_id."""
         self._n_runs += 1
-        self.logger.info(f"Running on {subject}/{session}")
-        if subject == "FAIL":
+        self.logger.info(f"Running on participant {participant}, session {session_id}")
+        if participant == "FAIL":
             self._n_errors += 1
             raise RuntimeError("FAIL")
 
@@ -65,7 +73,7 @@ def workflow(tmp_path: Path):
     )
     # write config
     config = get_config(
-        visits=["1"],
+        visit_ids=["1"],
         bids_pipelines=[
             # built-in pipelines
             {
@@ -101,12 +109,6 @@ def workflow(tmp_path: Path):
     return workflow
 
 
-def _make_dummy_json(fpath: StrOrPathLike):
-    fpath: Path = Path(fpath)
-    fpath.parent.mkdir(parents=True, exist_ok=True)
-    fpath.write_text("{}\n")
-
-
 @pytest.mark.parametrize(
     "args",
     [
@@ -128,12 +130,33 @@ def test_init(args):
     assert hasattr(workflow, "pipeline_name")
     assert hasattr(workflow, "pipeline_version")
     assert hasattr(workflow, "pipeline_step")
-    assert hasattr(workflow, "participant")
-    assert hasattr(workflow, "session")
+    assert hasattr(workflow, "participant_id")
+    assert hasattr(workflow, "session_id")
     assert isinstance(workflow.dpath_pipeline, Path)
     assert isinstance(workflow.dpath_pipeline_output, Path)
     assert isinstance(workflow.dpath_pipeline_work, Path)
     assert isinstance(workflow.dpath_pipeline_bids_db, Path)
+
+
+@pytest.mark.parametrize(
+    "participant_id,session_id,participant_expected,session_expected",
+    [
+        ("01", "BL", "01", "BL"),
+        ("sub-01", "ses-BL", "01", "BL"),
+    ],
+)
+def test_init_participant_session(
+    participant_id, session_id, participant_expected, session_expected
+):
+    workflow = PipelineWorkflow(
+        dpath_root="my_dataset",
+        pipeline_name="my_pipeline",
+        pipeline_version="1.0",
+        participant_id=participant_id,
+        session_id=session_id,
+    )
+    assert workflow.participant_id == participant_expected
+    assert workflow.session_id == session_expected
 
 
 def test_pipeline_version_optional():
@@ -145,7 +168,7 @@ def test_pipeline_version_optional():
 
 
 def test_pipeline_config(workflow: PipelineWorkflow):
-    assert isinstance(workflow.pipeline_config, PipelineConfig)
+    assert isinstance(workflow.pipeline_config, ProcPipelineConfig)
 
 
 def test_fpath_container(workflow: PipelineWorkflow):
@@ -220,10 +243,10 @@ def test_descriptor_substitutions(
 
     # set descriptor file and write descriptor content
     fpath_descriptor = tmp_path / "custom_pipeline.json"
-    workflow.pipeline_config = PipelineConfig(
+    workflow.pipeline_config = ProcPipelineConfig(
         NAME=workflow.pipeline_name,
         VERSION=workflow.pipeline_version,
-        STEPS=[PipelineStepConfig(DESCRIPTOR_FILE=fpath_descriptor)],
+        STEPS=[ProcPipelineStepConfig(DESCRIPTOR_FILE=fpath_descriptor)],
     )
 
     fpath_descriptor.write_text(json.dumps({"key1": "[[TO_REPLACE1]]"}))
@@ -275,10 +298,10 @@ def test_invocation_substitutions(
 
     # set invocation file and write invocation content
     fpath_invocation = tmp_path / "invocation.json"
-    workflow.pipeline_config = PipelineConfig(
+    workflow.pipeline_config = ProcPipelineConfig(
         NAME=workflow.pipeline_name,
         VERSION=workflow.pipeline_version,
-        STEPS=[PipelineStepConfig(INVOCATION_FILE=fpath_invocation)],
+        STEPS=[ProcPipelineStepConfig(INVOCATION_FILE=fpath_invocation)],
     )
     fpath_invocation.write_text(json.dumps({"key1": "[[TO_REPLACE1]]"}))
 
@@ -340,13 +363,13 @@ def test_process_template_json(return_str, tmp_path: Path):
 
     processed = workflow.process_template_json(
         {
-            "[[NIPOPPY_BIDS_ID]]": "[[NIPOPPY_PARTICIPANT]]",
-            "[[NIPOPPY_SESSION]]": "[[NIPOPPY_SESSION_SHORT]]",
+            "[[NIPOPPY_BIDS_PARTICIPANT]]": "[[NIPOPPY_PARTICIPANT_ID]]",
+            "[[NIPOPPY_BIDS_SESSION]]": "[[NIPOPPY_SESSION_ID]]",
             "[[NIPOPPY_DPATH_PIPELINE]]": "[[NIPOPPY_DPATH_BIDS]]",
             "[[NIPOPPY_EXTRA1]]": "[[NIPOPPY_EXTRA2]]",
         },
-        participant="01",
-        session="ses-1",
+        participant_id="01",
+        session_id="1",
         extra1="extra_kwarg",
         objs=[Test()],
         return_str=return_str,
@@ -360,10 +383,10 @@ def test_process_template_json(return_str, tmp_path: Path):
 
     # check that everything was replaced
     for pattern in [
-        "[[NIPOPPY_BIDS_ID]]",
-        "[[NIPOPPY_PARTICIPANT]]",
-        "[[NIPOPPY_SESSION]]",
-        "[[NIPOPPY_SESSION_SHORT]]",
+        "[[NIPOPPY_BIDS_PARTICIPANT]]",
+        "[[NIPOPPY_PARTICIPANT_ID]]",
+        "[[NIPOPPY_BIDS_SESSION]]",
+        "[[NIPOPPY_SESSION_ID]]",
         "[[NIPOPPY_DPATH_PIPELINE]]",
         "[[NIPOPPY_DPATH_BIDS]]",
         "[[NIPOPPY_EXTRA1]]",
@@ -372,19 +395,21 @@ def test_process_template_json(return_str, tmp_path: Path):
         assert pattern not in processed
 
 
-@pytest.mark.parametrize("participant,session", [("123", None), (None, "ses-1")])
-def test_process_template_json_error(participant, session, tmp_path: Path):
+@pytest.mark.parametrize("participant_id,session_id", [("123", None), (None, "1")])
+def test_process_template_json_error(participant_id, session_id, tmp_path: Path):
     workflow = PipelineWorkflow(
         dpath_root=tmp_path / "my_dataset",
         pipeline_name="my_pipeline",
         pipeline_version="1.0",
     )
 
-    with pytest.raises(ValueError, match="participant and session must be strings"):
+    with pytest.raises(
+        ValueError, match="participant_id and session_id must be strings"
+    ):
         workflow.process_template_json(
             {},
-            participant=participant,
-            session=session,
+            participant_id=participant_id,
+            session_id=session_id,
         )
 
 
@@ -432,20 +457,24 @@ def test_boutiques_config_invalid(tmp_path: Path):
 
 
 @pytest.mark.parametrize(
-    "participant,session,expected_count",
+    "participant_id,session_id,expected_count",
     [
         (None, None, 12),
         ("01", None, 6),
         ("02", None, 6),
-        (None, "ses-1", 5),
-        (None, "ses-2", 5),
-        (None, "ses-3", 2),
-        ("01", "ses-3", 2),
-        ("02", "ses-3", 0),
+        (None, "1", 5),
+        (None, "2", 5),
+        (None, "3", 2),
+        ("01", "3", 2),
+        ("02", "3", 0),
     ],
 )
 def test_set_up_bids_db(
-    workflow: PipelineWorkflow, participant, session, expected_count, tmp_path: Path
+    workflow: PipelineWorkflow,
+    participant_id,
+    session_id,
+    expected_count,
+    tmp_path: Path,
 ):
     dpath_bids_db = tmp_path / "bids_db"
     fids.create_fake_bids_dataset(
@@ -462,11 +491,31 @@ def test_set_up_bids_db(
     )
     bids_layout = workflow.set_up_bids_db(
         dpath_bids_db=dpath_bids_db,
-        participant=participant,
-        session=strip_session(session),
+        participant_id=participant_id,
+        session_id=session_id,
     )
     assert dpath_bids_db.exists()
     assert len(bids_layout.get(extension=".nii.gz")) == expected_count
+
+
+def test_set_up_bids_db_ignore_patterns(workflow: PipelineWorkflow, tmp_path: Path):
+    dpath_bids_db = tmp_path / "bids_db"
+    participant_id = "01"
+    session_id = "1"
+
+    fids.create_fake_bids_dataset(
+        output_dir=workflow.layout.dpath_bids,
+    )
+
+    pybids_ignore_patterns = workflow.pybids_ignore_patterns[:]
+
+    workflow.set_up_bids_db(
+        dpath_bids_db=dpath_bids_db,
+        participant_id=participant_id,
+        session_id=session_id,
+    )
+
+    assert pybids_ignore_patterns == workflow.pybids_ignore_patterns
 
 
 @pytest.mark.parametrize(
@@ -504,19 +553,19 @@ def test_run_setup_create_directories(dry_run: bool, tmp_path: Path):
 
 
 @pytest.mark.parametrize(
-    "participant,session,expected_count",
-    [(None, None, 4), ("01", None, 3), ("01", "ses-2", 1)],
+    "participant_id,session_id,expected_count",
+    [(None, None, 4), ("01", None, 3), ("01", "2", 1)],
 )
 def test_run_main(
     workflow: PipelineWorkflow,
-    participant,
-    session,
+    participant_id,
+    session_id,
     expected_count,
 ):
-    workflow.participant = participant
-    workflow.session = session
+    workflow.participant_id = participant_id
+    workflow.session_id = session_id
 
-    participants_and_sessions = {"01": ["ses-1", "ses-2", "ses-3"], "02": ["ses-1"]}
+    participants_and_sessions = {"01": ["1", "2", "3"], "02": ["1"]}
     manifest = prepare_dataset(
         participants_and_sessions_manifest=participants_and_sessions,
         participants_and_sessions_bidsified=participants_and_sessions,
@@ -528,10 +577,10 @@ def test_run_main(
 
 
 def test_run_main_catch_errors(workflow: PipelineWorkflow):
-    workflow.participant = "FAIL"
-    workflow.session = "ses-1"
+    workflow.participant_id = "FAIL"
+    workflow.session_id = "1"
 
-    participants_and_sessions = {workflow.participant: [workflow.session]}
+    participants_and_sessions = {workflow.participant_id: [workflow.session_id]}
     manifest = prepare_dataset(
         participants_and_sessions_manifest=participants_and_sessions,
         participants_and_sessions_bidsified=participants_and_sessions,
@@ -544,35 +593,7 @@ def test_run_main_catch_errors(workflow: PipelineWorkflow):
 
 
 @pytest.mark.parametrize(
-    "participant,session,expected_count",
-    [(None, None, 4), ("01", None, 3), ("02", None, 1), ("01", "ses-2", 1)],
-)
-def test_get_participants_sessions_to_run(
-    participant, session, expected_count, workflow: PipelineWorkflow
-):
-    workflow.participant = participant
-    workflow.session = session
-
-    participants_and_sessions_manifest = {
-        "01": ["ses-1", "ses-2", "ses-3"],
-        "02": ["ses-1", "ses-2", "ses-3"],
-    }
-    participants_and_sessions_bidsified = {
-        "01": ["ses-1", "ses-2", "ses-3"],
-        "02": ["ses-1"],
-    }
-    manifest = prepare_dataset(
-        participants_and_sessions_manifest=participants_and_sessions_manifest,
-        participants_and_sessions_bidsified=participants_and_sessions_bidsified,
-        dpath_bidsified=workflow.layout.dpath_bids,
-    )
-    manifest.save_with_backup(workflow.layout.fpath_manifest)
-    workflow.run_main()
-    assert workflow._n_runs == expected_count
-
-
-@pytest.mark.parametrize(
-    "pipeline_name,pipeline_version,participant,session,expected_stem",
+    "pipeline_name,pipeline_version,participant_id,session_id,expected_stem",
     [
         (
             "my_pipeline",
@@ -588,22 +609,22 @@ def test_get_participants_sessions_to_run(
             None,
             "test/my_pipeline-1.0/my_pipeline-1.0-sub1",
         ),
-        ("fmriprep", None, None, "ses-1", "test/fmriprep-23.1.3/fmriprep-23.1.3-1"),
+        ("fmriprep", None, None, "1", "test/fmriprep-23.1.3/fmriprep-23.1.3-1"),
     ],
 )
 def test_generate_fpath_log(
     pipeline_name,
     pipeline_version,
-    participant,
-    session,
+    participant_id,
+    session_id,
     expected_stem,
     workflow: PipelineWorkflow,
     datetime_fixture,  # noqa F811
 ):
     workflow.pipeline_name = pipeline_name
     workflow.pipeline_version = pipeline_version
-    workflow.participant = participant
-    workflow.session = session
+    workflow.participant_id = participant_id
+    workflow.session_id = session_id
     fpath_log = workflow.generate_fpath_log()
     assert (
         fpath_log == workflow.layout.dpath_logs / f"{expected_stem}-20240404_1234.log"

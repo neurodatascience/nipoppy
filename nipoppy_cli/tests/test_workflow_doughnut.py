@@ -29,22 +29,22 @@ from .conftest import (
     ),
     [
         (
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL", "ses-M12"]},
+            {"01": ["BL", "M12"], "02": ["BL", "M12"]},
             {
-                "01": ["ses-BL", "ses-M12"],
-                "02": ["ses-BL", "ses-M12"],
-                "03": ["ses-BL", "ses-M12"],
+                "01": ["BL", "M12"],
+                "02": ["BL", "M12"],
+                "03": ["BL", "M12"],
             },
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL"]},
-            {"01": ["ses-BL"], "02": ["ses-BL"], "03": ["ses-BL"]},
-            {"01": ["ses-BL", "ses-M12"], "03": ["ses-M12"]},
+            {"01": ["BL", "M12"], "02": ["BL"]},
+            {"01": ["BL"], "02": ["BL"], "03": ["BL"]},
+            {"01": ["BL", "M12"], "03": ["M12"]},
         ),
         (
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL"]},
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL"]},
+            {"PD01": ["BL"], "PD02": ["BL"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL"]},
         ),
     ],
 )
@@ -60,7 +60,7 @@ def test_run(
 ):
     dpath_root = tmp_path / "my_dataset"
 
-    dpath_downloaded = dpath_root / ATTR_TO_DPATH_MAP["dpath_raw_dicom"]
+    dpath_downloaded = dpath_root / ATTR_TO_DPATH_MAP["dpath_raw_imaging"]
     dpath_organized = dpath_root / ATTR_TO_DPATH_MAP["dpath_sourcedata"]
     dpath_bidsified = dpath_root / ATTR_TO_DPATH_MAP["dpath_bids"]
     fpath_manifest = dpath_root / ATTR_TO_FPATH_MAP["fpath_manifest"]
@@ -81,7 +81,7 @@ def test_run(
 
     # prepare config file
     config = get_config(
-        visits=list(manifest1[Manifest.col_visit].unique()),
+        visit_ids=list(manifest1[Manifest.col_visit_id].unique()),
     )
     save_json(config.model_dump(mode="json"), fpath_config)
 
@@ -127,16 +127,16 @@ def test_run(
     ),
     [
         (
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL", "ses-M12"]},
-            {"01": ["ses-BL", "ses-M12"], "02": ["ses-BL"]},
-            {"01": ["ses-BL"], "02": ["ses-BL"], "03": ["ses-BL"]},
-            {"01": ["ses-BL", "ses-M12"], "03": ["ses-M12"]},
+            {"01": ["BL", "M12"], "02": ["BL", "M12"]},
+            {"01": ["BL", "M12"], "02": ["BL"]},
+            {"01": ["BL"], "02": ["BL"], "03": ["BL"]},
+            {"01": ["BL", "M12"], "03": ["M12"]},
         ),
         (
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL"]},
-            {"PD01": ["ses-BL", "ses-M12"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL", "ses-M12"]},
-            {"PD01": ["ses-BL"], "PD02": ["ses-BL"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL"]},
+            {"PD01": ["BL", "M12"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL", "M12"]},
+            {"PD01": ["BL"], "PD02": ["BL"]},
         ),
     ],
 )
@@ -152,7 +152,7 @@ def test_run_regenerate(
     dpath_root = tmp_path / "my_dataset"
     create_empty_dataset(dpath_root)
 
-    dpath_downloaded = dpath_root / ATTR_TO_DPATH_MAP["dpath_raw_dicom"]
+    dpath_downloaded = dpath_root / ATTR_TO_DPATH_MAP["dpath_raw_imaging"]
     dpath_organized = dpath_root / ATTR_TO_DPATH_MAP["dpath_sourcedata"]
     dpath_bidsified = dpath_root / ATTR_TO_DPATH_MAP["dpath_bids"]
     fpath_manifest = dpath_root / ATTR_TO_FPATH_MAP["fpath_manifest"]
@@ -172,26 +172,24 @@ def test_run_regenerate(
 
     # prepare config file
     config = get_config(
-        visits=list(manifest[Manifest.col_visit].unique()),
+        visit_ids=list(manifest[Manifest.col_visit_id].unique()),
     )
     save_json(config.model_dump(mode="json"), fpath_config)
 
     # to be overwritten
     doughnut_records = []
     for _, manifest_record in manifest.iterrows():
-        participant = manifest_record[Manifest.col_participant_id]
+        participant_id = manifest_record[Manifest.col_participant_id]
         doughnut_records.append(
             {
-                Doughnut.col_participant_id: participant,
-                Doughnut.col_visit: manifest_record[Manifest.col_visit],
-                Doughnut.col_session: manifest_record[Manifest.col_session],
+                Doughnut.col_participant_id: participant_id,
+                Doughnut.col_visit_id: manifest_record[Manifest.col_visit_id],
+                Doughnut.col_session_id: manifest_record[Manifest.col_session_id],
                 Doughnut.col_datatype: manifest_record[Manifest.col_datatype],
-                Doughnut.col_participant_dicom_dir: participant,
-                Doughnut.col_dicom_id: participant,
-                Doughnut.col_bids_id: f"sub-{participant}",
-                Doughnut.col_downloaded: True,
-                Doughnut.col_organized: True,
-                Doughnut.col_bidsified: True,
+                Doughnut.col_participant_dicom_dir: participant_id,
+                Doughnut.col_in_raw_imaging: True,
+                Doughnut.col_in_sourcedata: True,
+                Doughnut.col_in_bids: True,
             }
         )
     doughnut_old = Doughnut(doughnut_records)
