@@ -39,6 +39,12 @@
             "optional": true,
             "type": "String",
             "value-key": "[CONF_LIST]",
+            "list": true,
+            "value-choices": [
+                "mot_6",
+                "WM_signal",
+                "CSF_signal"
+            ],
             "command-line-flag": "--conf_list"
         },
         {
