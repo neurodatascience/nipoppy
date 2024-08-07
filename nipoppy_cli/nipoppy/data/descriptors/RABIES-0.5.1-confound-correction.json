@@ -86,7 +86,7 @@
         {
             "id": "edge_cutoff",
             "name": "edge_cutoff",
-            "description": "Specify the number of seconds to cut at beginning and end of acquisition if applying a frequency filter. Frequency filters generate edge effects at begining and end of the timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hzhighpass.).",
+            "description": "Specify the number of seconds to cut at beginning and end of acquisition if applying a frequency filter. Frequency filters generate edge effects at beginning and end of the timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hzhighpass.).",
             "optional": true,
             "type": "Number",
             "value-key": "[EDGE_CUTOFF]",
@@ -122,7 +122,7 @@
         {
             "id": "read_datasink",
             "name": "read_datasink",
-            "description": "Choose this option to read preprocessing outputs from datasinks instead of the savedpreprocessing workflow graph. This allows to run confound correction without havingavailable RABIES preprocessing folders, but the targetted datasink folders must follow the structure of RABIES preprocessing.",
+            "description": "Choose this option to read preprocessing outputs from datasinks instead of the savedpreprocessing workflow graph. This allows to run confound correction without havingavailable RABIES preprocessing folders, but the targeted datasink folders must follow the structure of RABIES preprocessing.",
             "optional": true,
             "type": "Flag",
             "value-key": "[READ_DATASINK]",
