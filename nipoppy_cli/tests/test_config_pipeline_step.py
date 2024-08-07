@@ -61,3 +61,12 @@ def test_field_base(step_class: type[BaseModel], fields, data_list):
 def test_no_extra_field(model_class):
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         model_class(not_a_field="a")
+
+
+@pytest.mark.parametrize("step_class", [ProcPipelineStepConfig, BidsPipelineStepConfig])
+def test_substitutions(step_class):
+    step_config = step_class(
+        NAME="step_name",
+        DESCRIPTOR_FILE="[[STEP_NAME]].json",
+    )
+    assert str(step_config.DESCRIPTOR_FILE) == "step_name.json"

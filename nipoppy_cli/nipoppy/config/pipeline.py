@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from abc import ABC
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import ConfigDict, Field, model_validator
+from pydantic_core import to_jsonable_python
 
 from nipoppy.config.container import ContainerInfo, SchemaWithContainerConfig
 from nipoppy.config.pipeline_step import (
@@ -14,6 +15,7 @@ from nipoppy.config.pipeline_step import (
     BidsPipelineStepConfig,
     ProcPipelineStepConfig,
 )
+from nipoppy.utils import apply_substitutions_to_json
 
 
 class BasePipelineConfig(SchemaWithContainerConfig, ABC):
@@ -32,6 +34,25 @@ class BasePipelineConfig(SchemaWithContainerConfig, ABC):
         default=[],
         description="List of pipeline step configurations",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_before(cls, data: Any) -> Any:
+        """
+        Validate the pipeline configuration before instantiation.
+
+        Specifically:
+        - Apply substitutions for pipeline name/version in the config
+        """
+        if isinstance(data, dict):
+            substitutions = {}
+            keys = ("NAME", "VERSION")
+            for key in keys:
+                if key in data:
+                    substitutions[f"[[PIPELINE_{key}]]"] = data[key]
+            data = apply_substitutions_to_json(to_jsonable_python(data), substitutions)
+
+        return data
 
     @model_validator(mode="after")
     def validate_after(self):

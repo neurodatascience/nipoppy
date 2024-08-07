@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from abc import ABC
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
+from pydantic_core import to_jsonable_python
 
 from nipoppy.config.container import SchemaWithContainerConfig
 from nipoppy.tabular.doughnut import Doughnut
+from nipoppy.utils import apply_substitutions_to_json
 
 
 class BasePipelineStepConfig(SchemaWithContainerConfig, ABC):
@@ -29,6 +31,22 @@ class BasePipelineStepConfig(SchemaWithContainerConfig, ABC):
         default=None,
         description=("Path to the JSON invocation file"),
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_before(cls, data: Any) -> Any:
+        """
+        Validate the pipeline step configuration before instantiation.
+
+        Specifically:
+        - Apply substitutions for step name in the config
+        """
+        if isinstance(data, dict):
+            if data.get("NAME") is not None:
+                data = apply_substitutions_to_json(
+                    to_jsonable_python(data), {"[[STEP_NAME]]": data["NAME"]}
+                )
+        return data
 
 
 class ProcPipelineStepConfig(BasePipelineStepConfig):

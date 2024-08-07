@@ -4,12 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from nipoppy.utils import (
-    DPATH_DESCRIPTORS,
-    DPATH_INVOCATIONS,
-    DPATH_LAYOUTS,
-    DPATH_TRACKER_CONFIGS,
-)
+from nipoppy.utils import DPATH_LAYOUTS
 from nipoppy.workflows.dataset_init import InitWorkflow
 
 from .conftest import ATTR_TO_DPATH_MAP, FPATH_CONFIG, FPATH_MANIFEST
@@ -33,23 +28,30 @@ def test_run(dpath_root: Path):
     assert Path(dpath_root, FPATH_CONFIG).exists()
     assert Path(dpath_root, FPATH_MANIFEST).exists()
 
-    # check that descriptor files have been copied
-    for fpath in DPATH_DESCRIPTORS.iterdir():
-        assert Path(
-            dpath_root, ATTR_TO_DPATH_MAP["dpath_descriptors"], fpath.name
-        ).exists()
-
-    # check that sample invocation files have been copied
-    for fpath in DPATH_INVOCATIONS.iterdir():
-        assert Path(
-            dpath_root, ATTR_TO_DPATH_MAP["dpath_invocations"], fpath.name
-        ).exists()
-
-    # check that sample tracker config files have been copied
-    for fpath in DPATH_TRACKER_CONFIGS.iterdir():
-        assert Path(
-            dpath_root, ATTR_TO_DPATH_MAP["dpath_tracker_configs"], fpath.name
-        ).exists()
+    # check that pipeline config files have been copied
+    for pipeline_configs in (
+        workflow.config.BIDS_PIPELINES,
+        workflow.config.PROC_PIPELINES,
+    ):
+        for pipeline_config in pipeline_configs:
+            assert (
+                getattr(pipeline_config, "TRACKER_CONFIG_FILE", None) is None
+                or pipeline_config.TRACKER_CONFIG_FILE.exists()
+            )
+            for pipeline_step_config in pipeline_config.STEPS:
+                assert (
+                    getattr(pipeline_step_config, "DESCRIPTOR_FILE", None) is None
+                    or pipeline_step_config.DESCRIPTOR_FILE.exists()
+                )
+                assert (
+                    getattr(pipeline_step_config, "INVOCATION_FILE", None) is None
+                    or pipeline_step_config.INVOCATION_FILE.exists()
+                )
+                assert (
+                    getattr(pipeline_step_config, "PYBIDS_IGNORE_PATTERNS_FILE", None)
+                    is None
+                    or pipeline_step_config.PYBIDS_IGNORE_FILE.exists()
+                )
 
 
 def test_run_error(dpath_root: Path):
@@ -68,12 +70,3 @@ def test_custom_layout(dpath_root: Path):
     # check some of the paths from the old spec exist
     assert (dpath_root / "proc").exists()
     assert (dpath_root / "dicom").exists()
-
-
-@pytest.mark.parametrize("attr", ["config", "manifest", "doughnut"])
-def test_config_attrs_error(attr):
-    with pytest.raises(
-        RuntimeError,
-        match="The config property .* is not available*",
-    ):
-        getattr(InitWorkflow(dpath_root="my_dataset"), attr)

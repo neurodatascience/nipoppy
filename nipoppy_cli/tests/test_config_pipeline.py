@@ -89,6 +89,23 @@ def test_step_names_error_duplicate(valid_data):
         )
 
 
+def test_substitutions():
+    data = {
+        "NAME": "my_pipeline",
+        "VERSION": "1.0.0",
+        "TRACKER_CONFIG_FILE": "[[PIPELINE_NAME]]-[[PIPELINE_VERSION]].json",
+        "STEPS": [
+            {
+                "NAME": "step1",
+                "INVOCATION_FILE": "[[PIPELINE_NAME]]-[[PIPELINE_VERSION]].json",
+            }
+        ],
+    }
+    pipeline_config = ProcPipelineConfig(**data)
+    assert str(pipeline_config.TRACKER_CONFIG_FILE) == "my_pipeline-1.0.0.json"
+    assert str(pipeline_config.STEPS[0].INVOCATION_FILE) == "my_pipeline-1.0.0.json"
+
+
 @pytest.mark.parametrize("container", ["my_container.sif", "my_other_container.sif"])
 def test_get_fpath_container(valid_data, container):
     pipeline_config = ProcPipelineConfig(
