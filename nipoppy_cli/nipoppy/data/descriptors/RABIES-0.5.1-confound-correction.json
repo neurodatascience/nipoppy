@@ -1,0 +1,252 @@
+{
+    "name": "RABIES",
+    "description": "tool description",
+    "tool-version": "v0.5.1",
+    "schema-version": "0.5",
+    "command-line": "[[NIPOPPY_CONTAINER_COMMAND]] [[NIPOPPY_FPATH_CONTAINER]] [INCLUSION_IDS] [EXCLUSION_IDS] [PLUGIN] [LOCAL_THREADS] [SCALE_MIN_MEMORY] [MIN_PROC] [FIGURE_FORMAT] [VERBOSE] [FORCE] confound_correction [NATIVESPACE_ANALYSIS] [IMAGE_SCALING] [DETRENDING_ORDER] [CONF_LIST] [FRAME_CENSORING] [TR] [HIGHPASS] [LOWPASS] [EDGE_CUTOFF] [SMOOTHING_FILTER] [MATCH_NUMBER_TIMEPOINTS] [ICA_AROMA] [READ_DATASINK] [TIMESERIES_INTERVAL] [INPUT_DIR] [OUTPUT_DIR]",
+    "inputs": [
+        {
+            "id": "nativespace_analysis",
+            "name": "nativespace_analysis",
+            "description": "Conduct confound correction and analysis in native space.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[NATIVESPACE_ANALYSIS]",
+            "command-line-flag": "--nativespace_analysis"
+        },
+        {
+            "id": "image_scaling",
+            "name": "image_scaling",
+            "description": "Select an option for scaling the image variance to match the intensity profile of ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[IMAGE_SCALING]",
+            "command-line-flag": "--image_scaling"
+        },
+        {
+            "id": "detrending_order",
+            "name": "detrending_order",
+            "description": "Select between linear or quadratic (second-order) detrending of voxel timeseries.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[DETRENDING_ORDER]",
+            "command-line-flag": "--detrending_order"
+        },
+        {
+            "id": "conf_list",
+            "name": "conf_list",
+            "description": "Select list of nuisance regressors that will be applied on voxel timeseries, i.e., confound regression. *** WM/CSF/vascular/global_signal: correspond to mean signal from WM/CSF/vascular/brain masks. *** mot_6: 6 rigid head motion correction parameters. *** mot_24: mot_6 + their temporal derivative, then all 12 parameters squared, as in Friston et al. (1996, Magnetic Resonance in Medicine). *** aCompCor: method from Muschelli et al. (2014, Neuroimage), where component timeseriesare obtained using PCA, conducted on the combined WM and CSF masks voxel timeseries. Components adding up to 50 percent of the variance are included. *** mean_FD: the mean framewise displacement timecourse.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[CONF_LIST]",
+            "list": true,
+            "value-choices": [
+                "mot_6",
+                "WM_signal",
+                "CSF_signal"
+            ],
+            "command-line-flag": "--conf_list"
+        },
+        {
+            "id": "frame_censoring",
+            "name": "frame_censoring",
+            "description": "Censor frames that are highly corrupted (i.e. 'scrubbing').* FD_censoring: Apply frame censoring based on a framewise displacement threshold. The frames that exceed the given threshold, together with 1 back and 2 forward frames will be masked out, as in Power et al. (2012, Neuroimage). *** Specify 'true' or 'false'.* FD_threshold: the FD threshold in mm.* DVARS_censoring: Will remove timepoints that present outlier values on the DVARS metric (temporal derivative of global signal). This method will censor timepoints until the distribution of DVARS values across time does not contain outliers values above or below 2.5 standard deviations. *** Specify 'true' or 'false'.* minimum_timepoint: Can set a minimum number of timepoints remaining after frame censoring. If the threshold is not met, an empty file is generated and the scan is not considered in further steps. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[FRAME_CENSORING]",
+            "command-line-flag": "--frame_censoring"
+        },
+        {
+            "id": "TR",
+            "name": "TR",
+            "description": "Specify repetition time (TR) in seconds. (e.g. --TR 1.2)",
+            "optional": true,
+            "type": "String",
+            "value-key": "[TR]",
+            "command-line-flag": "--TR"
+        },
+        {
+            "id": "highpass",
+            "name": "highpass",
+            "description": "Specify highpass filter frequency.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[HIGHPASS]",
+            "command-line-flag": "--highpass"
+        },
+        {
+            "id": "lowpass",
+            "name": "lowpass",
+            "description": "Specify lowpass filter frequency.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[LOWPASS]",
+            "command-line-flag": "--lowpass"
+        },
+        {
+            "id": "edge_cutoff",
+            "name": "edge_cutoff",
+            "description": "Specify the number of seconds to cut at beginning and end of acquisition if applying a frequency filter. Frequency filters generate edge effects at beginning and end of the timeseries. We recommend to cut those timepoints (around 30sec at both end for 0.01Hzhighpass.).",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[EDGE_CUTOFF]",
+            "command-line-flag": "--edge_cutoff"
+        },
+        {
+            "id": "smoothing_filter",
+            "name": "smoothing_filter",
+            "description": "Specify filter size in mm for spatial smoothing. Will apply nilearn's function https://nilearn.github.io/modules/generated/nilearn.image.smooth_img.html",
+            "optional": true,
+            "type": "Number",
+            "value-key": "[SMOOTHING_FILTER]",
+            "command-line-flag": "--smoothing_filter"
+        },
+        {
+            "id": "match_number_timepoints",
+            "name": "match_number_timepoints",
+            "description": "With this option, only a subset of the timepoints are kept post-censoring to match the --minimum_timepoint number for all scans. This can be conducted to avoid inconsistent temporal degrees of freedom (tDOF) between scans during downstream analysis. We recommend selecting this option if a significant confounding effect of tDOF is detected during --data_diagnosis. The extra timepoints removed are randomly selected among the set available post-censoring.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[MATCH_NUMBER_TIMEPOINTS]",
+            "command-line-flag": "--match_number_timepoints"
+        },
+        {
+            "id": "ica_aroma",
+            "name": "ica_aroma",
+            "description": "Apply ICA-AROMA denoising (Pruim et al. 2015). The original classifier was modified to incorporaterodent-adapted masks and classification hyperparameters. * apply: apply the denoising. *** Specify 'true' or 'false'.* dim: Specify a pre-determined number of MELODIC components to derive. '0' will use an automatic estimator.* random_seed: For reproducibility, this option sets a fixed random seed for MELODIC. ",
+            "optional": true,
+            "type": "String",
+            "value-key": "[ICA_AROMA]",
+            "command-line-flag": "--ica_aroma"
+        },
+        {
+            "id": "read_datasink",
+            "name": "read_datasink",
+            "description": "Choose this option to read preprocessing outputs from datasinks instead of the savedpreprocessing workflow graph. This allows to run confound correction without havingavailable RABIES preprocessing folders, but the targeted datasink folders must follow the structure of RABIES preprocessing.",
+            "optional": true,
+            "type": "Flag",
+            "value-key": "[READ_DATASINK]",
+            "command-line-flag": "--read_datasink"
+        },
+        {
+            "id": "timeseries_interval",
+            "name": "timeseries_interval",
+            "description": "Before confound correction, can crop the timeseries within a specific interval. e.g. '0,80' for timepoint 0 to 80.",
+            "optional": true,
+            "type": "String",
+            "value-key": "[TIMESERIES_INTERVAL]",
+            "command-line-flag": "--timeseries_interval"
+        },
+        {
+            "id": "inclusion_ids",
+            "name": "inclusion_ids",
+            "description": "Define a list of BOLD scan to include",
+            "optional": true,
+            "type": "String",
+            "command-line-flag": "--inclusion_ids",
+            "value-key": "[INCLUSION_IDS]"
+        },
+        {
+            "id": "exclusion_ids",
+            "name": "exclusion_ids",
+            "description": "This argument provides a list of scans to exclude",
+            "optional": true,
+            "type": "String",
+            "command-line-flag": "--exclusion_ids",
+            "value-key": "[EXCLUSION_IDS]"
+        },
+        {
+            "id": "plugin",
+            "name": "plugin",
+            "description": "Specify the nipype plugin for workflow execution.",
+            "optional": true,
+            "type": "String",
+            "command-line-flag": "-p",
+            "value-key": "[PLUGIN]"
+        },
+        {
+            "id": "local_threads",
+            "name": "local_threads",
+            "description": "For --plugin MultiProc, set the maximum number of processors run in parallel.",
+            "optional": true,
+            "type": "Number",
+            "command-line-flag": "--local_threads",
+            "value-key": "[LOCAL_THREADS]"
+        },
+        {
+            "id": "scale_min_memory",
+            "name": "scale_min_memory",
+            "description": "For --plugin MultiProc, set the memory scaling factor attributed to nodes during execution. Increase the scaling if memory crashes are reported.",
+            "optional": true,
+            "type": "Number",
+            "command-line-flag": "--scale_min_memory",
+            "value-key": "[SCALE_MIN_MEMORY]"
+        },
+        {
+            "id": "min_proc",
+            "name": "min_proc",
+            "description": "For --plugin SGE/SGEGraph, scale the number of nodes attributed to jobs to avoid memory crashes.",
+            "optional": true,
+            "type": "Number",
+            "command-line-flag": "--min_proc",
+            "value-key": "[MIN_PROC]"
+        },
+        {
+            "id": "figure_format",
+            "name": "figure_format",
+            "description": "Select the file format for figures generated by RABIES.",
+            "optional": true,
+            "type": "String",
+            "command-line-flag": "--figure_format",
+            "value-key": "[FIGURE_FORMAT]"
+        },
+        {
+            "id": "verbose",
+            "name": "verbose",
+            "description": "Select the file format for figures generated by RABIES.",
+            "optional": true,
+            "type": "Number",
+            "command-line-flag": "--verbose",
+            "value-key": "[VERBOSE]"
+        },
+        {
+            "id": "force",
+            "name": "force",
+            "description": "The pipeline will not stop if previous outputs are encountered. Previous outputs will be overwritten.",
+            "optional": true,
+            "type": "Flag",
+            "command-line-flag": "--force",
+            "value-key": "[FORCE]"
+        },
+        {
+            "id": "input_dir",
+            "name": "input_dir",
+            "description": "The directory where the output files from the preprocess command should be stored. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[INPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_BIDS]]"
+        },
+        {
+            "id": "output_dir",
+            "name": "output_dir",
+            "description": "The directory where the output files should be stored after confound correction. If you are running group level analysis this folder should be prepopulated with the results of the participant level analysis.",
+            "optional": false,
+            "type": "String",
+            "value-key": "[OUTPUT_DIR]",
+            "default-value": "[[NIPOPPY_DPATH_PIPELINE_OUTPUT]]"
+        }
+    ],
+    "tags": {},
+    "suggested-resources": {
+        "cpu-cores": 1,
+        "ram": 1,
+        "walltime-estimate": 60
+    },
+    "error-codes": [
+        {
+            "code": 1,
+            "description": "Crashed"
+        }
+    ]
+}
