@@ -94,7 +94,8 @@
                 {
                     "NAME": "convert",
                     "INVOCATION_FILE": "[[NIPOPPY_DPATH_INVOCATIONS]]/[[NIPOPPY_PIPELINE_NAME]]-[[NIPOPPY_PIPELINE_VERSION]]-convert.json",
-                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidscoiner-[[NIPOPPY_PIPELINE_VERSION]].json"
+                    "DESCRIPTOR_FILE": "[[NIPOPPY_DPATH_DESCRIPTORS]]/bidscoiner-[[NIPOPPY_PIPELINE_VERSION]].json",
+                    "UPDATE_DOUGHNUT": true
                 }
             ]
         }
