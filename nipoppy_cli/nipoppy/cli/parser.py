@@ -4,6 +4,7 @@ import logging
 from argparse import ArgumentParser, HelpFormatter, _ActionsContainer, _SubParsersAction
 from pathlib import Path
 
+from nipoppy._version import __version__
 from nipoppy.env import BIDS_SESSION_PREFIX, BIDS_SUBJECT_PREFIX
 
 PROGRAM_NAME = "nipoppy"
@@ -118,6 +119,17 @@ def add_arg_help(parser: _ActionsContainer) -> _ActionsContainer:
         "--help",
         action="help",
         help="Show this help message and exit.",
+    )
+    return parser
+
+
+def add_arg_version(parser: _ActionsContainer) -> _ActionsContainer:
+    """Add a --version argument to the parser."""
+    parser.add_argument(
+        "--version",
+        action="version",
+        help="Show version number and exit.",
+        version=f"{__version__}",
     )
     return parser
 
@@ -306,6 +318,7 @@ def get_global_parser(
         add_help=False,
     )
     add_arg_help(global_parser)
+    add_arg_version(global_parser)
 
     # subcommand parsers
     subparsers = global_parser.add_subparsers(

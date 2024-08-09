@@ -4,6 +4,8 @@ For the full list of built-in configuration values, see the documentation:
 https://www.sphinx-doc.org/en/master/usage/configuration.html
 """
 
+from nipoppy._version import __version__
+
 # for substitutions
 from nipoppy.layout import DEFAULT_LAYOUT_INFO
 
@@ -13,6 +15,16 @@ from nipoppy.layout import DEFAULT_LAYOUT_INFO
 project = "Nipoppy"
 copyright = "2024, NeuroDataScience-ORIGAMI Lab"
 author = "NeuroDataScience-ORIGAMI Lab"
+
+# The version info for the project you're documenting, acts as replacement
+# for |version| and |release|, also used in various other places throughout
+# the built documents.
+#
+# The short X.Y version.
+version = __version__
+
+# The full version, including alpha/beta/rc tags.
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -126,6 +138,7 @@ myst_substitutions = {
 autodoc_typehints = "description"
 
 autoapi_dirs = ["../../nipoppy"]
+autoapi_ignore = ["*_version*", "*/cli/*"]
 autoapi_options = [
     "members",
     "undoc-members",
@@ -141,6 +154,8 @@ autoapi_template_dir = "_templates/autoapi"
 
 # ignore some auto doc related warnings
 #  see https://github.com/sphinx-doc/sphinx/issues/10785
+# suppress_warnings = ["autoapi"]
+
 nitpick_ignore = [
     ("py:class", "Path"),
     ("py:class", "optional"),
