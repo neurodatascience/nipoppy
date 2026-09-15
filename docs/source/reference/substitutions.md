@@ -34,7 +34,7 @@ These substitutions are available for **all configuration files**:
 - `[[NIPOPPY_FPATH_MANIFEST]]`: path to the {term}`manifest file`
 - `[[NIPOPPY_FPATH_CURATION_STATUS]]`: path to the {term}`curation status file`
 - `[[NIPOPPY_FPATH_PROCESSING_STATUS]]`: path to the {term}`processing status file`
-- And other strings of form `[[NIPOPPY_<LAYOUT_PROPERTY>]]`, where `<LAYOUT_PROPERTY>` is a property in the Nipoppy {ref}`dataset layout configuration file <layout-schema>` (all uppercase)
+- And other strings of form `[[NIPOPPY_<LAYOUT_PROPERTY>]]`, where `<LAYOUT_PROPERTY>` is a property in the Nipoppy {ref}`study layout configuration file <layout-schema>` (all uppercase)
 
 ### Pipeline configuration files
 

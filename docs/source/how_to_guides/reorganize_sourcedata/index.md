@@ -106,7 +106,7 @@ sub- and ses- prefix added
 - uncompressed DICOM sourcedata in {{dpath_pre_reorg}}. You can check this by running
 
 ```console
-$ nipoppy status --dataset <NIPOPPY_PROJECT_ROOT>
+$ nipoppy status --dataset <NIPOPPY_STUDY_ROOT>
 ```
 
 The output should list the number of participants that are present in both the {term}`manifest file` and in {{dpath_pre_reorg}} but are not in {{dpath_post_reorg}} yet, according to the {term}`curation status file`. These are the participants and session Nipoppy will loop over when running `nipoppy reorg`. If you feel like the information of `nipoppy status` is outdated, you can run `nipoppy track-curation` to update.
@@ -118,7 +118,7 @@ The output should list the number of participants that are present in both the {
 If all of these requirements are satisfied, you can run
 
 ```console
-$ nipoppy reorg --dataset <NIPOPPY_PROJECT_ROOT>
+$ nipoppy reorg --dataset <NIPOPPY_STUDY_ROOT>
 ```
 
 For each participant-session pair, Nipoppy
@@ -128,7 +128,7 @@ For each participant-session pair, Nipoppy
 You can check the successful reorganization in the {term}`curation status file` or simply by running
 
 ```console
-$ nipoppy status --dataset <NIPOPPY_PROJECT_ROOT>
+$ nipoppy status --dataset <NIPOPPY_STUDY_ROOT>
 ```
 
 ### Customizing the `nipoppy reorg` behavior
@@ -138,7 +138,7 @@ If the file organization in {{dpath_pre_reorg}} does not follow a subject-first,
 (dicom-dir-map-example)=
 If the raw imaging data are not organized in any of these two structures, a custom tab-separated file can be created to map each unique participant-session pair to a directory path (relative to {{dpath_pre_reorg}}). This path to this mapping file must be specified in the `"DICOM_DIR_MAP_FILE"` in the {term}`global configuration file <DICOM_DIR_MAP_FILE>`. See the {ref}`schema reference <dicom-dir-map-schema>` for more information.
 
-Here is an example file for a dataset that already uses the `ses-` prefix for sessions:
+Here is an example file for a study that already uses the `ses-` prefix for sessions:
 
 ```{csv-table}
 ---

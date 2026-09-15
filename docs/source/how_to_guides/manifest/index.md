@@ -10,15 +10,15 @@ Example script 2<example2>
 Example script 3<example3>
 ```
 
-This guide shows how to create a dataset's [manifest file](<project:../../explanations/manifest.md>), which is a list of participants recruited in the study, their visits, and expected data modalities.
+This guide shows how to create a study's [manifest file](<project:../../explanations/manifest.md>), which is a list of participants recruited in the study, their visits, and expected data modalities.
 
 :::{note}
-If the Nipoppy dataset was initialized from an existing BIDS dataset with `nipoppy init --bids-source`, then a manifest file containing valid and accurate entries for the imaging data was automatically generated from the BIDS input. In this case, it is not necessary to manually insert or update the imaging data information in the manifest file.
+If the Nipoppy study was initialized from an existing BIDS dataset with `nipoppy init --bids-source`, then a manifest file containing valid and accurate entries for the imaging data was automatically generated from the BIDS input. In this case, it is not necessary to manually insert or update the imaging data information in the manifest file.
 
 However, if the study has additional visits that were not present in the BIDS data (e.g., non-imaging visits), they will need to be added to the manifest separately.
 :::
 
-Every Nipoppy dataset should have a manifest file at {{fpath_manifest}}.
+Every Nipoppy study should have a manifest file at {{fpath_manifest}}.
 This file is tab-separated and has four columns: `participant_id`, `visit_id`, `session_id` and `datatype`.
 Here is an example of a valid manifest file:
 :::{csv-table}

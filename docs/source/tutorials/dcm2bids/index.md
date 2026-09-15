@@ -3,7 +3,7 @@
 In this tutorial, you will learn how to use Nipoppy and the BIDS converter [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/) to convert your imaging sourcedata to {term}`BIDS`.
 
 Concretely, we will:
-1. Initialize a Nipoppy dataset
+1. Initialize a Nipoppy study
 2. Reorganize DICOM sourcedata
 3. Install and set up the dcm2bids pipeline
 4. Extract DICOM header information to create the `dcm2bids_config.json` file
@@ -37,9 +37,9 @@ wget -O tutorial-dataset.zip https://github.com/nipoppy/tutorial-dataset/archive
 ```
 Unzip once downloaded.
 
-## Step 1: Initialize the Nipoppy dataset
+## Step 1: Initialize the Nipoppy study
 
-**1.1.** Run the following command to create a Nipoppy dataset:
+**1.1.** Run the following command to create a Nipoppy study:
 
 ```console
 $ nipoppy init --dataset nipoppy_study
@@ -76,7 +76,7 @@ Usually, there is a gap between data state out of scanner vs. ready for bidsific
 :::
 
 
-**2.1.** We need to move the **content** of the `tutorial-dataset/reorg` directory to the `sourcedata/imaging/pre_reorg` directory of our `nipoppy_study` dataset, i.e.:
+**2.1.** We need to move the **content** of the `tutorial-dataset/reorg` directory to the `sourcedata/imaging/pre_reorg` directory of our `nipoppy_study` study, i.e.:
 
 ```console
 mv tutorial-dataset/reorg/* nipoppy_study/sourcedata/imaging/pre_reorg
@@ -97,13 +97,13 @@ Running `tree nipoppy_study/sourcedata/imaging/pre_reorg/ | head` we can see com
 ...
 ```
 
-We need to track this modification in our dataset by running
+We need to track this modification in our study by running
 
 ```console
 nipoppy track-curation --dataset nipoppy_study
 ```
 
-before we can have an overview of the dataset status with
+before we can have an overview of the study status with
 
 ```console
 nipoppy status --dataset nipoppy_study
@@ -168,7 +168,7 @@ emphasize-lines: 6,11
 ---
 ```
 
-By default, this file does not contain any pipeline-specific information, since the dataset does not have any pipelines installed yet. Still, there are fields that may need to be modified depending on your setup:
+By default, this file does not contain any pipeline-specific information, since the study does not have any pipelines installed yet. Still, there are fields that may need to be modified depending on your setup:
 - If Apptainer is not available on your system, you will need to change `CONTAINER_CONFIG` -> `COMMAND` to
     - `"singularity"` if you have Singularity installed
     - `"docker"` if you have Docker installed
@@ -183,7 +183,7 @@ By default, this file does not contain any pipeline-specific information, since 
     ```
     - Alternatively, you can create a symlink from {{dpath_containers}} to that directory (then this line in the configuration can be deleted) (recommended).
 
-**3.2.** We can use following command to check which pipelines can be run with the dataset:
+**3.2.** We can use following command to check which pipelines can be run with the study:
 
 ```console
 $ nipoppy pipeline list --dataset nipoppy_study
@@ -196,12 +196,12 @@ INFO     No available processing pipelines
 INFO     No available extraction pipelines
 ```
 
-That is because a newly initialized Nipoppy dataset does not contain any pipelines. Pipeline configuration files are available on the [Zenodo data repository](https://zenodo.org/search?q=metadata.subjects.subject%3A%22Nipoppy%22&l=list&p=1&s=10&sort=bestmatch) and can be searched for directly from your terminal using the command `nipoppy pipeline search`. The [configuration files for dcm2bids](https://zenodo.org/records/16876754) can be downloaded by running the following:
+That is because a newly initialized Nipoppy study does not contain any pipelines. Pipeline configuration files are available on the [Zenodo data repository](https://zenodo.org/search?q=metadata.subjects.subject%3A%22Nipoppy%22&l=list&p=1&s=10&sort=bestmatch) and can be searched for directly from your terminal using the command `nipoppy pipeline search`. The [configuration files for dcm2bids](https://zenodo.org/records/16876754) can be downloaded by running the following:
 ```{code-block} console
 $ nipoppy pipeline install --dataset nipoppy_study {{zenodo_id_dcm2bids_3_2_0}}
 ```
 
-When running `nipoppy pipeline install`, if using a container engine, you will be asked if you would like to download the dcm2bids container. If you do not already have a download of the container, type `y` and press `Enter` to do so. The download/building process may take ~10 minutes. Apptainer or Singularity container images will be downloaded as `dcm2bids_3.2.0.sif` inside the container store directory (i.e., `nipoppy_study/containers` or the custom path you set in the `global_config.json` file). Docker images are managed centrally and so will not be downloaded to the dataset.
+When running `nipoppy pipeline install`, if using a container engine, you will be asked if you would like to download the dcm2bids container. If you do not already have a download of the container, type `y` and press `Enter` to do so. The download/building process may take ~10 minutes. Apptainer or Singularity container images will be downloaded as `dcm2bids_3.2.0.sif` inside the container store directory (i.e., `nipoppy_study/containers` or the custom path you set in the `global_config.json` file). Docker images are managed centrally and so will not be downloaded to the study.
 
 **3.3.** When we open the `nipoppy_study/global_config.json`, we can see that the pipeline expects some more configuration (indicated by the null placeholder):
 
@@ -220,7 +220,7 @@ When running `nipoppy pipeline install`, if using a container engine, you will b
     },
 ```
 
-We need to replace the `null` next to the `DCM2BIDS_CONFIG_FILE` field with file path to the `dcm2bids_config.json` file that we will create in the next step. We recommend to keep this file in the `code` directory in your nipoppy dataset, like so:
+We need to replace the `null` next to the `DCM2BIDS_CONFIG_FILE` field with file path to the `dcm2bids_config.json` file that we will create in the next step. We recommend to keep this file in the `code` directory in your nipoppy study, like so:
 
 ```{code-block} json
 :emphasize-lines: 5
@@ -303,7 +303,7 @@ In our case, the `dcm2bids_config.json` can look like this:
   }
 ```
 
-**4.2.** We create a `dcm2bids_config.json` with the above content and place it in the `code` directory in our `nipoppy_study`dataset.
+**4.2.** We create a `dcm2bids_config.json` with the above content and place it in the `code` directory in our `nipoppy_study` study.
 
 ## Step 5: Convert the DICOM sourcedata to NIfTI BIDS raw data
 

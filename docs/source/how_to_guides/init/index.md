@@ -1,4 +1,4 @@
-# Initializing a new dataset
+# Initializing a new study
 
 ```{toctree}
 ---

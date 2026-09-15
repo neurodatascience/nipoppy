@@ -142,7 +142,7 @@ Layout configuration
         :linenos:
         :language: json
 
-Here is the schema used for :term:`JSON` files that define the layout of the dataset:
+Here is the schema used for :term:`JSON` files that define the layout of the study:
 
 .. jsonschema:: layout.json
     :lift_title: False

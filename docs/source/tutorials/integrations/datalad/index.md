@@ -15,7 +15,7 @@ $ cd ..
 ```
 
 
-## Step 1: Initialize the Nipoppy dataset
+## Step 1: Initialize the Nipoppy study
 
 Create a DataLad dataset first so we can record the provenance of all the Nipoppy commands from the beginning.
 
@@ -23,7 +23,7 @@ Create a DataLad dataset first so we can record the provenance of all the Nipopp
 $ datalad create -c text2git nipoppy_study
 $ cd nipoppy_study
 # We use `init --force` because the datalad dataset contains .git and .datalad directories.
-$ datalad run -m "Initialize nipoppy dataset" nipoppy init --bids-source ../ds004101 --force
+$ datalad run -m "Initialize nipoppy study" nipoppy init --bids-source ../ds004101 --force
 ```
 
 ## Step 2: Modify the global configuration file
@@ -151,7 +151,7 @@ commit b81f344ba381788c94f8f58753b965ee794ed4c6
 Author: Austin Macdonald <austin@dartmouth.edu>
 Date:   Fri Jul 11 12:22:44 2025 -0500
 
-    [DATALAD RUNCMD] Initialize nipoppy dataset
+    [DATALAD RUNCMD] Initialize nipoppy study
 
     === Do not change lines below ===
     {

@@ -12,9 +12,9 @@ See the [Installation instructions](../installation.md) first if you have not ye
 $ git clone https://github.com/nipoppy/tutorial-dataset.git
 ```
 
-## Initializing a new dataset
+## Initializing a new study
 
-**1.** Initialize a Nipoppy dataset:
+**1.** Initialize a Nipoppy study:
 ```{code-block} console
 $ nipoppy init --dataset my-example-study
 ```
@@ -23,7 +23,7 @@ $ nipoppy init --dataset my-example-study
 The newly created directory tree follows the Nipoppy specification. Other Nipoppy commands expect all these directories to exist -- they will throw an error if that is not the case.
 ```
 
-**2.** Move the example dataset and files into your Nipoppy dataset:
+**2.** Move the example dataset and files into your Nipoppy study:
 ```{code-block} console
 $ mv tutorial-dataset/manifest.tsv my-example-study
 $ mv tutorial-dataset/reorg/* my-example-study/sourcedata/imaging/pre_reorg
@@ -34,7 +34,7 @@ $ mv tutorial-dataset/bidsify/participants.tsv tutorial-dataset/bidsify/dataset_
 See the [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/tutorial/first-steps/#building-the-configuration-file) docs for info about the `dcm2bids_config.json` and the [BIDS](https://bids.neuroimaging.io/getting_started/tutorials/annotation.html) docs for info about valid BIDS dataset requirements.
 
 
-**3.** Change directory into your Nipoppy dataset:
+**3.** Change directory into your Nipoppy study:
 ```{code-block} console
 $ cd my-example-study
 ```
@@ -81,7 +81,7 @@ linenos: True
 $ nipoppy reorg
 ```
 
-**2.** Check the dataset status:
+**2.** Check the study status:
 ```{code-block} console
 $ nipoppy status
 ```
@@ -100,7 +100,7 @@ Expected output:
 
 ## [Pipeline setups](../../how_to_guides/pipeline_install/index.md)
 
-A newly initialized Nipoppy dataset does not contain any pipeline setups or containers.
+A newly initialized Nipoppy study does not contain any pipeline setups or containers.
 
 ### dcm2bids example
 
@@ -166,7 +166,7 @@ $ nipoppy track-curation
 
 The curation status file can be found at {{fpath_curation_status}}.
 
-**4.** Check the dataset status:
+**4.** Check the study status:
 ```{code-block} console
 $ nipoppy status
 ```
@@ -204,7 +204,7 @@ INFO            - mriqc (23.1.0)
 
 ...
 ```
-**3.** Create a new directory in the Nipoppy dataset root called `templateflow` (required by MRIQC, see [TemplateFlow](https://www.templateflow.org/) docs):
+**3.** Create a new directory in the Nipoppy study root called `templateflow` (required by MRIQC, see [TemplateFlow](https://www.templateflow.org/) docs):
 ```{code-block} console
 $ mkdir templateflow
 ```
@@ -251,7 +251,7 @@ $ nipoppy track-processing --pipeline mriqc
 
 The processing status file can be found at {{fpath_processing_status}}.
 
-**7.** Check the dataset status:
+**7.** Check the study status:
 ```{code-block} console
 $ nipoppy status
 ```

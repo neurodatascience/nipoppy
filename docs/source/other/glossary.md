@@ -4,7 +4,7 @@
 
 ```{glossary}
 Manifest file
-    The [manifest file](../explanations/manifest) at {{fpath_manifest}} contains ground truth information about the participants and visits/sessions available for a dataset.
+    The [manifest file](../explanations/manifest) at {{fpath_manifest}} contains ground truth information about the participants and visits/sessions available for a study.
 
     A guide for how to create a manifest file can be found [here](../how_to_guides/manifest/index).
 

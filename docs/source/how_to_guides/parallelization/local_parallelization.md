@@ -9,7 +9,7 @@ If this option is specified, instead of launching the pipeline, the command will
 
 ```console
 $ nipoppy <SUBCOMMAND> \
-    --dataset <NIPOPPY_PROJECT_ROOT> \
+    --dataset <NIPOPPY_STUDY_ROOT> \
     --pipeline <PIPELINE_NAME> \
     --write-list <PATH_TO_TSV_FILE>
 ```
@@ -24,7 +24,7 @@ $ parallel \
     --colsep '\t' \
     --jobs <N_MAX_JOBS> \
     nipoppy <SUBCOMMAND> \
-        --dataset <NIPOPPY_PROJECT_ROOT> \
+        --dataset <NIPOPPY_STUDY_ROOT> \
         --pipeline <PIPELINE_NAME> \
         # other desired options \
         # ... \

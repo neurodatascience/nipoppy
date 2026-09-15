@@ -11,7 +11,7 @@ This umbrella effort is guided by following design principles:
 | Principle   | Example implementation in Nipoppy    |
 |:-------|:------------------------------------------------------------------------|
 | Specify sequence / ordering of tasks whenever possible   | Generate a {term}`manifest <manifest file>` before anything else!                                |
-| Optimize for user-oriented modular design    | Conceptually, Nipoppy is divided into *curate, process, extract* modules to match typical research project stages in a neuroimaging lab. |
+| Optimize for user-oriented modular design    | Conceptually, Nipoppy is divided into *curate, process, extract* modules to match typical research study stages in a neuroimaging lab. |
 | Prioritize lightweight, simpler design over comprehensive functionalities  | Nipoppy performs simpler sanity checks at module endpoints instead of sophisticated provenance tracking of the process to ensure reproducibility|
 | Handle collected data “as-is” | Nipoppy doesn’t interfere with the current data collection practice i.e. modify recruitment, assessment, DICOM files |
 | Don’t be a black box | Nipoppy wants to be a hands-on training tool helping researchers to adopt FAIR principles |

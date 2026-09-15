@@ -62,24 +62,24 @@ At the time of writing, the above command prints the following table (trimmed):
             ╵                           ╵
 ```
 
-## Installing a pipeline into a Nipoppy project
+## Installing a pipeline into a Nipoppy study
 
 Once you know the Zenodo ID of the pipeline we wish to use, you can install it directly from Zenodo using the `nipoppy pipeline install` command. Here we install fMRIPrep version 24.1.1.
 
 ```console
-$ nipoppy pipeline install --dataset <NIPOPPY_PROJECT_ROOT> 15306677
+$ nipoppy pipeline install --dataset <NIPOPPY_STUDY_ROOT> 15306677
 ```
 
 ````{tip}
 You can also install a pipeline from a directory on disk with the same command:
 
 ```console
-$ nipoppy pipeline install --dataset <NIPOPPY_PROJECT_ROOT> <PATH_TO_PIPELINE_CONFIG_DIRECTORY>
+$ nipoppy pipeline install --dataset <NIPOPPY_STUDY_ROOT> <PATH_TO_PIPELINE_CONFIG_DIRECTORY>
 ```
 ````
 
 
-Running this command will download all pipeline configuration files for fMRIPrep 24.1.1 into the Nipoppy dataset. Depending on the **pipeline type**, the files will be written to different locations:
+Running this command will download all pipeline configuration files for fMRIPrep 24.1.1 into the Nipoppy study. Depending on the **pipeline type**, the files will be written to different locations:
 - BIDSification pipelines: {{dpath_pipelines}}`/bidsification`
 - Processing pipelines: {{dpath_pipelines}}`/processing`
 - Extraction pipelines: {{dpath_pipelines}}`/extraction`

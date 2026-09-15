@@ -4,7 +4,7 @@ In this tutorial, you will learn how to use the Nipoppy {term}`CLI` to run the [
 
 Concretely, we will:
 
-1. **Initialize** a Nipoppy dataset from a BIDS dataset
+1. **Initialize** a Nipoppy study from a BIDS dataset
 2. **Install** and set up the MRIQC processing pipeline
 2. **Run** MRIQC on a single participant and session
 3. **Track** the output files to check if processing was successful
@@ -25,9 +25,9 @@ We will use the [**ds004101 dataset from OpenNeuro**](https://openneuro.org/data
   ```
 - Depending on your internet connection, the above command may take a few minutes. Once it is done, you should have a new directory `ds004101-1.0.1` containing the BIDS dataset. Run `tree ds004101-1.0.1` to see the dataset content.
 
-## Step 1: Initialize the Nipoppy dataset
+## Step 1: Initialize the Nipoppy study
 
-Run the following command to create a Nipoppy dataset and populate it with the BIDS data:
+Run the following command to create a Nipoppy study and populate it with the BIDS data:
 
 ```console
 $ nipoppy init --dataset nipoppy_study --bids-source ds004101-1.0.1
@@ -80,13 +80,13 @@ participant_id  visit_id    session_id  datatype
 10570           2post       2post       ['fmap', 'func']
 ```
 
-The `nipoppy status` prints out a summary of the dataset, including the number of participants who are in BIDS or have completed a pipeline.
+The `nipoppy status` prints out a summary of the study, including the number of participants who are in BIDS or have completed a pipeline.
 
 ```console
 $ nipoppy status --dataset nipoppy_study
 ```
 
-For now, the dataset only has BIDS data:
+For now, the study only has BIDS data:
 
 ```{code-block}
 :caption: Table in `nipoppy status` output
@@ -111,7 +111,7 @@ emphasize-lines: 6,11
 ---
 ```
 
-By default, this file does not contain any pipeline-specific information, since the dataset does not have any pipelines installed yet. Still, there are fields that may need to be modified depending on your setup:
+By default, this file does not contain any pipeline-specific information, since the study does not have any pipelines installed yet. Still, there are fields that may need to be modified depending on your setup:
 - If Apptainer is not available on your system, you will need to change `CONTAINER_CONFIG` -> `COMMAND` to
     - `"singularity"` if you have Singularity installed
     - `"docker"` if you have Docker installed
@@ -126,9 +126,9 @@ By default, this file does not contain any pipeline-specific information, since 
     ```
     - Alternatively, you can create a symlink from {{dpath_containers}} to that directory (then this line in the configuration can be deleted) (recommended).
 
-## Step 3: Install the MRIQC pipeline into the dataset
+## Step 3: Install the MRIQC pipeline into the study
 
-The following command can be used to check which pipelines can be run with the dataset:
+The following command can be used to check which pipelines can be run with the study:
 ```console
 $ nipoppy pipeline list --dataset nipoppy_study
 ```
@@ -140,12 +140,12 @@ INFO     No available processing pipelines
 INFO     No available extraction pipelines
 ```
 
-That is because a newly initialized Nipoppy dataset does not contain any pipelines. Pipeline configuration files are available on the [Zenodo data repository](https://zenodo.org/search?q=metadata.subjects.subject%3A%22Nipoppy%22&l=list&p=1&s=10&sort=bestmatch) and can be searched for directly from your terminal using the command `nipoppy pipeline search`. The [configuration files for MRIQC](https://zenodo.org/records/15306682) can be downloaded by running the following:
+That is because a newly initialized Nipoppy study does not contain any pipelines. Pipeline configuration files are available on the [Zenodo data repository](https://zenodo.org/search?q=metadata.subjects.subject%3A%22Nipoppy%22&l=list&p=1&s=10&sort=bestmatch) and can be searched for directly from your terminal using the command `nipoppy pipeline search`. The [configuration files for MRIQC](https://zenodo.org/records/15306682) can be downloaded by running the following:
 ```{code-block} console
 $ nipoppy pipeline install --dataset nipoppy_study {{zenodo_id_mriqc_23_1_0}}
 ```
 
-When running `nipoppy pipeline install`, if using a container engine, you will be asked if you would like to download the MRIQC container. If you do not already have a download of the container, type `y` and press `Enter` to do so. The download/building process may take ~10 minutes. Apptainer or Singularity container images will be downloaded as `mriqc_23.1.0.sif` inside the container store directory (i.e., `nipoppy_study/containers` or the custom path you set in the `global_config.json` file). Docker images are managed centrally and so will not be downloaded to the dataset.
+When running `nipoppy pipeline install`, if using a container engine, you will be asked if you would like to download the MRIQC container. If you do not already have a download of the container, type `y` and press `Enter` to do so. The download/building process may take ~10 minutes. Apptainer or Singularity container images will be downloaded as `mriqc_23.1.0.sif` inside the container store directory (i.e., `nipoppy_study/containers` or the custom path you set in the `global_config.json` file). Docker images are managed centrally and so will not be downloaded to the study.
 
 The pipeline installation process will add a `TEMPLATEFLOW_HOME` pipeline variable to the `nipoppy_study/global_config.json` file:
 
@@ -259,9 +259,9 @@ The {term}`processing status file` can also be uploaded to the [Neurobagel diges
 
 Finally, this file can be used directly as input to the [Neurobagel CLI](https://neurobagel.org/user_guide/cli/) when generating participant-level metadata about processing pipeline results.
 
-## Step 6 (optional): Run MRIQC on the rest of the dataset
+## Step 6 (optional): Run MRIQC on the rest of the study
 
-Use `nipoppy process` without the participant and session flags to process the rest of the dataset (in a loop). This will skip the participant-session that has previously been run successfully.
+Use `nipoppy process` without the participant and session flags to process the rest of the study (in a loop). This will skip the participant-session that has previously been run successfully.
 
 ```console
 $ nipoppy process \

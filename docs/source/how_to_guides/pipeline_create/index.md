@@ -96,7 +96,7 @@ pipelines/howto
 ## Edit the configuration files
 
 :::{attention}
-Nipoppy uses string substitutions to inject dataset-specific information (e.g., paths, participant IDs) into configuration files at runtime.
+Nipoppy uses string substitutions to inject study-specific information (e.g., paths, participant IDs) into configuration files at runtime.
 See [this page](<project:../../reference/substitutions.md>) for lists of available substitutions for each type of configuration file.
 :::
 

@@ -9,7 +9,7 @@ This will be indicated in the usage message when running `nipoppy <SUBCOMMAND> -
 
 It is also possible to set these options using `.env` environment files.
 Nipoppy searches the following locations (in order of decreasing priority):
-1. {{dpath_root}}`/.env`: project-level
+1. {{dpath_root}}`/.env`: study-level
 2. `~/.nipoppy/.env`: user-level
 
 The overall order for determining the value of options is as follows (highest to lowest priority):

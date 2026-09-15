@@ -1,6 +1,6 @@
 # The manifest file
 
-The Nipoppy manifest file is a TSV file that contains *expected availability* information about the participants, visits, sessions, and imaging datatypes available in a dataset.
+The Nipoppy manifest file is a TSV file that contains *expected availability* information about the participants, visits, sessions, and imaging datatypes available in a study.
 
 Here is an example manifest file:
 
@@ -22,7 +22,7 @@ Those who are familiar with {term}`BIDS` might notice that this file seems simil
 
 <img alt="Nipoppy protocol" src="../_static/img/nipoppy_protocol.jpg" width=850px>
 
-Conceptually, the manifest file creation is the first step in the Nipoppy protocol (once the Nipoppy dataset has been created).
+Conceptually, the manifest file creation is the first step in the Nipoppy protocol (once the Nipoppy study has been created).
 
 This is where the "Curate" phase of the protocol begins: using information obtained in the "Capture" phase (which may be messy or non/semi-standardized, imaging and/or non-imaging), we build a source of ground truth information that will be critical for knowing which participants and visits (imaging or non-imaging) are expected to exist in the study.
 

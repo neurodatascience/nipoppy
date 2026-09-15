@@ -35,7 +35,7 @@ Fields for configuring image processing pipelines, container runtimes, and high-
     Maximum number of jobs allowed in the {term}`HPC` queue per user. This limit varies based on {term}`HPC` systems.
 
 `PIPELINE_VARIABLES`
-    Dataset-specific configurations for individual pipelines. This section is populated as needed when new pipelines are installed.
+    Study-specific configurations for individual pipelines. This section is populated as needed when new pipelines are installed.
 ```
 
 ## Other

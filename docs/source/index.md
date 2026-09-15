@@ -1,6 +1,6 @@
 # Welcome to the Nipoppy documentation website!
 
-Nipoppy is a lightweight framework for standardized organization and processing of neuroimaging-clinical datasets. Its goal is to help users adopt the [FAIR](https://www.go-fair.org/fair-principles/) principles and improve the reproducibility of studies.
+Nipoppy is a lightweight framework for standardized organization and processing of neuroimaging-clinical studies. Its goal is to help users adopt the [FAIR](https://www.go-fair.org/fair-principles/) principles and improve the reproducibility of studies.
 
 <img alt="Nipoppy protocol" src="_static/img/nipoppy_protocol.jpg" width=850px>
 
@@ -9,7 +9,7 @@ The framework includes three components:
 
 1. A **protocol** for data _wrangling_ to standardize generation of analysis-ready datasets
 
-2. A **specification** for dataset organization that extends the [Brain Imaging Data Structure (BIDS) standard](https://bids.neuroimaging.io/)
+2. A **specification** for study organization that extends the [Brain Imaging Data Structure (BIDS) standard](https://bids.neuroimaging.io/)
 
 3. A **command-line interface** and **Python package** that provide user-friendly tools for applying the framework
 
@@ -83,7 +83,7 @@ how_to_guides/pipeline_run/index
 how_to_guides/tracking/index
 how_to_guides/parallelization/index
 how_to_guides/pipeline_create/index
-Configuring projects <how_to_guides/configuration/index>
+Configuring studies <how_to_guides/configuration/index>
 ```
 
 

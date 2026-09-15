@@ -49,7 +49,7 @@ Below we list several use case scenarios and their touchpoints with Nipoppy for 
 
 The above use cases target individual researchers and data managers to help adopt best-practices and [FAIR](https://www.go-fair.org/fair-principles/) data workflows. This can significantly improve reproducibility, reuse, and reduce duplication of effort - particularly in the following two canonical data governance setups.
 
-- Centralized Nipoppy adoption of medium and large size datasets in a lab or institute
+- Centralized Nipoppy adoption of medium and large size studies in a lab or institute
     - Provides a **single ground truth** and inventory of collected and processed data
     - Streamlines and **avoids duplication** of compute heavy processing
     - Keeps **provenance of processing** configurations

@@ -132,4 +132,4 @@ $ module load rust
 
 ## Next steps
 
-All done? See the [Quickstart guide](quickstart/index.md) next for instructions on how to set up a Nipoppy dataset and configure pipelines.
+All done? See the [Quickstart guide](quickstart/index.md) next for instructions on how to set up a Nipoppy study and configure pipelines.
