@@ -16,7 +16,7 @@ from nipoppy.env import (
     PipelineTypeEnum,
     StrOrPathLike,
 )
-from nipoppy.exceptions import FileOperationError
+from nipoppy.exceptions import FileOperationError, WorkflowError
 from nipoppy.logger import get_logger
 from nipoppy.tabular.manifest import Manifest
 from nipoppy.utils import fileops
@@ -79,11 +79,26 @@ class InitWorkflow(BaseDatasetWorkflow):
         """
         self._validate_study_root()
 
+        if self.bids_source is None:
+            fileops.copy(
+                FPATH_SAMPLE_MANIFEST,
+                self.study.layout.fpath_manifest,
+                exist_ok=True,
+                dry_run=self.dry_run,
+            )
+            logger.warning(
+                f"Sample manifest file copied to {self.study.layout.fpath_manifest}. "
+                "It should be edited to match your dataset."
+            )
+        else:
+            self._handle_bids_source()
+            self._init_manifest_from_bids_dataset()
+
         # create directories
         fileops.mkdir(self.dpath_root / NIPOPPY_DIR_NAME, dry_run=self.dry_run)
         for dpath in self.study.layout.get_paths(directory=True, include_optional=True):
             if self.bids_source is not None and dpath == self.study.layout.dpath_bids:
-                self._handle_bids_source()
+                continue
             elif (
                 self.container_store is not None
                 and dpath == self.study.layout.dpath_containers
@@ -106,21 +121,6 @@ class InitWorkflow(BaseDatasetWorkflow):
 
         # config file
         self._create_config_file()
-
-        # manifest
-        if self.bids_source is not None:
-            self._init_manifest_from_bids_dataset()
-        else:
-            fileops.copy(
-                FPATH_SAMPLE_MANIFEST,
-                self.study.layout.fpath_manifest,
-                exist_ok=True,
-                dry_run=self.dry_run,
-            )
-            logger.warning(
-                f"Sample manifest file copied to {self.study.layout.fpath_manifest}. "
-                "It should be edited to match your dataset."
-            )
 
         # copy dataset description file if specified in layout
         if (
@@ -318,6 +318,12 @@ class InitWorkflow(BaseDatasetWorkflow):
         df[Manifest.col_visit_id] = df[Manifest.col_session_id]
 
         manifest = Manifest(df).validate()
+        if manifest.empty:
+            raise WorkflowError(
+                "No subjects found in BIDS source "
+                f"directory {self.bids_source}. Expected {BIDS_SUBJECT_PREFIX}* "
+                "directories directly inside it."
+            )
         manifest.save_with_backup(
             self.study.layout.fpath_manifest, dry_run=self.dry_run
         )

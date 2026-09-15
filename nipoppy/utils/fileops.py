@@ -33,11 +33,17 @@ def copy(source: Path, target: Path, dry_run=False, exist_ok: bool = False):
     """
     Copy a file or directory.
 
-    Raise an error by default if the target path already exists.
+    Creates missing parent directories.
+
+    Raises
+    ------
+    FileOperationError
+        If the target path already exists and `exist_ok` is False.
     """
     if target.exists() and not exist_ok:
         raise FileOperationError(f"Target already exists: {target}")
 
+    mkdir(target.parent, dry_run=dry_run)
     logger.debug(f"Copying {source} to {target}")
     if not dry_run:
         if source.is_file():
@@ -66,7 +72,6 @@ def copy_template(
         Key-value pairs passed to process_template_str for substitution
     """
     logger.debug(f"Copying template {source} to {dest}")
-    mkdir(dest.parent, dry_run=dry_run)
     copy(source, dest, dry_run=dry_run, exist_ok=exist_ok)
     if not dry_run:
         dest.write_text(

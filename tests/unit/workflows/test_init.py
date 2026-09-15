@@ -1,6 +1,7 @@
 """Tests for the dataset init workflow."""
 
 import os
+import re
 import shutil
 import subprocess
 from collections.abc import Generator
@@ -12,10 +13,16 @@ import pytest_mock
 from fids import fids
 
 from nipoppy.env import FAKE_SESSION_ID, PROGRAM_VERSION
-from nipoppy.exceptions import FileOperationError
+from nipoppy.exceptions import FileOperationError, WorkflowError
 from nipoppy.tabular.manifest import Manifest
 from nipoppy.utils import fileops
-from nipoppy.utils.utils import DPATH_HPC, DPATH_LAYOUTS, FPATH_SAMPLE_CONFIG, load_json
+from nipoppy.utils.utils import (
+    DPATH_HPC,
+    DPATH_LAYOUTS,
+    FPATH_SAMPLE_CONFIG,
+    FPATH_SAMPLE_MANIFEST,
+    load_json,
+)
 from nipoppy.workflows.dataset_init import InitWorkflow
 
 
@@ -113,6 +120,13 @@ def _assert_layout_creation(workflow):
     # check that all directories have been created (using layout-aware paths)
     for dpath in workflow.study.layout.get_paths(directory=True, include_optional=True):
         assert dpath.exists(), f"Expected directory not found: {dpath}"
+        if (
+            workflow.bids_source is not None
+            and dpath == workflow.study.layout.dpath_bids
+        ):
+            # BIDS source directory should be copied/moved/symlinked without
+            # modifications to its contents.
+            continue
         # Check README exists for directories with descriptions (except .nipoppy)
         if dpath != workflow.study.layout.dpath_nipoppy and not dpath.is_symlink():
             readme_path = dpath / "README.md"
@@ -155,10 +169,32 @@ def assert_config_matches(fpath_actual: Path, fpath_expected: Path):
 
 
 @pytest.mark.no_xdist
-def test_run(workflow: InitWorkflow, caplog: pytest.LogCaptureFixture):
+@pytest.mark.parametrize(
+    "fname_layout",
+    ["layout-default.json", "layout-bids-study.json", "layout-0.1.0.json"],
+)
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_run(
+    dpath_root: Path,
+    caplog: pytest.LogCaptureFixture,
+    fname_layout: str,
+    dry_run: bool,
+):
+    workflow = InitWorkflow(
+        dpath_root=dpath_root,
+        fpath_layout=DPATH_LAYOUTS / fname_layout,
+        dry_run=dry_run,
+    )
     workflow.run()
 
-    _assert_layout_creation(workflow)
+    if dry_run:
+        assert not dpath_root.exists()
+    else:
+        _assert_layout_creation(workflow)
+        assert (
+            workflow.study.layout.fpath_manifest.read_text()
+            == FPATH_SAMPLE_MANIFEST.read_text()
+        )
 
     assert f"Successfully initialized a dataset at {workflow.dpath_root}" in caplog.text
 
@@ -438,11 +474,17 @@ def test_bids_study_layout_passes_validation(dpath_root: Path):
     assert result.returncode == 0
 
 
+@pytest.mark.parametrize("mode", ["copy", "move", "symlink"])
+@pytest.mark.parametrize(
+    "fname_layout", ["layout-default.json", "layout-bids-study.json"]
+)
 def test_init_bids(
-    workflow: InitWorkflow,
+    dpath_root: Path,
     fake_bids_root: Path,
     mocker: pytest_mock.MockerFixture,
     caplog: pytest.LogCaptureFixture,
+    mode: str,
+    fname_layout: str,
 ):
     """Test init from an existing BIDS dataset.
 
@@ -451,7 +493,12 @@ def test_init_bids(
     - handle_bids_source is called
     - README has been created
     """
-    workflow.bids_source = fake_bids_root
+    workflow = InitWorkflow(
+        dpath_root=dpath_root,
+        bids_source=fake_bids_root,
+        mode=mode,
+        fpath_layout=DPATH_LAYOUTS / fname_layout,
+    )
 
     mocked_handle_bids_source = mocker.patch.object(
         workflow, "_handle_bids_source", wraps=workflow._handle_bids_source
@@ -463,6 +510,41 @@ def test_init_bids(
     _assert_manifest_creation(workflow)
     mocked_handle_bids_source.assert_called_once()
     assert "Sample manifest file copied" not in caplog.text
+
+
+@pytest.mark.parametrize("mode", ["copy", "move", "symlink"])
+@pytest.mark.parametrize("nested", [False, True], ids=["empty", "nested-bids"])
+def test_init_bids_empty_manifest(
+    workflow: InitWorkflow,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+    mode: str,
+    nested: bool,
+):
+    bids_source = tmp_path / "bids"
+    bids_source.mkdir()
+    if nested:
+        (bids_source / "bids" / "sub-01" / "ses-1" / "anat").mkdir(parents=True)
+
+    workflow.bids_source = bids_source
+    workflow.mode = mode
+
+    with pytest.raises(
+        WorkflowError,
+        match=re.escape(
+            "Cannot initialize an empty manifest: no subjects found in BIDS source "
+            f"directory {str(bids_source)}. "
+            "Expected sub-* directories directly inside it."
+        ),
+    ):
+        workflow.run()
+
+    assert workflow.study.layout.dpath_bids.is_dir()
+    assert workflow.study.layout.dpath_bids.is_symlink() == (mode == "symlink")
+    assert bids_source.exists() == (mode != "move")
+    # Failing to create the manifest from a BIDS dataset should fail immediately.
+    assert list(workflow.dpath_root.iterdir()) == [workflow.study.layout.dpath_bids]
+    assert "Successfully initialized a dataset" not in caplog.text
 
 
 def test_handle_bids_source_invalid_mode(workflow: InitWorkflow, fake_bids_root: Path):
@@ -523,10 +605,12 @@ def test_init_bids_readonly(
     assert not (workflow.study.layout.dpath_bids / "README.md").exists()
 
 
-def test_init_bids_dry_run(workflow: InitWorkflow, fake_bids_root: Path):
+@pytest.mark.parametrize("mode", ["copy", "move", "symlink"])
+def test_init_bids_dry_run(workflow: InitWorkflow, fake_bids_root: Path, mode: str):
     """Copy no file when running in dry mode."""
     dpath_root = workflow.study.layout.dpath_root
     workflow.bids_source = fake_bids_root
+    workflow.mode = mode
     workflow.dry_run = True
     workflow.run()
 
