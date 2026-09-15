@@ -157,18 +157,11 @@ def test_create_from_descriptor(workflow: PipelineCreateWorkflow):
     )
 
 
-@pytest.mark.parametrize(
-    "file_content,exception_message",
-    [
-        ("", "Error validating the descriptor file .*:"),
-        ("{}", "Descriptor file .* is invalid:"),
-    ],
-)
+@pytest.mark.parametrize("file_content", ["", "{}"])
 def test_create_invalid_descriptor(
     tmp_path: Path,
     workflow: PipelineCreateWorkflow,
     file_content: str,
-    exception_message: str,
 ):
     """Test the behavior when the source descriptor is invalid."""
     source_descriptor = tmp_path / "bad_descriptor.json"
@@ -176,5 +169,5 @@ def test_create_invalid_descriptor(
 
     workflow.source_descriptor = source_descriptor
 
-    with pytest.raises(WorkflowError, match=exception_message):
+    with pytest.raises(WorkflowError, match="Error validating the descriptor file .*:"):
         workflow.run_main()

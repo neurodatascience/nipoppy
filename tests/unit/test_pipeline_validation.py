@@ -32,12 +32,6 @@ from tests.conftest import DPATH_TEST_DATA
 
 
 @pytest.fixture()
-def descriptor_str():
-    """Fixture for _check_invocation_file."""
-    return Path(DPATH_TEST_DATA / "descriptor-valid.json").read_text()
-
-
-@pytest.fixture()
 def valid_config_data():
     """Minimal data for a valid BasePipelineConfig."""
     return {
@@ -81,9 +75,7 @@ def test_load_pipeline_config_file_invalid(fpath, exception_class, exception_mes
 
 
 def test_check_descriptor_file(caplog: pytest.LogCaptureFixture):
-    assert isinstance(
-        _check_descriptor_file(DPATH_TEST_DATA / "descriptor-valid.json"), str
-    )
+    _check_descriptor_file(DPATH_TEST_DATA / "descriptor-valid.json")
     assert len(caplog.records) == 0
 
 
@@ -135,8 +127,13 @@ def test_check_descriptor_file_invalid(fpath, exception_class, exception_message
         _check_descriptor_file(fpath)
 
 
-def test_check_invocation_file(descriptor_str):
-    _check_invocation_file(DPATH_TEST_DATA / "invocation-valid.json5", descriptor_str)
+def test_check_invocation_file(caplog: pytest.LogCaptureFixture):
+    _check_invocation_file(
+        DPATH_TEST_DATA / "invocation-valid.json5",
+        DPATH_TEST_DATA / "descriptor-valid.json",
+    )
+
+    assert len(caplog.records) == 0
 
 
 @pytest.mark.parametrize(
@@ -150,11 +147,9 @@ def test_check_invocation_file(descriptor_str):
         ),
     ],
 )
-def test_check_invocation_file_invalid(
-    fpath, exception_class, exception_message, descriptor_str
-):
+def test_check_invocation_file_invalid(fpath, exception_class, exception_message):
     with pytest.raises(exception_class, match=exception_message):
-        _check_invocation_file(fpath, descriptor_str)
+        _check_invocation_file(fpath, DPATH_TEST_DATA / "descriptor-valid.json")
 
 
 def test_check_hpc_config_file():

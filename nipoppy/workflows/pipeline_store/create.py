@@ -3,8 +3,6 @@
 import warnings
 from pathlib import Path
 
-import boutiques
-
 from nipoppy.env import PROGRAM_VERSION, PipelineTypeEnum
 from nipoppy.exceptions import FileOperationError, WorkflowError
 from nipoppy.layout import DatasetLayout
@@ -13,7 +11,7 @@ from nipoppy.pipeline_validation import _load_pipeline_config_file
 from nipoppy.utils import fileops
 from nipoppy.utils.json5 import update_json5_file
 from nipoppy.utils.utils import TEMPLATE_PIPELINE_PATH, load_json
-from nipoppy.workflows.base import BaseWorkflow
+from nipoppy.workflows.base import BaseWorkflow, _run_command
 
 logger = get_logger()
 
@@ -66,20 +64,26 @@ class PipelineCreateWorkflow(BaseWorkflow):
 
         descriptor_path = target.joinpath(pipeline_step_config.DESCRIPTOR_FILE)
         if source_descriptor is not None:
-            try:
-                boutiques.validate(str(source_descriptor))
-            except boutiques.DescriptorValidationError as exception:
+            process, (stdout, stderr) = _run_command(
+                ["bosh", "validate", str(source_descriptor)],
+                check=False,
+                log_command=False,
+                log_output=False,
+                capture_output=True,
+            )
+            if process.returncode != 0:
                 raise WorkflowError(
-                    f"Descriptor file {source_descriptor} is invalid:\n{exception}"
-                )
-            except ValueError as exception:  # catches simplejson.errors.JSONDecodeError
-                raise WorkflowError(
-                    "Error validating the descriptor file "
-                    f"{source_descriptor}:\n{exception}"
+                    f"Error validating the descriptor file {source_descriptor}:"
+                    f"\n{stdout}\n{stderr}"
                 )
             fileops.copy(source_descriptor, descriptor_path, dry_run=self.dry_run)
         else:
-            boutiques.create(str(descriptor_path))
+            _run_command(
+                ["bosh", "create", str(descriptor_path)],
+                check=True,
+                log_command=False,
+                log_output=False,
+            )
 
         substitutions = {"version": PROGRAM_VERSION}
 
@@ -92,8 +96,15 @@ class PipelineCreateWorkflow(BaseWorkflow):
             dry_run=self.dry_run,
         )
         # then append the actual example invocation
+        _, (stdout, _) = _run_command(
+            ["bosh", "example", str(descriptor_path)],
+            check=True,
+            log_command=False,
+            log_output=False,
+            capture_output=True,
+        )
         with invocation_path.open("a") as file_invocation:
-            file_invocation.write(boutiques.example(str(descriptor_path)))
+            file_invocation.write(stdout)
 
         fileops.copy_template(
             TEMPLATE_PIPELINE_PATH.joinpath(pipeline_step_config.HPC_CONFIG_FILE),

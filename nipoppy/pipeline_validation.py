@@ -4,7 +4,6 @@ import json
 import logging
 from pathlib import Path
 
-import boutiques
 from pydantic_core import ValidationError
 
 from nipoppy.config.hpc import HpcConfig
@@ -22,6 +21,7 @@ from nipoppy.exceptions import ConfigError, FileOperationError
 from nipoppy.layout import DatasetLayout, LayoutError
 from nipoppy.logger import get_logger
 from nipoppy.utils.utils import TEMPLATE_REPLACE_PATTERN, load_json
+from nipoppy.workflows.base import _run_command
 
 logger = get_logger()
 
@@ -62,9 +62,7 @@ def _load_pipeline_config_file(
     return config
 
 
-def _check_descriptor_file(
-    fpath_descriptor: StrOrPathLike, strict: bool = False
-) -> str:
+def _check_descriptor_file(fpath_descriptor: StrOrPathLike, strict: bool = False):
     """Validate a Boutiques descriptor file."""
     fpath_descriptor: Path = Path(fpath_descriptor)
     if not fpath_descriptor.exists():
@@ -73,11 +71,16 @@ def _check_descriptor_file(
     descriptor_dict = load_json(fpath_descriptor)
 
     descriptor_str = json.dumps(descriptor_dict)
-    try:
-        boutiques.validate(descriptor_str)
-    except boutiques.DescriptorValidationError as exception:
+    process, (stdout, stderr) = _run_command(
+        ["bosh", "validate", str(fpath_descriptor)],
+        check=False,
+        log_command=False,
+        log_output=False,
+        capture_output=True,
+    )
+    if process.returncode != 0:
         raise ConfigError(
-            f"Descriptor file {fpath_descriptor} is invalid:\n{exception}"
+            f"Descriptor file {fpath_descriptor} is invalid:\n{stdout}\n{stderr}"
         )
 
     if TEMPLATE_REPLACE_PATTERN.search(descriptor_str) is not None:
@@ -94,10 +97,8 @@ def _check_descriptor_file(
                 + "This will be deprecated in the future: you should update this file following steps listed in https://nipoppy.readthedocs.io/en/0.4.1/changelog.html#release-0-4-1."  # noqa E501
             )
 
-    return descriptor_str
 
-
-def _check_invocation_file(fpath_invocation: Path, descriptor_str: str) -> None:
+def _check_invocation_file(fpath_invocation: Path, fpath_descriptor: Path) -> None:
     """Validate a Boutiques invocation file."""
     fpath_invocation: Path = Path(fpath_invocation)
     if not fpath_invocation.exists():
@@ -105,13 +106,22 @@ def _check_invocation_file(fpath_invocation: Path, descriptor_str: str) -> None:
 
     invocation_dict = load_json(fpath_invocation, allow_json5=True)
 
-    try:
-        boutiques.invocation(
-            "--invocation", json.dumps(invocation_dict), descriptor_str
-        )
-    except boutiques.InvocationValidationError as exception:
+    process, (stdout, stderr) = _run_command(
+        [
+            "bosh",
+            "invocation",
+            "--invocation",
+            json.dumps(invocation_dict),
+            str(fpath_descriptor),
+        ],
+        check=False,
+        log_command=False,
+        log_output=False,
+        capture_output=True,
+    )
+    if process.returncode != 0:
         raise ConfigError(
-            f"Invocation file {fpath_invocation} is invalid:\n{exception}"
+            f"Invocation file {fpath_invocation} is invalid:\n{stdout}\n{stderr}"
         )
 
 
@@ -202,7 +212,7 @@ def _check_pipeline_files(
                 msg=f"\tChecking descriptor file: {step.DESCRIPTOR_FILE}",
             )
             fpath_descriptor = dpath_bundle / step.DESCRIPTOR_FILE
-            descriptor_str = _check_descriptor_file(fpath_descriptor, strict=strict)
+            _check_descriptor_file(fpath_descriptor, strict=strict)
             fpaths.append(fpath_descriptor)
 
             if step.INVOCATION_FILE is not None:
@@ -211,7 +221,7 @@ def _check_pipeline_files(
                     msg=f"\tChecking invocation file: {step.INVOCATION_FILE}",
                 )
                 fpath_invocation = dpath_bundle / step.INVOCATION_FILE
-                _check_invocation_file(fpath_invocation, descriptor_str)
+                _check_invocation_file(fpath_invocation, fpath_descriptor)
                 fpaths.append(fpath_invocation)
 
         if step.HPC_CONFIG_FILE is not None:

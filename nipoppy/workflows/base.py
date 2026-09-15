@@ -55,7 +55,7 @@ class CommandRunner(Protocol):
         /,
         *,
         check: bool = True,
-        quiet: bool = False,
+        log_command: bool = True,
         dry_run: bool = False,
     ) -> subprocess.Popen[str] | str:
         """Run a command in a subprocess, with logging and dry-run support."""
@@ -67,18 +67,20 @@ def _run_command(
     /,
     *,
     check: bool = True,
-    quiet: bool = False,
+    log_command: bool = True,
+    log_output: bool = True,
+    capture_output: bool = False,
     dry_run: bool = False,
     **kwargs,
-) -> subprocess.Popen[str] | str:
+) -> subprocess.Popen[str] | tuple[subprocess.Popen[str], tuple[str, str]] | str:
     """Run a command in a subprocess.
 
-    The command's stdout and stderr outputs are written to the log
-    with special prefixes.
+    If `log_command` is True, the command's stdout and stderr outputs are
+    written to the log with special prefixes.
 
     If in "dry run" mode, the command is not executed, and the method returns
-    the command string. Otherwise, the subprocess.Popen object is returned
-    unless capture_output is True.
+    the command string. Otherwise, the subprocess.Popen object is returned. If
+    `capture_output` is True, stdout and stderr output are returned as well.
 
     Parameters
     ----------
@@ -87,27 +89,42 @@ def _run_command(
     check : bool, optional
         If True, raise an error if the process exits with a non-zero code,
         by default True
-    quiet : bool, optional
-        If True, do not log the command, by default False
+    log_command : bool, optional
+        Whether or not to log the command, by default True
+    log_output : bool, optional
+        Whether or not to log the command output, by default True
+    capture_output : bool, optional
+        Whether or not to capture the output, by default False
+    dry_run : bool, optional
+        If True, do not execute the command, by default False
     **kwargs
         Passed to `subprocess.Popen`.
 
     Returns
     -------
-    subprocess.Popen or str
+    subprocess.Popen[str] or tuple[subprocess.Popen[str], tuple[str, str]] or str
+        The subprocess.Popen object if the command was executed, or the command
+        string if in dry run mode. If `capture_output` is True, a tuple of the
+        subprocess.Popen object and a tuple of (stdout, stderr) strings is
+        returned.
     """
 
-    def process_output(output_source, log_prefix: str, log_level=logging.INFO):
+    def process_output(
+        output_source, log_prefix: str, output_list: list, log_level=logging.INFO
+    ):
         """Consume lines from an IO stream and log them."""
         for line in output_source:
             line = line.strip("\n")
-            # using extra={"markup": False} in case the output contains substrings
-            # that would be interpreted as closing tags by the RichHandler
-            logger.log(
-                level=log_level,
-                msg=f"{log_prefix} {line}",
-                extra={"markup": False},
-            )
+            if log_output:
+                # using extra={"markup": False} in case the output contains substrings
+                # that would be interpreted as closing tags by the RichHandler
+                logger.log(
+                    level=log_level,
+                    msg=f"{log_prefix} {line}",
+                    extra={"markup": False},
+                )
+            if output_list is not None:
+                output_list.append(line)
 
     # build command string
     if not isinstance(command_or_args, str):
@@ -121,7 +138,7 @@ def _run_command(
     if not kwargs.get("shell"):
         command_or_args = args
 
-    if not quiet:
+    if log_command:
         _log_command(command)
 
     if not dry_run:
@@ -133,22 +150,31 @@ def _run_command(
             **kwargs,
         )
 
+        stdout_list = []
+        stderr_list = []
         while process.poll() is None:
             process_output(
                 process.stdout,
                 LogPrefix.RUN_STDOUT,
+                stdout_list,
             )
 
             process_output(
                 process.stderr,
                 LogPrefix.RUN_STDERR,
+                stderr_list,
                 log_level=logging.ERROR,
             )
 
         if check and process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, command)
 
-        run_output = process
+        if capture_output:
+            stdout = "\n".join(stdout_list)
+            stderr = "\n".join(stderr_list)
+            run_output = (process, (stdout, stderr))
+        else:
+            run_output = process
 
     else:
         run_output = command

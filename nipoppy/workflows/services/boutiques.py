@@ -85,7 +85,7 @@ def _run_bosh_command(
     logger.info(f"{mode} pipeline command")
 
     try:
-        run_command(command, quiet=True, dry_run=dry_run)
+        run_command(command, log_command=False, dry_run=dry_run)
     except subprocess.CalledProcessError as exception:
         raise ExecutionError(error_message_builder(exception.returncode))
 

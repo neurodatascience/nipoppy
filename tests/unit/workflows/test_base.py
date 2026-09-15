@@ -65,6 +65,15 @@ def test_run_command(tmp_path: Path):
     assert fpath.exists()
 
 
+@pytest.mark.no_xdist
+def test_run_command_capture_output(tmp_path: Path):
+    fpath = tmp_path / "test.txt"
+    process, (stdout, stderr) = _run_command(["echo", fpath], capture_output=True)
+    assert process.returncode == 0
+    assert stdout == str(fpath)
+    assert stderr == ""
+
+
 def test_run_command_single_string(tmp_path: Path):
     fpath = tmp_path / "test.txt"
     process = _run_command(f"touch {fpath}", shell=True)
@@ -97,8 +106,18 @@ def test_run_command_no_markup(caplog: pytest.LogCaptureFixture, tmp_path: Path)
 
 
 @pytest.mark.no_xdist
-def test_run_command_quiet(caplog: pytest.LogCaptureFixture):
+def test_run_command_log_command_false(caplog: pytest.LogCaptureFixture):
     message = "This should be printed"
-    _run_command(["echo", message], quiet=True)
+    _run_command(["echo", message], log_command=False)
     assert LogPrefix.RUN not in caplog.text
+    assert LogPrefix.RUN_STDOUT in caplog.text
+    assert message in caplog.text
+
+
+@pytest.mark.no_xdist
+def test_run_command_log_output_false(caplog: pytest.LogCaptureFixture):
+    message = "This should be printed"
+    _run_command(["echo", message], log_output=False)
+    assert LogPrefix.RUN in caplog.text
+    assert LogPrefix.RUN_STDOUT not in caplog.text
     assert message in caplog.text
