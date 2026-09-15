@@ -44,6 +44,8 @@ def test_session_id_to_bids_session_id(session, expected):
         (None, True, True, None),
         ("P-01", True, False, None),
         ("sub_01", False, False, None),
+        ("", False, False, None),
+        ("sub-", False, False, None),
     ],
 )
 def test_check_participant_id(participant_id, raise_error, is_valid, expected):
@@ -68,6 +70,8 @@ def test_check_participant_id(participant_id, raise_error, is_valid, expected):
         (None, True, True, None),
         ("-01", True, False, None),
         ("1_", False, False, None),
+        ("", False, False, None),
+        ("ses-", False, False, None),
     ],
 )
 def test_check_session_id(session_id, raise_error, is_valid, expected):

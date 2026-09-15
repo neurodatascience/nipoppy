@@ -77,6 +77,11 @@ def test_validate_sessions_visits(session_ids, visit_ids, is_valid):
     "data,session_id,expected_count",
     [
         (
+            (["01", "02"], ["BL", "M12"], [None, None], [["anat"], ["anat"]]),
+            None,
+            0,
+        ),
+        (
             (["01"], ["BL"], None, [[]]),
             "BL",
             0,

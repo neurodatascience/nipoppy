@@ -154,6 +154,7 @@ def test_validate_duplicate_records(data):
             1,
         ),
         ({"a": ["A", "B", "C", "D"], "b": [1, 2, 3, 4]}, {"a": [], "b": []}, 4),
+        ({"a": [], "b": []}, {"a": ["A", "B"], "b": [1, 2]}, 0),
     ],
 )
 def test_get_diff(data1, data2, expected_count):
@@ -189,6 +190,12 @@ def test_get_diff_invalid_cols():
 @pytest.mark.parametrize(
     "original,index_cols,to_add,expected",
     [
+        [
+            [{"a": "A", "b": 1}],
+            ["b"],
+            [],
+            [{"a": "A", "b": 1}],
+        ],
         [
             [{"a": "A", "b": 1}],
             ["b"],

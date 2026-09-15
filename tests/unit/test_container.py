@@ -106,6 +106,13 @@ def test_check_command_exists_error(
                 f"{Path('relative_path').resolve()}:{Path('relative_path').resolve()}:rw",  # noqa: E501
             ],
         ),
+        (
+            [],
+            "/my/local/path",
+            None,
+            None,
+            ["-B", "/my/local/path:/my/local/path"],
+        ),
     ],
 )
 def test_add_bind_arg(
