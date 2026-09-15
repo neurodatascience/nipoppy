@@ -91,36 +91,54 @@ class PipelineTracker(BasePipelineWorkflow):
                 with tarfile.open(fpath_tarball) as tarball:
                     paths_tarred = tarball.getnames()
 
+        any_incomplete = False
+
         for relative_path in relative_paths:
             relative_path = Path(relative_path)
-            logger.debug(f"Checking path {self.dpath_pipeline_output / relative_path}")
+            absolute_path = self.dpath_pipeline_output / relative_path
+            logger.debug(f"Checking path {absolute_path}")
 
             matches_glob = list(self.dpath_pipeline_output.glob(str(relative_path)))
             logger.debug(f"Matches: {matches_glob}")
 
-            # also check tarball paths if applicable/needed
-            if (not matches_glob) and (relative_dpath_tarred is not None):
-                # NOTE
-                # The behaviour of Path.match() is not exactly the same as glob
-                # but it should be good enough for now. What we really need is
-                # Path.full_match(), but that was only introduced in Python 3.13
-                matches_tarred = [
-                    path_tarred
-                    for path_tarred in paths_tarred
-                    if Path(path_tarred).match(
-                        str(
-                            Path(relative_path).relative_to(
-                                Path(relative_dpath_tarred).parent
-                            )
-                        ),
-                    )
-                ]
-                logger.debug(f"Matches in tarball: {matches_tarred}")
+            if matches_glob:
+                # Check for broken symlinks (e.g. git-annex without content)
+                if any(p.is_symlink() and not p.exists() for p in matches_glob):
+                    any_incomplete = True
             else:
-                matches_tarred = []
+                # Path.glob() with literal paths does not return broken symlinks,
+                # so check directly whether the path is a broken symlink
+                if absolute_path.is_symlink() and not absolute_path.exists():
+                    any_incomplete = True
+                    continue
 
-            if not (matches_glob or matches_tarred):
-                return ProcessingStatusTable.status_fail
+                # also check tarball paths if applicable/needed
+                if relative_dpath_tarred is not None:
+                    # NOTE
+                    # The behaviour of Path.match() is not exactly the same as
+                    # glob but it should be good enough for now. What we really
+                    # need is Path.full_match(), but that was only introduced
+                    # in Python 3.13
+                    matches_tarred = [
+                        path_tarred
+                        for path_tarred in paths_tarred
+                        if Path(path_tarred).match(
+                            str(
+                                Path(relative_path).relative_to(
+                                    Path(relative_dpath_tarred).parent
+                                )
+                            ),
+                        )
+                    ]
+                    logger.debug(f"Matches in tarball: {matches_tarred}")
+                else:
+                    matches_tarred = []
+
+                if not matches_tarred:
+                    return ProcessingStatusTable.status_fail
+
+        if any_incomplete:
+            return ProcessingStatusTable.status_unavailable
 
         return ProcessingStatusTable.status_success
 

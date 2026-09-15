@@ -162,6 +162,56 @@ def test_check_status(tracker: PipelineTracker, relative_paths, expected_status)
     assert tracker.check_status(relative_paths) == expected_status
 
 
+@pytest.mark.ai_generated
+@pytest.mark.parametrize(
+    "relative_paths,broken_symlinks,regular_files,expected_status",
+    [
+        # One broken symlink + one regular file → UNAVAILABLE
+        (
+            ["dirA/01_ses-1.txt", "dirA/dirB/file.txt"],
+            ["dirA/01_ses-1.txt"],
+            ["dirA/dirB/file.txt"],
+            ProcessingStatusTable.status_unavailable,
+        ),
+        # All broken symlinks → UNAVAILABLE
+        (
+            ["dirA/01_ses-1.txt", "dirA/dirB/file.txt"],
+            ["dirA/01_ses-1.txt", "dirA/dirB/file.txt"],
+            [],
+            ProcessingStatusTable.status_unavailable,
+        ),
+        # Broken symlink + missing file → FAIL (FAIL takes priority)
+        (
+            ["dirA/01_ses-1.txt", "dirA/dirB/file.txt", "missing.txt"],
+            ["dirA/01_ses-1.txt"],
+            ["dirA/dirB/file.txt"],
+            ProcessingStatusTable.status_fail,
+        ),
+    ],
+)
+def test_check_status_broken_symlinks(
+    tracker: PipelineTracker,
+    relative_paths,
+    broken_symlinks,
+    regular_files,
+    expected_status,
+):
+    """Test that broken symlinks (git-annex) yield UNAVAILABLE status."""
+    # Create regular files
+    for relative_path in regular_files:
+        fpath = tracker.dpath_pipeline_output / relative_path
+        fpath.parent.mkdir(parents=True, exist_ok=True)
+        fpath.touch()
+
+    # Create broken symlinks (simulating git-annex without content)
+    for relative_path in broken_symlinks:
+        fpath = tracker.dpath_pipeline_output / relative_path
+        fpath.parent.mkdir(parents=True, exist_ok=True)
+        fpath.symlink_to("/nonexistent-annex-target")
+
+    assert tracker.check_status(relative_paths) == expected_status
+
+
 @pytest.mark.parametrize(
     "relative_paths,relative_dpath_to_tar,expected_status",
     [
